@@ -12,16 +12,30 @@ defmodule WeChat.ServerMessage.EventHandler do
   alias WeChat.ServerMessage.{Encryptor, XmlParser, XmlMessage}
 
   def handle_event(params, body, client) do
-    decode_msg(body, params["msg_signature"], params["nonce"], params["timestamp"], client)
+    with {:ok, %{"Encrypt" => encrypt_content}} <- XmlParser.parse(body) do
+      decode_msg(
+        encrypt_content,
+        params["msg_signature"],
+        params["nonce"],
+        params["timestamp"],
+        client
+      )
+    else
+      {:ok, xml} when is_map(xml) ->
+        # 明文模式
+        {:ok, :plaqin_text, xml}
+
+      _error ->
+        {:error, "invalid"}
+    end
   end
 
   def decode_msg(encrypt_content, signature, nonce, timestamp, client) do
-    with {:ok, %{"Encrypt" => encrypt_content}} <- XmlParser.parse(encrypt_content),
-         ^signature <- Encryptor.get_sha1([client.token(), encrypt_content, nonce, timestamp]),
+    with ^signature <- Encryptor.get_sha1([client.token(), encrypt_content, nonce, timestamp]),
          appid <- client.appid(),
          {^appid, xml} <- Encryptor.decrypt(encrypt_content, client.encoding_aes_key()),
          {:ok, xml} <- XmlParser.parse(xml) do
-      {:ok, Map.put(xml, "appid", appid)}
+      {:ok, :encrypted, xml}
     else
       _error ->
         {:error, "invalid"}
