@@ -3,10 +3,12 @@ defmodule WeChat.ServerMessage.Encryptor do
   消息加解密
   [API Docs Link](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Technical_Plan.html)
   """
+  @type encoding_aes_key :: String.t()
 
   @aes_block_size 16
   @pad_block_size 32
 
+  @spec get_sha1([String.t()]) :: signature :: String.t()
   def get_sha1(list) do
     str_to_sign =
       list
@@ -16,6 +18,8 @@ defmodule WeChat.ServerMessage.Encryptor do
     :crypto.hash(:sha, str_to_sign) |> Base.encode16(case: :lower)
   end
 
+  @spec encrypt(msg :: String.t(), WeChat.appid(), encoding_aes_key()) ::
+          msg_encrypted :: String.t()
   def encrypt(msg, appid, encoding_aes_key) do
     aes_key = aes_key(encoding_aes_key)
 
@@ -26,6 +30,8 @@ defmodule WeChat.ServerMessage.Encryptor do
     |> Base.encode64()
   end
 
+  @spec decrypt(msg_encrypted :: String.t(), encoding_aes_key()) ::
+          {WeChat.appid(), xml :: String.t()}
   def decrypt(msg_encrypted, encoding_aes_key) do
     aes_key = aes_key(encoding_aes_key)
 

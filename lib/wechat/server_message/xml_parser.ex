@@ -3,10 +3,12 @@ defmodule WeChat.ServerMessage.XmlParser do
 
   @behaviour Saxy.Handler
 
+  @spec parse(xml :: String.t()) :: {:ok, map()}
   def parse(xml) do
     Saxy.parse_string(xml, __MODULE__, [])
   end
 
+  @impl true
   def handle_event(:start_document, _prolog, stack) do
     {:ok, stack}
   end

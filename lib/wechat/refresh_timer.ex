@@ -6,10 +6,12 @@ defmodule WeChat.RefreshTimer do
 
   @default_opts %{role: :common, store_adapter: WeChat.StoreAdapter.Default}
 
+  @spec add(client :: WeChat.client(), opts :: map()) :: :ok
   def add(client, opts) do
     GenServer.call(__MODULE__, {:add, client, opts})
   end
 
+  @spec refresh(client :: WeChat.client()) :: :ok | :nofound
   def refresh(client) do
     GenServer.call(__MODULE__, {:refresh, client})
   end

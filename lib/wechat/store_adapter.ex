@@ -1,7 +1,11 @@
 defmodule WeChat.StoreAdapter do
   @moduledoc false
-  @callback store(appid :: String.t(), store_key :: atom(), map()) :: :ok
-  @callback get(appid :: String.t(), store_key :: atom()) :: {:ok, map()}
+  @type appid :: String.t()
+  @type store_key :: atom()
+  @type value :: map()
+
+  @callback store(appid :: String.t(), store_key :: atom(), value :: map()) :: :ok
+  @callback get(appid :: String.t(), store_key :: atom()) :: {:ok, value :: map()}
 end
 
 defmodule WeChat.StoreAdapter.Default do
@@ -9,8 +13,11 @@ defmodule WeChat.StoreAdapter.Default do
   @behaviour WeChat.StoreAdapter
   @app :wechat
   @store_file "wechat_app_tokens.json"
+  alias WeChat.StoreAdapter
 
-  def store(appid, store_key, map) do
+  @impl true
+  @spec store(StoreAdapter.appid(), StoreAdapter.store_key(), StoreAdapter.value()) :: :ok | any()
+  def store(appid, store_key, value) do
     file = Path.join([:code.priv_dir(@app), @store_file])
 
     with store_key <- to_string(store_key),
@@ -18,7 +25,7 @@ defmodule WeChat.StoreAdapter.Default do
       content =
         string
         |> Jason.decode!()
-        |> Map.update(appid, %{store_key => map}, &Map.put(&1, store_key, map))
+        |> Map.update(appid, %{store_key => value}, &Map.put(&1, store_key, value))
         |> Jason.encode!()
 
       File.write(file, content)
@@ -27,23 +34,25 @@ defmodule WeChat.StoreAdapter.Default do
         with :ok <-
                Path.dirname(file)
                |> File.mkdir_p() do
-          content = Jason.encode!(%{appid => %{store_key => map}})
+          content = Jason.encode!(%{appid => %{store_key => value}})
           File.write(file, content)
         end
     end
   end
 
+  @impl true
+  @spec get(StoreAdapter.appid(), StoreAdapter.store_key()) :: {:ok, StoreAdapter.value()}
   def get(appid, store_key) do
     file = Path.join([:code.priv_dir(@app), @store_file])
 
     with store_key <- to_string(store_key),
          {:ok, string} <- File.read(file) do
-      map =
+      value =
         string
         |> Jason.decode!()
         |> get_in([appid, store_key])
 
-      {:ok, map}
+      {:ok, value}
     end
   end
 end
