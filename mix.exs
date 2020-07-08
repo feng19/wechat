@@ -43,6 +43,12 @@ defmodule WeChat.MixProject do
       formatter_opts: [gfm: true],
       extras: ["README.md"],
       groups_for_modules: [
+        {"Basic",
+         [
+           WeChat,
+           WeChat.Requester
+         ]},
+        {"Structure", [WeChat.Article]},
         {
           "用户管理 APIs",
           [
@@ -98,9 +104,7 @@ defmodule WeChat.MixProject do
             # 第三方平台
             WeChat.Component
           ]
-        },
-        {"Basic Types", [WeChat]},
-        {"Structure", [WeChat.Article]}
+        }
       ]
     ]
   end

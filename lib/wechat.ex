@@ -1,5 +1,7 @@
 defmodule WeChat do
-  @moduledoc false
+  @moduledoc """
+  WeChat SDK for Elixir
+  """
 
   @type appid :: String.t()
   @type openid :: String.t()
