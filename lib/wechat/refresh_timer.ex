@@ -122,7 +122,7 @@ defmodule WeChat.RefreshTimer do
   end
 
   defp refresh_ticket(ticket_type, store_key, client, store_adapter) do
-    with {:ok, %{status: 200, body: data}} <- WeChat.JS.get_ticket(client, ticket_type),
+    with {:ok, %{status: 200, body: data}} <- WeChat.WebApp.get_ticket(client, ticket_type),
          %{"ticket" => ticket, "expires_in" => expires_in} <- data do
       expired_time = Utils.now_unix() + expires_in
       store(store_key, ticket, expired_time, client, store_adapter)

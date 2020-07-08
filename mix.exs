@@ -85,8 +85,8 @@ defmodule WeChat.MixProject do
             WeChat.Comment,
             # 账号管理
             WeChat.Account,
-            # JS-SDK(WIP)
-            WeChat.JS,
+            # 网页开发(WIP)
+            WeChat.WebApp,
             # 第三方平台
             WeChat.Component,
             # 微信推送消息处理

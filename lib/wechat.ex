@@ -6,8 +6,16 @@ defmodule WeChat do
   @type unionid :: String.t()
   @type username :: String.t()
 
+  @typedoc """
+  国家地区语言
+    * `"zh_CN"` - 简体
+    * `"zh_TW"` - 繁体
+    * `"en"` - 英语
+  """
+  @type lang :: String.t()
+
   @type client :: module
-  @type response :: {:ok, status :: integer, data :: map} | Tesla.Env.result()
+  @type response :: Tesla.Env.result()
 
   @common_modules [
     WeChat.Material,
@@ -23,7 +31,7 @@ defmodule WeChat do
     WeChat.UserBlacklist,
     WeChat.Account,
     WeChat.Comment,
-    WeChat.JS
+    WeChat.WebApp
   ]
 
   defmacro __using__(opts \\ []) do
