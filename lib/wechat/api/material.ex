@@ -28,10 +28,7 @@ defmodule WeChat.Material do
   @type article :: WeChat.Article.t()
 
   @doc """
-  新增临时素材 - 文件
-
-  ## API Docs
-    [link](#{@doc_link}/New_temporary_materials.html){:target="_blank"}
+  新增临时素材 - 文件 - [Official API Docs Link](#{@doc_link}/New_temporary_materials.html){:target="_blank"}
   """
   @spec upload_media(WeChat.client(), material_type, file_path :: Path.t()) :: WeChat.response()
   def upload_media(client, type, file_path) do
@@ -46,10 +43,7 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  新增临时素材 - binary
-
-  ## API Docs
-    [link](#{@doc_link}/New_temporary_materials.html){:target="_blank"}
+  新增临时素材 - binary - [Official API Docs Link](#{@doc_link}/New_temporary_materials.html){:target="_blank"}
   """
   @spec upload_media(
           WeChat.client(),
@@ -69,10 +63,7 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  获取临时素材
-
-  ## API Docs
-    [link](#{@doc_link}/Get_temporary_materials.html){:target="_blank"}
+  获取临时素材 - [Official API Docs Link](#{@doc_link}/Get_temporary_materials.html){:target="_blank"}
   """
   @spec get_media(WeChat.client(), media_id) :: WeChat.response()
   def get_media(client, media_id) do
@@ -85,10 +76,7 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  新增永久图文素材
-
-  ## API Docs
-    [link](#{@doc_link}/Adding_Permanent_Assets.html#新增永久图文素材){:target="_blank"}
+  新增永久图文素材 - [Official API Docs Link](#{@doc_link}/Adding_Permanent_Assets.html#新增永久图文素材){:target="_blank"}
   """
   @spec add_news(WeChat.client(), articles :: [article]) :: WeChat.response()
   def add_news(client, articles) do
@@ -100,10 +88,7 @@ defmodule WeChat.Material do
   end
 
   #  @doc """
-  #  上传图文消息内的图片获取URL
-  #
-  #  ## API Docs
-  #    [link](#{@doc_link}/Adding_Permanent_Assets.html#上传图文消息内的图片获取URL){:target="_blank"}
+  #  上传图文消息内的图片获取URL - [Official API Docs Link](#{@doc_link}/Adding_Permanent_Assets.html#上传图文消息内的图片获取URL){:target="_blank"}
   #  """
   #  @spec upload_image(WeChat.client, file_path :: Path.t) :: WeChat.response
   #  def upload_image(client, file_path) do
@@ -115,20 +100,14 @@ defmodule WeChat.Material do
   #  end
   #
   #  @doc """
-  #  新增其他类型永久素材
-  #
-  #  ## API Docs
-  #    [link](#{@doc_link}/Adding_Permanent_Assets.html#新增其他类型永久素材){:target="_blank"}
+  #  新增其他类型永久素材 - [Official API Docs Link](#{@doc_link}/Adding_Permanent_Assets.html#新增其他类型永久素材){:target="_blank"}
   #  """
   #  def add_material(client) do
   #    :todo
   #  end
 
   @doc """
-  获取永久素材
-
-  ## API Docs
-    [link](#{@doc_link}/Getting_Permanent_Assets.html){:target="_blank"}
+  获取永久素材 - [Official API Docs Link](#{@doc_link}/Getting_Permanent_Assets.html){:target="_blank"}
   """
   @spec get_material(WeChat.client(), media_id) :: WeChat.response()
   def get_material(client, media_id) do
@@ -140,10 +119,7 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  删除永久素材
-
-  ## API Docs
-    [link](#{@doc_link}/Deleting_Permanent_Assets.html){:target="_blank"}
+  删除永久素材 - [Official API Docs Link](#{@doc_link}/Deleting_Permanent_Assets.html){:target="_blank"}
   """
   @spec del_material(WeChat.client(), media_id) :: WeChat.response()
   def del_material(client, media_id) do
@@ -155,10 +131,7 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  修改永久图文素材
-
-  ## API Docs
-    [link](#{@doc_link}/Editing_Permanent_Rich_Media_Assets.html){:target="_blank"}
+  修改永久图文素材 - [Official API Docs Link](#{@doc_link}/Editing_Permanent_Rich_Media_Assets.html){:target="_blank"}
   """
   @spec update_news(WeChat.client(), media_id, article, index :: integer) :: WeChat.response()
   def update_news(client, media_id, article, index \\ 0) do
@@ -180,10 +153,7 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  获取素材总数
-
-  ## API Docs
-    [link](#{@doc_link}/Get_the_total_of_all_materials.html){:target="_blank"}
+  获取素材总数 - [Official API Docs Link](#{@doc_link}/Get_the_total_of_all_materials.html){:target="_blank"}
   """
   @spec get_material_count(WeChat.client()) :: WeChat.response()
   def get_material_count(client) do
@@ -193,15 +163,12 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  获取素材列表
+  获取素材列表 - [Official API Docs Link](#{@doc_link}/Get_materials_list.html){:target="_blank"}
 
   ## 参数说明:
     * type:   素材的类型，图片（image）、视频（video）、语音 （voice）、图文（news）
     * offset: 从全部素材的该偏移位置开始返回，0表示从第一个素材 返回
     * count:  返回素材的数量，取值在1到20之间
-
-  ## API Docs
-    [link](#{@doc_link}/Get_materials_list.html){:target="_blank"}
   """
   @spec batch_get_material(WeChat.client(), material_type, material_count, offset :: integer) ::
           WeChat.response()

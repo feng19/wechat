@@ -1,5 +1,5 @@
 defmodule WeChat.Requester do
-  use Tesla
+  use Tesla, only: [:get, :post]
 
   adapter(Tesla.Adapter.Hackney)
 

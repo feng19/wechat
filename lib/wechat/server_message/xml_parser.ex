@@ -1,5 +1,5 @@
 defmodule WeChat.ServerMessage.XmlParser do
-  @moduledoc false
+  @moduledoc "XML Parser"
 
   @behaviour Saxy.Handler
 

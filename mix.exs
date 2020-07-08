@@ -76,6 +76,14 @@ defmodule WeChat.MixProject do
            # 微信卡券 - 投放卡券
            WeChat.CardDistributing
          ]},
+        {"Server Message",
+         [
+           # 微信推送消息处理
+           WeChat.ServerMessage.EventHandler,
+           WeChat.ServerMessage.Encryptor,
+           WeChat.ServerMessage.XmlMessage,
+           WeChat.ServerMessage.XmlParser
+         ]},
         {
           "Other APIs",
           [
@@ -88,9 +96,7 @@ defmodule WeChat.MixProject do
             # 网页开发(WIP)
             WeChat.WebApp,
             # 第三方平台
-            WeChat.Component,
-            # 微信推送消息处理
-            WeChat.ServerMessage.EventHandler
+            WeChat.Component
           ]
         },
         {"Basic Types", [WeChat]},

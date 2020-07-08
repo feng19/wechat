@@ -1,14 +1,15 @@
 defmodule WeChat.ServerMessage.XmlMessage do
   @moduledoc """
   回复推送消息
-  [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html)
+
+  [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html){:target="_blank"}
   """
   import Saxy.XML
 
   @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Message_Management/Passive_user_reply_message.html"
 
   @doc """
-  return reply_msg
+  回包加密 - [Official API Docs Link](#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html)
 
   ```xml
   <xml>
@@ -30,7 +31,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复文本消息
+  回复文本消息 - [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
 
   ```xml
   <xml>
@@ -41,9 +42,6 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <Content><![CDATA[你好]]></Content>
   </xml>
   ```
-
-  ## API Docs
-    [link](#{@doc_link}#0){:target="_blank"}
   """
   def reply_text(to_openid, from_wx_no, timestamp, content) do
     element("xml", [], [
@@ -57,7 +55,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复图片消息
+  回复图片消息 - [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
 
   ```xml
   <xml>
@@ -70,9 +68,6 @@ defmodule WeChat.ServerMessage.XmlMessage do
     </Image>
   </xml>
   ```
-
-  ## API Docs
-    [link](#{@doc_link}#1){:target="_blank"}
   """
   def reply_image(to_openid, from_wx_no, timestamp, media_id) do
     element("xml", [], [
@@ -86,7 +81,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复语音消息
+  回复语音消息 - [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
 
   ```xml
   <xml>
@@ -99,9 +94,6 @@ defmodule WeChat.ServerMessage.XmlMessage do
     </Voice>
   </xml>
   ```
-
-  ## API Docs
-    [link](#{@doc_link}#2){:target="_blank"}
   """
   def reply_voice(to_openid, from_wx_no, timestamp, media_id) do
     element("xml", [], [
@@ -115,7 +107,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复视频消息
+  回复视频消息 - [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
 
   ```xml
   <xml>
@@ -130,9 +122,6 @@ defmodule WeChat.ServerMessage.XmlMessage do
     </Video>
   </xml>
   ```
-
-  ## API Docs
-    [link](#{@doc_link}#3){:target="_blank"}
   """
   def reply_video(to_openid, from_wx_no, timestamp, media_id, title, desc) do
     element("xml", [], [
@@ -150,7 +139,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复音乐消息
+  回复音乐消息 - [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
 
   ```xml
   <xml>
@@ -167,9 +156,6 @@ defmodule WeChat.ServerMessage.XmlMessage do
     </Music>
   </xml>
   ```
-
-  ## API Docs
-    [link](#{@doc_link}#4){:target="_blank"}
   """
   def reply_music(
         to_openid,
@@ -198,7 +184,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  文章
+  回复图文消息 - 文章item - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
 
   ```xml
   <item>
@@ -219,7 +205,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复图文消息
+  回复图文消息 - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
 
   ```xml
   <xml>
@@ -238,9 +224,6 @@ defmodule WeChat.ServerMessage.XmlMessage do
     </Articles>
   </xml>
   ```
-
-  ## API Docs
-    [link](#{@doc_link}#3){:target="_blank"}
   """
   def reply_news(to_openid, from_wx_no, timestamp, article_items) do
     element("xml", [], [

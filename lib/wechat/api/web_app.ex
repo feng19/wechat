@@ -3,9 +3,8 @@ defmodule WeChat.WebApp do
   网页开发
 
   ## API Docs
-
-  * [网页授权](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html)
-  * [JS-SDK](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html)
+    * [网页授权](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html){:target="_blank"}
+    * [JS-SDK](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html){:target="_blank"}
   """
   alias WeChat.{Requester, Utils}
 
@@ -36,7 +35,7 @@ defmodule WeChat.WebApp do
     [link](#{@doc_link}/Wechat_webpage_authorization.html#0){:target="_blank"}
   """
   @spec oauth2_authorize_url(WeChat.client(), redirect_uri(), state :: String.t(), scope()) ::
-          WeChat.response()
+          url :: String.t()
   def oauth2_authorize_url(client, redirect_uri, scope \\ "snsapi_base", state \\ "") do
     "https://open.weixin.qq.com/connect/oauth2/authorize?" <>
       URI.encode_query(

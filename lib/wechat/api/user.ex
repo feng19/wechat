@@ -6,10 +6,7 @@ defmodule WeChat.User do
   @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/User_Management"
 
   @doc """
-  设置用户备注名
-
-  ## API Docs
-    [link](#{@doc_link}/Configuring_user_notes.html){:target="_blank"}
+  设置用户备注名 - [Official API Docs Link](#{@doc_link}/Configuring_user_notes.html){:target="_blank"}
   """
   @spec update_remark(WeChat.client(), WeChat.openid(), remark :: String.t()) :: WeChat.response()
   def update_remark(client, openid, remark) do
@@ -21,10 +18,7 @@ defmodule WeChat.User do
   end
 
   @doc """
-  获取用户基本信息(UnionID机制)
-
-  ## API Docs
-    [link](#{@doc_link}/Get_users_basic_information_UnionID.html#UinonId){:target="_blank"}
+  获取用户基本信息(UnionID机制) - [Official API Docs Link](#{@doc_link}/Get_users_basic_information_UnionID.html#UinonId){:target="_blank"}
   """
   @spec user_info(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def user_info(client, openid) do
@@ -37,10 +31,7 @@ defmodule WeChat.User do
   end
 
   @doc """
-  获取用户基本信息(UnionID机制)
-
-  ## API Docs
-    [link](#{@doc_link}/Get_users_basic_information_UnionID.html#UinonId){:target="_blank"}
+  获取用户基本信息(UnionID机制) - [Official API Docs Link](#{@doc_link}/Get_users_basic_information_UnionID.html#UinonId){:target="_blank"}
   """
   @spec user_info(WeChat.client(), WeChat.openid(), WeChat.lang()) :: WeChat.response()
   def user_info(client, openid, lang) do
@@ -54,10 +45,7 @@ defmodule WeChat.User do
   end
 
   @doc """
-  批量获取用户基本信息
-
-  ## API Docs
-    [link](#{@doc_link}/Get_users_basic_information_UnionID.html){:target="_blank"}
+  批量获取用户基本信息 - [Official API Docs Link](#{@doc_link}/Get_users_basic_information_UnionID.html){:target="_blank"}
   """
   @spec batch_get_user_info(WeChat.client(), [map]) :: WeChat.response()
   def batch_get_user_info(client, user_list) do
@@ -69,10 +57,7 @@ defmodule WeChat.User do
   end
 
   @doc """
-  获取用户列表
-
-  ## API Docs
-    [link](#{@doc_link}/Getting_a_User_List.html){:target="_blank"}
+  获取用户列表 - [Official API Docs Link](#{@doc_link}/Getting_a_User_List.html){:target="_blank"}
   """
   @spec get_users(WeChat.client()) :: WeChat.response()
   def get_users(client) do
@@ -82,10 +67,7 @@ defmodule WeChat.User do
   end
 
   @doc """
-  获取用户列表
-
-  ## API Docs
-    [link](#{@doc_link}/Getting_a_User_List.html){:target="_blank"}
+  获取用户列表 - [Official API Docs Link](#{@doc_link}/Getting_a_User_List.html){:target="_blank"}
   """
   @spec get_users(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_users(client, next_openid) do

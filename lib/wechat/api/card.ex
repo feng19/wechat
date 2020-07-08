@@ -54,10 +54,7 @@ defmodule WeChat.Card do
   @type cond_source :: 0 | 1
 
   @doc """
-  创建卡券
-
-  ## API Docs
-    [link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#8){:target="_blank"}
+  创建卡券 - [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#8){:target="_blank"}
   """
   @spec create(WeChat.client(), body :: map) :: WeChat.response()
   def create(client, body) do
@@ -67,7 +64,7 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  设置快速买单
+  设置快速买单 - [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#11){:target="_blank"}
 
   ## 功能介绍
 
@@ -78,9 +75,6 @@ defmodule WeChat.Card do
   * 无需商户具备微信支付开发能力，即可完成订单生成，与微信支付打通。
   * 可以通过手机公众号、电脑商户后台，轻松操作收款并查看核销记录，交易对账，并支持离线下载。
   * 支持会员营销，二次营销，如会员卡交易送积分，抵扣积分，买单后赠券等。
-
-  ## API Docs
-    [link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#11){:target="_blank"}
   """
   @spec set_pay_cell(WeChat.client(), card_id, is_open :: boolean) :: WeChat.response()
   def set_pay_cell(client, card_id, is_open) do
@@ -92,20 +86,16 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  设置自助核销
+  设置自助核销 - [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#14){:target="_blank"}
 
   ## 功能介绍
 
   自助核销与扫码/输码核销互为补充，卡券商户助手通过扫码/输码完成核销的同时，也确保了用券的真实性，适合有强对账需求的商户使用；而自助核销由用户发起，全程由用户操作，适合对账需求不强的商户使用。
 
-  目前，自助核销可能适合以下场景使用：
-
-  * 不允许店员上班期间带手机；
-  * 高峰期店内人流量大，扫码/输码核销速度不能满足短时需求；
-  * 会议入场，短时有大量核销任务；
-
-  ## API Docs
-    [link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#14){:target="_blank"}
+  目前，自助核销可能适合以下场景使用:
+    * 不允许店员上班期间带手机；
+    * 高峰期店内人流量大，扫码/输码核销速度不能满足短时需求；
+    * 会议入场，短时有大量核销任务；
   """
   @spec set_self_consume_cell(WeChat.client(), card_id, is_open :: boolean) :: WeChat.response()
   def set_self_consume_cell(client, card_id, is_open) do
@@ -117,12 +107,9 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  查询Code
+  查询Code - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#1){:target="_blank"}
 
   我们强烈建议开发者在调用核销code接口之前调用查询code接口，并在核销之前对非法状态的code(如转赠中、已删除、已核销等)做出处理。
-
-  ## API Docs
-    [link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#1){:target="_blank"}
   """
   @spec check_card_code(WeChat.client(), card_id, card_code, check_consume :: boolean) ::
           WeChat.response()
@@ -135,12 +122,9 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  核销Code接口
+  核销Code接口 - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
 
   消耗code接口是核销卡券的唯一接口,开发者可以调用当前接口将用户的优惠券进行核销，该过程不可逆。
-
-  ## API Docs
-    [link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
   """
   @spec consume_code(WeChat.client(), card_code) :: WeChat.response()
   def consume_code(client, card_code) do
@@ -152,14 +136,11 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  核销Code接口
+  核销Code接口 - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
 
   消耗code接口是核销卡券的唯一接口,开发者可以调用当前接口将用户的优惠券进行核销，该过程不可逆。
 
   卡券ID(card_id): 创建卡券时use_custom_code填写true时必填。非自定义Code不必填写
-
-  ## API Docs
-    [link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
   """
   @spec consume_code(WeChat.client(), card_id, card_code) :: WeChat.response()
   def consume_code(client, card_id, card_code) do
@@ -171,12 +152,9 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  Code解码接口
+  Code解码接口 - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#3){:target="_blank"}
 
   消耗code接口是核销卡券的唯一接口,开发者可以调用当前接口将用户的优惠券进行核销，该过程不可逆。
-
-  ## API Docs
-    [link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#3){:target="_blank"}
   """
   @spec decrypt_code(WeChat.client(), encrypt_code :: String.t()) :: WeChat.response()
   def decrypt_code(client, encrypt_code) do
