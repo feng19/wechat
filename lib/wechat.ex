@@ -19,6 +19,12 @@ defmodule WeChat do
   @type client :: module
   @type response :: Tesla.Env.result()
 
+  @type cache_id :: appid() | {appid(), appid()}
+  @type cache_sub_key :: atom()
+  @type cache_key :: {cache_id(), appid()}
+  @type cache_value :: String.t() | integer()
+
+  @default_opts [role: :common, storage: WeChat.DefaultStorage]
   @common_modules [
     WeChat.Material,
     WeChat.Card,
@@ -37,20 +43,19 @@ defmodule WeChat do
   ]
 
   defmacro __using__(opts \\ []) do
-    {role, opts} = Keyword.pop(opts, :role, :common)
-
-    case role in [:common, :component] do
-      true ->
-        :skip
-
-      false ->
-        raise ArgumentError, "please set role in [:common, :component]"
-    end
+    opts = Keyword.merge(@default_opts, opts)
+    role = Keyword.get(opts, :role, :common)
 
     sub_modules =
       case role do
-        :common -> @common_modules
-        :component -> [WeChat.Component | @common_modules]
+        :common ->
+          @common_modules
+
+        :component ->
+          [WeChat.Component | @common_modules]
+
+        _ ->
+          raise ArgumentError, "please set role in [:common, :component]"
       end
 
     {sub_module_ast_list, files} =
@@ -70,13 +75,21 @@ defmodule WeChat do
 
   defp gen_get_function(:common, default_opts) do
     default_opts
-    |> Keyword.take([:appid, :appsecret, :encoding_aes_key, :token])
+    |> Keyword.take([:role, :storage, :appid, :appsecret, :encoding_aes_key, :token])
     |> gen_get_function()
   end
 
   defp gen_get_function(:component, default_opts) do
     default_opts
-    |> Keyword.take([:appid, :component_appid, :component_appsecret, :encoding_aes_key, :token])
+    |> Keyword.take([
+      :role,
+      :storage,
+      :appid,
+      :component_appid,
+      :component_appsecret,
+      :encoding_aes_key,
+      :token
+    ])
     |> gen_get_function()
   end
 
@@ -227,14 +240,31 @@ defmodule WeChat do
 
   def doc_link_prefix, do: "https://developers.weixin.qq.com/doc"
 
-  def put_cache(id, key, value) do
-    :ets.insert(:wechat, {{id, key}, value})
+  def new_cache_table() do
+    :ets.new(:wechat, [:named_table, :set, :public, read_concurrency: true])
   end
 
-  def get_cache(id, key) do
-    case :ets.lookup(:wechat, {id, key}) do
+  @spec set_client(client()) :: true
+  def set_client(client), do: put_cache(client.appid(), :client, client)
+
+  @spec search_client(appid()) :: nil | client()
+  def search_client(appid), do: get_cache(appid, :client)
+
+  @spec put_cache(cache_id(), cache_sub_key(), cache_value()) :: true
+  def put_cache(id, sub_key, value) do
+    :ets.insert(:wechat, {{id, sub_key}, value})
+  end
+
+  @spec get_cache(cache_id(), cache_sub_key()) :: nil | cache_value()
+  def get_cache(id, sub_key) do
+    case :ets.lookup(:wechat, {id, sub_key}) do
       [{_, value}] -> value
       _ -> nil
     end
+  end
+
+  @spec del_cache(cache_id(), cache_sub_key()) :: true
+  def del_cache(id, sub_key) do
+    :ets.delete(:wechat, {id, sub_key})
   end
 end

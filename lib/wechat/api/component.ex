@@ -118,18 +118,20 @@ defmodule WeChat.Component do
   @doc """
   获取令牌 - [Official API Docs Link](#{@doc_link}/component_access_token.html){:target="_blank"}
   """
-  @spec get_component_token(WeChat.client()) :: WeChat.response()
+  @spec get_component_token(WeChat.client()) :: nil | WeChat.response()
   def get_component_token(client) do
     component_appid = client.component_appid()
 
-    Requester.post(
-      "/cgi-bin/component/api_component_token",
-      json_map(
-        component_appid: component_appid,
-        component_appsecret: client.component_appsecret(),
-        component_verify_ticket: WeChat.get_cache(component_appid, :component_verify_ticket)
+    with ticket when ticket != nil <- WeChat.get_cache(component_appid, :component_verify_ticket) do
+      Requester.post(
+        "/cgi-bin/component/api_component_token",
+        json_map(
+          component_appid: component_appid,
+          component_appsecret: client.component_appsecret(),
+          component_verify_ticket: ticket
+        )
       )
-    )
+    end
   end
 
   @doc """
@@ -166,19 +168,26 @@ defmodule WeChat.Component do
   @doc """
   获取/刷新接口调用令牌 - [Official API Docs Link](#{@doc_link}/api_authorizer_token.html){:target="_blank"}
   """
-  @spec authorizer_token(WeChat.client()) :: WeChat.response()
+  @spec authorizer_token(WeChat.client()) :: nil | WeChat.response()
   def authorizer_token(client) do
-    component_appid = client.component_appid()
+    appid = client.appid()
 
-    Requester.post(
-      "/cgi-bin/component/api_authorizer_token",
-      json_map(
-        component_appid: component_appid,
-        authorizer_appid: client.appid(),
-        authorizer_refresh_token: WeChat.get_cache(component_appid, :authorizer_refresh_token)
-      ),
-      query: [component_access_token: WeChat.get_cache(component_appid, :component_access_token)]
-    )
+    with authorizer_refresh_token when authorizer_refresh_token != nil <-
+           WeChat.get_cache(appid, :authorizer_refresh_token) do
+      component_appid = client.component_appid()
+
+      Requester.post(
+        "/cgi-bin/component/api_authorizer_token",
+        json_map(
+          component_appid: component_appid,
+          authorizer_appid: appid,
+          authorizer_refresh_token: authorizer_refresh_token
+        ),
+        query: [
+          component_access_token: WeChat.get_cache(component_appid, :component_access_token)
+        ]
+      )
+    end
   end
 
   @doc """

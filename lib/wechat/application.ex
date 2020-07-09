@@ -6,11 +6,15 @@ defmodule WeChat.Application do
   use Application
 
   def start(_type, _args) do
-    :ets.new(:wechat, [:named_table, :set, :public, read_concurrency: true])
+    refresh_timer = Application.get_env(:wechat, :refresh_timer, WeChat.RefreshTimer)
+
+    children = [
+      refresh_timer
+    ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: WeChat.Supervisor]
-    Supervisor.start_link([], opts)
+    Supervisor.start_link(children, opts)
   end
 end

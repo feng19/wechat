@@ -2,31 +2,56 @@ defmodule WeChat.RefreshTimer do
   @moduledoc false
   use GenServer
   require Logger
-  alias WeChat.Utils
+  alias WeChat.{Utils, StorageAdapter}
 
-  @default_opts %{role: :common, store_adapter: WeChat.StoreAdapter.Default}
+  @type opts :: map()
+  # 过期前10分钟刷新
+  @refresh_before_time 10 * 60
+  # 刷新失败重试时间间隔 1分钟
+  @refresh_retry_interval 60_000
 
-  @spec add(client :: WeChat.client(), opts :: map()) :: :ok
+  @spec add(WeChat.client(), opts()) :: :ok
   def add(client, opts) do
     GenServer.call(__MODULE__, {:add, client, opts})
   end
 
-  @spec refresh(client :: WeChat.client()) :: :ok | :nofound
+  @spec remove(WeChat.client()) :: :ok
+  def remove(client) do
+    GenServer.call(__MODULE__, {:remove, client})
+  end
+
+  @spec refresh(WeChat.client()) :: :ok | :nofound
   def refresh(client) do
     GenServer.call(__MODULE__, {:refresh, client})
   end
 
+  @spec refresh_key(
+          StorageAdapter.store_id(),
+          StorageAdapter.store_key(),
+          StorageAdapter.value(),
+          expired_time :: integer(),
+          WeChat.client()
+        ) :: :ok
+  def refresh_key(store_id, store_key, value, expired_time, client) do
+    GenServer.cast(__MODULE__, {:refresh_key, store_id, store_key, value, expired_time, client})
+  end
+
+  @spec start_link(state :: %{WeChat.client() => opts()}) :: GenServer.on_start()
   def start_link(state \\ %{}) do
     GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
   @impl true
   def init(state) do
+    WeChat.new_cache_table()
+
     state =
-      Map.new(state, fn {client, opts} ->
-        opts = Map.merge(@default_opts, opts)
-        do_add(client, opts)
-        {client, opts}
+      Map.new(state, fn
+        client when is_atom(client) ->
+          {client, do_add(client, %{})}
+
+        {client, opts} ->
+          {client, do_add(client, opts)}
       end)
 
     {:ok, state}
@@ -34,15 +59,27 @@ defmodule WeChat.RefreshTimer do
 
   @impl true
   def handle_call({:add, client, opts}, _from, state) do
-    opts = Map.merge(@default_opts, opts)
-    do_add(client, opts)
+    opts = do_add(client, opts)
     state = Map.put(state, client, opts)
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:remove, client}, _from, state) do
+    {get, state} = Map.pop(state, client)
+
+    with {_client, opts} <- get do
+      Enum.each(opts.refresh_list, fn {_key, _fun, timer} ->
+        :erlang.cancel_timer(timer)
+      end)
+    end
+
     {:reply, :ok, state}
   end
 
   def handle_call({:refresh, client}, _from, state) do
     with opts when is_map(opts) <- Map.get(state, client) do
-      do_refresh(client, opts)
+      opts = do_refresh(client, opts)
+      state = Map.put(state, client, opts)
       {:reply, :ok, state}
     else
       _ ->
@@ -51,126 +88,197 @@ defmodule WeChat.RefreshTimer do
   end
 
   @impl true
-  def handle_cast(_msg, state) do
-    {:noreply, state}
+  def handle_cast({:refresh_key, store_id, store_key, value, expired_time, client}, state) do
+    cache_and_store(store_id, store_key, value, expired_time, client)
+    {:ok, state}
   end
 
   @impl true
-  def handle_info({:timeout, _timer, {:access_token, client}}, state) do
+  def handle_info({:timeout, _timer, {store_id, store_key, client}}, state) do
     opts = Map.get(state, client)
-    refresh_access_token(:access_token, client, opts.store_adapter)
+    key = {store_id, store_key}
+    {{_key, fun, _timer}, refresh_list} = List.keytake(opts.refresh_list, key, 0)
+    timer = refresh_token(store_id, store_key, fun, client)
+    state = Map.put(opts, client, %{opts | refresh_list: [{key, fun, timer} | refresh_list]})
     {:noreply, state}
   end
 
-  def handle_info({:timeout, _timer, {:js_api_ticket, client}}, state) do
-    opts = Map.get(state, client)
-    refresh_ticket("jsapi", :js_api_ticket, client, opts.store_adapter)
-    {:noreply, state}
-  end
+  def cache_and_store(store_id, store_key, value, expired_time, client) do
+    WeChat.put_cache(store_id, store_key, value)
 
-  def handle_info({:timeout, _timer, {:wx_card_ticket, client}}, state) do
-    opts = Map.get(state, client)
-    refresh_ticket("wx_card", :wx_card_ticket, client, opts.store_adapter)
-    {:noreply, state}
-  end
+    storage = client.storage()
 
-  defp do_add(client, %{role: :common, store_adapter: store_adapter}) do
-    Logger.info("Initialize WeChat App: #{client} by Role: common.")
-
-    [
-      access_token: &refresh_access_token/3,
-      js_api_ticket: &refresh_ticket("jsapi", &1, &2, &3),
-      wx_card_ticket: &refresh_ticket("wx_card", &1, &2, &3)
-    ]
-    |> Enum.map(fn {store_key, fun} ->
-      case get_from_store(store_key, client, store_adapter) do
-        false ->
-          fun.(store_key, client, store_adapter)
-
-        {true, expires_in} ->
-          # 过期前10分钟刷新
-          (max(expires_in, expires_in - 10 * 60) * 1000)
-          |> :erlang.start_timer(self(), {store_key, client})
-      end
-    end)
-  end
-
-  defp do_refresh(client, %{role: :common, store_adapter: store_adapter}) do
-    Logger.info("Refreshing WeChat App: #{client} by Role: common.")
-    refresh_access_token(:access_token, client, store_adapter)
-    refresh_ticket("jsapi", :js_api_ticket, client, store_adapter)
-    refresh_ticket("wx_card", :wx_card_ticket, client, store_adapter)
-  end
-
-  defp refresh_access_token(store_key, client, store_adapter) do
-    with {:ok, %{status: 200, body: data}} <- WeChat.Account.get_access_token(client),
-         %{"access_token" => access_token, "expires_in" => expires_in} <- data do
-      expired_time = Utils.now_unix() + expires_in
-      store(store_key, access_token, expired_time, client, store_adapter)
-      Logger.info("#{__MODULE__} Get #{client}-#{store_key} succeed.")
-
-      :erlang.start_timer((expires_in - 10 * 60) * 1000, self(), {store_key, client})
-    else
-      error ->
-        Logger.warn(
-          "#{__MODULE__} Get #{client}-#{store_key} error:" <>
-            inspect(error) <> ", try again one minute later."
-        )
-
-        :erlang.start_timer(60_000, self(), {store_key, client})
-    end
-  end
-
-  defp refresh_ticket(ticket_type, store_key, client, store_adapter) do
-    with {:ok, %{status: 200, body: data}} <- WeChat.WebApp.get_ticket(client, ticket_type),
-         %{"ticket" => ticket, "expires_in" => expires_in} <- data do
-      expired_time = Utils.now_unix() + expires_in
-      store(store_key, ticket, expired_time, client, store_adapter)
-      Logger.info("#{__MODULE__} Get #{client}-#{store_key} succeed.")
-
-      :erlang.start_timer((expires_in - 10 * 60) * 1000, self(), {store_key, client})
-    else
-      error ->
-        Logger.warn(
-          "#{__MODULE__} Get #{client}-#{store_key} error:" <>
-            inspect(error) <> ", try again one minute later."
-        )
-
-        :erlang.start_timer(60_000, self(), {store_key, client})
-    end
-  end
-
-  def store(store_key, value, expired_time, client, store_adapter) do
-    appid = client.appid()
-    WeChat.put_cache(appid, store_key, value)
-
-    if store_adapter != nil do
+    if storage do
       result =
-        store_adapter.store(appid, store_key, %{"value" => value, "expired_time" => expired_time})
+        storage.store(store_id, store_key, %{"value" => value, "expired_time" => expired_time})
 
-      Logger.info("#{__MODULE__} Store #{client}-#{store_key} result: #{result}.")
+      Logger.info("Store [#{store_id}] [#{store_key}] by #{storage} => #{result}.")
     end
   end
 
-  def get_from_store(store_key, client, store_adapter) do
-    with true <- store_adapter != nil,
-         appid <- client.appid(),
+  def restore_and_cache(store_id, store_key, client) do
+    with storage when storage != nil <- client.storage(),
          {:ok, %{"value" => value, "expired_time" => expired_time}} <-
-           store_adapter.get(appid, store_key) do
+           storage.restore(store_id, store_key) do
       diff = expired_time - Utils.now_unix()
 
       if diff > 0 do
-        WeChat.put_cache(appid, store_key, value)
-        Logger.info("#{__MODULE__} Get #{client}-#{store_key}-#{diff} from store succeed.")
+        WeChat.put_cache(store_id, store_key, value)
+        Logger.info("Get [#{store_id}] [#{store_key}] [expires_in: #{diff}] from #{storage} succeed.")
         {true, diff}
       else
-        Logger.info("#{__MODULE__} Get #{client}-#{store_key} token expired.")
+        Logger.info("Get [#{store_id}] [#{store_key}] token expired.")
         false
       end
     else
       error ->
-        Logger.warn("#{__MODULE__} Get #{client}-#{store_key} error: #{inspect(error)}.")
+        Logger.warn("Get [#{store_id}] [#{store_key}] error: #{inspect(error)}.")
         false
+    end
+  end
+
+  defp common_refresh_list,
+    do: [
+      {:common, :access_token, &refresh_access_token/1},
+      {:common, :js_api_ticket, &refresh_ticket("jsapi", &1)},
+      {:common, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
+    ]
+
+  defp component_refresh_list,
+    do: [
+      {:component, :component_access_token, &refresh_component_access_token/1},
+      {:common, :access_token, &refresh_authorizer_access_token/1},
+      {:common, :js_api_ticket, &refresh_ticket("jsapi", &1)},
+      {:common, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
+    ]
+
+  defp do_add(client, opts) do
+    WeChat.set_client(client)
+    role = client.role()
+
+    refresh_list =
+      case role do
+        :common ->
+          common_refresh_list()
+
+        :component ->
+          component_refresh_list()
+      end
+
+    Logger.info("Initialize WeChat App: #{client} by Role: #{role}, Storage: #{client.storage}.")
+
+    refresh_list =
+      for {id_type, store_key, fun} <- refresh_list do
+        store_id = get_store_id_by_id_type(id_type, client)
+
+        timer =
+          case restore_and_cache(store_id, store_key, client) do
+            false ->
+              refresh_token(store_id, store_key, fun, client)
+
+            {true, expires_in} ->
+              # 过期前10分钟刷新
+              (max(0, expires_in - @refresh_before_time) * 1000)
+              |> :erlang.start_timer(self(), {store_id, store_key, client})
+          end
+
+        {{store_id, store_key}, fun, timer}
+      end
+
+    Map.put(opts, :refresh_list, refresh_list)
+  end
+
+  defp do_refresh(client, %{refresh_list: refresh_list} = opts) do
+    Logger.info("Refreshing WeChat App: #{client}, list: #{inspect(refresh_list)}.")
+
+    refresh_list =
+      for {{store_id, store_key}, fun, timer} <- refresh_list do
+        :erlang.cancel_timer(timer)
+        timer = refresh_token(store_id, store_key, fun, client)
+        {{store_id, store_key}, fun, timer}
+      end
+
+    Map.put(opts, :refresh_list, refresh_list)
+  end
+
+  @compile {:inline, get_store_id_by_id_type: 2}
+  def get_store_id_by_id_type(:common, client), do: client.appid()
+  def get_store_id_by_id_type(:component, client), do: client.component_appid()
+
+  defp refresh_token(store_id, store_key, fun, client) do
+    case fun.(client) do
+      {:ok, list, expires_in} when is_list(list) ->
+        now = Utils.now_unix()
+
+        Enum.each(list, fn {key, token, expires_in} ->
+          expired_time = now + expires_in
+          cache_and_store(store_id, key, token, expired_time, client)
+        end)
+
+        Logger.info("Refresh [#{store_id}] [#{store_key}] [expires_in: #{expires_in}] succeed.")
+
+        :erlang.start_timer(
+          (expires_in - @refresh_before_time) * 1000,
+          self(),
+          {store_id, store_key, client}
+        )
+
+      {:ok, token, expires_in} ->
+        expired_time = Utils.now_unix() + expires_in
+        cache_and_store(store_id, store_key, token, expired_time, client)
+        Logger.info("Refresh [#{store_id}] [#{store_key}] [expires_in: #{expires_in}] succeed.")
+
+        :erlang.start_timer(
+          (expires_in - @refresh_before_time) * 1000,
+          self(),
+          {store_id, store_key, client}
+        )
+
+      error ->
+        Logger.warn(
+          "Refresh [#{store_id}] [#{store_key}] error:" <>
+            inspect(error) <> ", Will be retry again one minute later."
+        )
+
+        :erlang.start_timer(@refresh_retry_interval, self(), {store_id, store_key, client})
+    end
+  end
+
+  defp refresh_access_token(client) do
+    with {:ok, %{status: 200, body: data}} <- WeChat.Account.get_access_token(client),
+         %{"access_token" => access_token, "expires_in" => expires_in} <- data do
+      {:ok, access_token, expires_in}
+    end
+  end
+
+  defp refresh_ticket(ticket_type, client) do
+    with {:ok, %{status: 200, body: data}} <- WeChat.WebApp.get_ticket(client, ticket_type),
+         %{"ticket" => ticket, "expires_in" => expires_in} <- data do
+      {:ok, ticket, expires_in}
+    end
+  end
+
+  defp refresh_component_access_token(client) do
+    with {:ok, %{status: 200, body: data}} <- WeChat.Component.get_component_token(client),
+         %{"component_access_token" => component_access_token, "expires_in" => expires_in} <- data do
+      {:ok, component_access_token, expires_in}
+    end
+  end
+
+  defp refresh_authorizer_access_token(client) do
+    with {:ok, %{status: 200, body: data}} <- WeChat.Component.authorizer_token(client),
+         %{
+           "authorizer_access_token" => authorizer_access_token,
+           "authorizer_refresh_token" => authorizer_refresh_token,
+           "expires_in" => expires_in
+         } <- data do
+      list = [
+        {:access_token, authorizer_access_token, expires_in},
+        # 官网并未说明有效期是多少，暂时指定一年有效期
+        {:authorizer_refresh_token, authorizer_refresh_token, 356 * 24 * 60 * 60}
+      ]
+
+      {:ok, list, expires_in}
     end
   end
 end
