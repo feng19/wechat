@@ -1,4 +1,4 @@
-# WeChat SDK
+# WeChat
 
 **微信SDK for Elixir(WIP)**
 
@@ -10,7 +10,7 @@ by adding `wechat_sdk` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:wechat_sdk, "~> 0.1.0"}
+    {:wechat, "~> 0.1.0"}
   ]
 end
 ```
@@ -25,7 +25,7 @@ be found at [https://hexdocs.pm/wechat_sdk](https://hexdocs.pm/wechat_sdk).
 
 ```elixir
 
-# 普通(`default`):
+# 公众号(`default`):
 
 defmodule YourApp.WeChatAppCodeName do
   @moduledoc "CodeName"
@@ -69,6 +69,7 @@ WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 * 账号管理
 * 微信卡券(WIP)
 * 第三方平台
+* 小程序(WIP)
 
 更多接口目前还在开发中……
 

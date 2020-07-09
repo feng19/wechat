@@ -1,5 +1,6 @@
 defmodule WeChat.MixProject do
   use Mix.Project
+  alias WeChat.{ServerMessage, MiniProgram}
 
   def project do
     [
@@ -46,7 +47,8 @@ defmodule WeChat.MixProject do
         {"Basic",
          [
            WeChat,
-           WeChat.Requester
+           WeChat.Requester,
+           WeChat.DefaultStorage
          ]},
         {"Structure", [WeChat.Article]},
         {
@@ -85,10 +87,10 @@ defmodule WeChat.MixProject do
         {"Server Message",
          [
            # 微信推送消息处理
-           WeChat.ServerMessage.EventHandler,
-           WeChat.ServerMessage.Encryptor,
-           WeChat.ServerMessage.XmlMessage,
-           WeChat.ServerMessage.XmlParser
+           ServerMessage.EventHandler,
+           ServerMessage.Encryptor,
+           ServerMessage.XmlMessage,
+           ServerMessage.XmlParser
          ]},
         {
           "Other APIs",
@@ -104,6 +106,10 @@ defmodule WeChat.MixProject do
             # 第三方平台
             WeChat.Component
           ]
+        },
+        {
+          "小程序 APIs",
+          [MiniProgram.Auth]
         }
       ]
     ]

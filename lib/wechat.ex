@@ -2,6 +2,7 @@ defmodule WeChat do
   @moduledoc """
   WeChat SDK for Elixir
   """
+  alias WeChat.MiniProgram
 
   @type appid :: String.t()
   @type openid :: String.t()
@@ -16,7 +17,9 @@ defmodule WeChat do
   """
   @type lang :: String.t()
 
-  @type client :: module
+  @type client :: module()
+  @type role :: :official_account | :component | :mini_program
+  @type app_type :: :official_account | :mini_program | :both
   @type response :: Tesla.Env.result()
 
   @type cache_id :: appid() | {appid(), appid()}
@@ -24,8 +27,8 @@ defmodule WeChat do
   @type cache_key :: {cache_id(), appid()}
   @type cache_value :: String.t() | integer()
 
-  @default_opts [role: :common, storage: WeChat.DefaultStorage]
-  @common_modules [
+  @default_opts [role: :official_account, storage: WeChat.DefaultStorage]
+  @official_account_modules [
     WeChat.Material,
     WeChat.Card,
     WeChat.CardManaging,
@@ -41,21 +44,36 @@ defmodule WeChat do
     WeChat.Comment,
     WeChat.WebApp
   ]
+  @mini_program_modules [
+    MiniProgram.Auth
+  ]
 
   defmacro __using__(opts \\ []) do
     opts = Keyword.merge(@default_opts, opts)
-    role = Keyword.get(opts, :role, :common)
+    role = Keyword.get(opts, :role, :official_account)
 
     sub_modules =
       case role do
-        :common ->
-          @common_modules
+        :official_account ->
+          @official_account_modules
 
         :component ->
-          [WeChat.Component | @common_modules]
+          case Keyword.get(opts, :app_type, :official_account) do
+            :official_account ->
+              [WeChat.Component | @official_account_modules]
+
+            :mini_program ->
+              [WeChat.Component | @mini_program_modules]
+
+            :both ->
+              [WeChat.Component | @official_account_modules ++ @mini_program_modules]
+          end
+
+        :mini_program ->
+          @mini_program_modules
 
         _ ->
-          raise ArgumentError, "please set role in [:common, :component]"
+          raise ArgumentError, "please set role in [:official_account, :component, :mini_program]"
       end
 
     {sub_module_ast_list, files} =
@@ -73,7 +91,7 @@ defmodule WeChat do
     gen_get_function(role, default_opts) ++ files ++ sub_module_ast_list
   end
 
-  defp gen_get_function(:common, default_opts) do
+  defp gen_get_function(:official_account, default_opts) do
     default_opts
     |> Keyword.take([:role, :storage, :appid, :appsecret, :encoding_aes_key, :token])
     |> gen_get_function()
@@ -90,6 +108,12 @@ defmodule WeChat do
       :encoding_aes_key,
       :token
     ])
+    |> gen_get_function()
+  end
+
+  defp gen_get_function(:mini_program, default_opts) do
+    default_opts
+    |> Keyword.take([:role, :storage, :appid, :appsecret, :encoding_aes_key, :token])
     |> gen_get_function()
   end
 
@@ -221,8 +245,8 @@ defmodule WeChat do
             show_cover_pic: integer,
             content: String.t(),
             content_source_url: String.t(),
-            need_open_comment: integer,
-            only_fans_can_comment: integer
+            need_open_comment: integer(),
+            only_fans_can_comment: integer()
           }
 
     defstruct [

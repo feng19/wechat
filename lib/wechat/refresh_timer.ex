@@ -2,7 +2,7 @@ defmodule WeChat.RefreshTimer do
   @moduledoc false
   use GenServer
   require Logger
-  alias WeChat.{Utils, StorageAdapter}
+  alias WeChat.{Utils, StorageAdapter, Account, WebApp, Component, MiniProgram}
 
   @type opts :: map()
   # 过期前10分钟刷新
@@ -117,39 +117,53 @@ defmodule WeChat.RefreshTimer do
   end
 
   def restore_and_cache(store_id, store_key, client) do
-    with storage when storage != nil <- client.storage(),
+    storage = client.storage()
+
+    with true <- storage != nil,
          {:ok, %{"value" => value, "expired_time" => expired_time}} <-
            storage.restore(store_id, store_key) do
       diff = expired_time - Utils.now_unix()
 
       if diff > 0 do
         WeChat.put_cache(store_id, store_key, value)
-        Logger.info("Get [#{store_id}] [#{store_key}] [expires_in: #{diff}] from #{storage} succeed.")
+
+        Logger.info(
+          "Get [#{store_id}] [#{store_key}] [expires_in: #{diff}] from #{storage} succeed."
+        )
+
         {true, diff}
       else
-        Logger.info("Get [#{store_id}] [#{store_key}] token expired.")
+        Logger.info("Get [#{store_id}] [#{store_key}] from #{storage} token expired.")
         false
       end
     else
+      nil ->
+        false
+
       error ->
-        Logger.warn("Get [#{store_id}] [#{store_key}] error: #{inspect(error)}.")
+        Logger.warn("Get [#{store_id}] [#{store_key}] from #{storage} error: #{inspect(error)}.")
         false
     end
   end
 
-  defp common_refresh_list,
+  defp official_account_refresh_list,
     do: [
-      {:common, :access_token, &refresh_access_token/1},
-      {:common, :js_api_ticket, &refresh_ticket("jsapi", &1)},
-      {:common, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
+      {:appid, :access_token, &refresh_access_token/1},
+      {:appid, :js_api_ticket, &refresh_ticket("jsapi", &1)},
+      {:appid, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
     ]
 
   defp component_refresh_list,
     do: [
-      {:component, :component_access_token, &refresh_component_access_token/1},
-      {:common, :access_token, &refresh_authorizer_access_token/1},
-      {:common, :js_api_ticket, &refresh_ticket("jsapi", &1)},
-      {:common, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
+      {:component_appid, :component_access_token, &refresh_component_access_token/1},
+      {:appid, :access_token, &refresh_authorizer_access_token/1},
+      {:appid, :js_api_ticket, &refresh_ticket("jsapi", &1)},
+      {:appid, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
+    ]
+
+  defp mini_program_refresh_list,
+    do: [
+      {:appid, :access_token, &refresh_mini_program_access_token/1}
     ]
 
   defp do_add(client, opts) do
@@ -158,11 +172,14 @@ defmodule WeChat.RefreshTimer do
 
     refresh_list =
       case role do
-        :common ->
-          common_refresh_list()
+        :official_account ->
+          official_account_refresh_list()
 
         :component ->
           component_refresh_list()
+
+        :mini_program ->
+          mini_program_refresh_list()
       end
 
     Logger.info("Initialize WeChat App: #{client} by Role: #{role}, Storage: #{client.storage}.")
@@ -202,8 +219,8 @@ defmodule WeChat.RefreshTimer do
   end
 
   @compile {:inline, get_store_id_by_id_type: 2}
-  def get_store_id_by_id_type(:common, client), do: client.appid()
-  def get_store_id_by_id_type(:component, client), do: client.component_appid()
+  def get_store_id_by_id_type(:appid, client), do: client.appid()
+  def get_store_id_by_id_type(:component_appid, client), do: client.component_appid()
 
   defp refresh_token(store_id, store_key, fun, client) do
     case fun.(client) do
@@ -245,28 +262,28 @@ defmodule WeChat.RefreshTimer do
   end
 
   defp refresh_access_token(client) do
-    with {:ok, %{status: 200, body: data}} <- WeChat.Account.get_access_token(client),
+    with {:ok, %{status: 200, body: data}} <- Account.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
     end
   end
 
   defp refresh_ticket(ticket_type, client) do
-    with {:ok, %{status: 200, body: data}} <- WeChat.WebApp.get_ticket(client, ticket_type),
+    with {:ok, %{status: 200, body: data}} <- WebApp.get_ticket(client, ticket_type),
          %{"ticket" => ticket, "expires_in" => expires_in} <- data do
       {:ok, ticket, expires_in}
     end
   end
 
   defp refresh_component_access_token(client) do
-    with {:ok, %{status: 200, body: data}} <- WeChat.Component.get_component_token(client),
+    with {:ok, %{status: 200, body: data}} <- Component.get_component_token(client),
          %{"component_access_token" => component_access_token, "expires_in" => expires_in} <- data do
       {:ok, component_access_token, expires_in}
     end
   end
 
   defp refresh_authorizer_access_token(client) do
-    with {:ok, %{status: 200, body: data}} <- WeChat.Component.authorizer_token(client),
+    with {:ok, %{status: 200, body: data}} <- Component.authorizer_token(client),
          %{
            "authorizer_access_token" => authorizer_access_token,
            "authorizer_refresh_token" => authorizer_refresh_token,
@@ -279,6 +296,13 @@ defmodule WeChat.RefreshTimer do
       ]
 
       {:ok, list, expires_in}
+    end
+  end
+
+  defp refresh_mini_program_access_token(client) do
+    with {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
+         %{"access_token" => access_token, "expires_in" => expires_in} <- data do
+      {:ok, access_token, expires_in}
     end
   end
 end

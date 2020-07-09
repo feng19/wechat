@@ -18,7 +18,11 @@ defmodule WeChat.Account do
   @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do
     Requester.get("/cgi-bin/token",
-      query: [grant_type: "client_credential", appid: client.appid(), secret: client.appsecret()]
+      query: [
+        grant_type: "client_credential",
+        appid: client.appid(),
+        secret: client.appsecret()
+      ]
     )
   end
 
