@@ -9,16 +9,6 @@ defmodule WeChat.ServerMessage.Encryptor do
   @aes_block_size 16
   @pad_block_size 32
 
-  @spec get_sha1([String.t()]) :: signature :: String.t()
-  def get_sha1(list) do
-    str_to_sign =
-      list
-      |> Enum.sort()
-      |> Enum.join()
-
-    :crypto.hash(:sha, str_to_sign) |> Base.encode16(case: :lower)
-  end
-
   @spec encrypt(msg :: String.t(), WeChat.appid(), encoding_aes_key()) ::
           msg_encrypted :: String.t()
   def encrypt(msg, appid, encoding_aes_key) do
@@ -57,7 +47,7 @@ defmodule WeChat.ServerMessage.Encryptor do
     {appid, msg}
   end
 
-  defp encode_padding_with_pkcs7(data) do
+  def encode_padding_with_pkcs7(data) do
     pad =
       data
       |> byte_size()
@@ -70,7 +60,7 @@ defmodule WeChat.ServerMessage.Encryptor do
     data <> String.duplicate(<<pad::8>>, pad)
   end
 
-  defp decode_padding_with_pkcs7(data) do
+  def decode_padding_with_pkcs7(data) do
     data_size = byte_size(data)
     <<pad::8>> = binary_part(data, data_size, -1)
     binary_part(data, 0, data_size - pad)

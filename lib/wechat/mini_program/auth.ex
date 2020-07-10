@@ -3,9 +3,50 @@ defmodule WeChat.MiniProgram.Auth do
   权限接口
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Storage.Cache}
+  alias WeChat.{Requester, Utils, Storage.Cache, ServerMessage.Encryptor}
 
   @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api"
+
+  @doc """
+  服务端获取开放数据 - [Official API Docs Link](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/signature.html)
+
+  [小程序登录](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/login.html)
+  """
+  @spec decode_user_info(
+          session_key :: String.t(),
+          raw_data :: String.t(),
+          signature :: String.t()
+        ) :: {:ok, map()} | {:error, String.t()}
+  def decode_user_info(session_key, raw_data, signature) do
+    case Utils.sha1(raw_data <> session_key) do
+      ^signature ->
+        Jason.decode(raw_data)
+
+      _ ->
+        {:error, "invalid"}
+    end
+  end
+
+  @doc """
+  服务端获取开放数据 - 包含敏感数据 - [Official API Docs Link](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/signature.html)
+
+  * [小程序登录](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/login.html)
+  * [加密数据解密算法](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/signature.html#加密数据解密算法)
+  """
+  @spec decode_get_user_sensitive_info(
+          session_key :: String.t(),
+          encrypted_data :: String.t(),
+          iv :: String.t()
+        ) :: {:ok, map()} | :error | {:error, any()}
+  def decode_get_user_sensitive_info(session_key, encrypted_data, iv) do
+    with {:ok, session_key} <- Base.decode64(session_key),
+         {:ok, iv} <- Base.decode64(iv),
+         {:ok, encrypted_data} <- Base.decode64(encrypted_data) do
+      :crypto.block_decrypt(:aes_cbc, session_key, iv, encrypted_data)
+      |> Encryptor.decode_padding_with_pkcs7()
+      |> Jason.decode()
+    end
+  end
 
   @doc """
   登录 - [Official API Docs Link](#{@doc_link}/login/auth.code2Session.html){:target="_blank"}

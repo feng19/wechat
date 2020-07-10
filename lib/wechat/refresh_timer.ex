@@ -96,12 +96,17 @@ defmodule WeChat.RefreshTimer do
 
   @impl true
   def handle_info({:timeout, _timer, {store_id, store_key, client}}, state) do
-    opts = Map.get(state, client)
-    key = {store_id, store_key}
-    {{_key, fun, _timer}, refresh_list} = List.keytake(opts.refresh_list, key, 0)
-    timer = refresh_token(store_id, store_key, fun, client)
-    state = Map.put(opts, client, %{opts | refresh_list: [{key, fun, timer} | refresh_list]})
-    {:noreply, state}
+    case Map.get(state, client) do
+      opts when opts != nil ->
+        key = {store_id, store_key}
+        {{_key, fun, _timer}, refresh_list} = List.keytake(opts.refresh_list, key, 0)
+        timer = refresh_token(store_id, store_key, fun, client)
+        state = Map.put(state, client, %{opts | refresh_list: [{key, fun, timer} | refresh_list]})
+        {:noreply, state}
+
+      _ ->
+        {:noreply, state}
+    end
   end
 
   def cache_and_store(store_id, store_key, value, expired_time, client) do
@@ -216,7 +221,7 @@ defmodule WeChat.RefreshTimer do
         {{store_id, store_key}, fun, timer}
       end
 
-    Map.put(opts, :refresh_list, refresh_list)
+    %{opts | refresh_list: refresh_list}
   end
 
   @compile {:inline, get_store_id_by_id_type: 2}

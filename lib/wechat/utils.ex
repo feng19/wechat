@@ -15,4 +15,13 @@ defmodule WeChat.Utils do
   def now_unix, do: System.system_time(:second)
 
   def doc_link_prefix, do: "https://developers.weixin.qq.com"
+
+  @spec sha1([String.t()] | String.t()) :: signature :: String.t()
+  def sha1(list) when is_list(list) do
+    Enum.sort(list) |> Enum.join() |> sha1()
+  end
+
+  def sha1(string) when is_binary(string) do
+    :crypto.hash(:sha, string) |> Base.encode16(case: :lower)
+  end
 end

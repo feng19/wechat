@@ -143,12 +143,10 @@ defmodule WeChat.WebApp do
     nonce_str = Utils.random_string(16)
     timestamp = Utils.now_unix()
 
-    str_to_sign =
-      "jsapi_ticket=#{jsapi_ticket}&noncestr=#{nonce_str}&timestamp=#{timestamp}&url=#{url}"
-
     signature =
-      :crypto.hash(:sha, str_to_sign)
-      |> Base.encode16(case: :lower)
+      Utils.sha1(
+        "jsapi_ticket=#{jsapi_ticket}&noncestr=#{nonce_str}&timestamp=#{timestamp}&url=#{url}"
+      )
 
     %{signature: signature, timestamp: timestamp, nonceStr: nonce_str}
   end
@@ -223,15 +221,7 @@ defmodule WeChat.WebApp do
     nonce_str = Utils.random_string(16)
     timestamp = Utils.now_unix()
     timestamp_str = Integer.to_string(timestamp)
-
-    str_to_sign =
-      [timestamp_str, nonce_str | list]
-      |> Enum.sort()
-      |> Enum.join()
-
-    signature =
-      :crypto.hash(:sha, str_to_sign)
-      |> Base.encode16(case: :lower)
+    signature = Utils.sha1([timestamp_str, nonce_str | list])
 
     %{signature: signature, timestamp: timestamp, nonce_str: nonce_str}
   end

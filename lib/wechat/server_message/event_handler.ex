@@ -197,7 +197,7 @@ defmodule WeChat.ServerMessage.EventHandler do
           {:ok, :encrypted, xml_string()} | {:error, String.t()}
   def decode_xml_msg(encrypt_content, signature, nonce, timestamp, client) do
     with ^signature <-
-           Encryptor.get_sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
+           Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
          appid <- client.appid(),
          {^appid, xml_string} <- Encryptor.decrypt(encrypt_content, client.encoding_aes_key()),
          {:ok, xml} <- XmlParser.parse(xml_string) do
@@ -218,7 +218,7 @@ defmodule WeChat.ServerMessage.EventHandler do
           {:ok, :encrypted, json_string()} | {:error, String.t()}
   def decode_json_msg(encrypt_content, signature, nonce, timestamp, client) do
     with ^signature <-
-           Encryptor.get_sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
+           Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
          appid <- client.appid(),
          {^appid, json_string} <- Encryptor.decrypt(encrypt_content, client.encoding_aes_key()),
          {:ok, json} <- Jason.decode(json_string) do
@@ -235,7 +235,7 @@ defmodule WeChat.ServerMessage.EventHandler do
     encrypt_content = Encryptor.encrypt(reply_msg, client.appid(), client.encoding_aes_key())
     nonce = Utils.random_string(10)
 
-    Encryptor.get_sha1([client.token(), to_string(timestamp), nonce, encrypt_content])
+    Utils.sha1([client.token(), to_string(timestamp), nonce, encrypt_content])
     |> XmlMessage.reply_msg(nonce, timestamp, encrypt_content)
   end
 end
