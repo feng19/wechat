@@ -5,9 +5,10 @@ defmodule WeChat.CardDistributing do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.{Requester, Card}
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Card, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html"
 
   @doc """
   创建二维码接口 - [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
@@ -16,12 +17,12 @@ defmodule WeChat.CardDistributing do
 
   自定义Code码的卡券调用接口时，POST数据中需指定code，非自定义code不需指定，指定openid同理。指定后的二维码只能被用户扫描领取一次。
 
-  获取二维码ticket后，开发者可用[换取二维码图片详情](#{WeChat.doc_link_prefix()}/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)。
+  获取二维码ticket后，开发者可用[换取二维码图片详情](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)。
   """
   @spec create_qrcode(WeChat.client(), body :: map) :: WeChat.response()
   def create_qrcode(client, body) do
     Requester.post("/card/qrcode/create", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -33,7 +34,7 @@ defmodule WeChat.CardDistributing do
   @spec create_landing_page(WeChat.client(), body :: map) :: WeChat.response()
   def create_landing_page(client, body) do
     Requester.post("/card/landingpage/create", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -45,7 +46,7 @@ defmodule WeChat.CardDistributing do
     Requester.post(
       "/card/code/deposit",
       json_map(card_id: card_id, code: code_list),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -55,7 +56,7 @@ defmodule WeChat.CardDistributing do
   @spec get_code_count(WeChat.client(), Card.card_id()) :: WeChat.response()
   def get_code_count(client, card_id) do
     Requester.post("/card/code/getdepositcount", json_map(card_id: card_id),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -67,21 +68,21 @@ defmodule WeChat.CardDistributing do
     Requester.post(
       "/card/code/checkcode",
       json_map(card_id: card_id, code: code_list),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
   @doc """
   图文消息群发卡券 - [Official API Docs Link](#{@doc_link}#6){:target="_blank"}
 
-  支持开发者调用该接口获取卡券嵌入图文消息的标准格式代码，将返回代码填入 [新增临时素材](#{WeChat.doc_link_prefix()}/offiaccount/Asset_Management/New_temporary_materials) 中content字段，即可获取嵌入卡券的图文消息素材。
+  支持开发者调用该接口获取卡券嵌入图文消息的标准格式代码，将返回代码填入 [新增临时素材](#{doc_link_prefix()}/doc/offiaccount/Asset_Management/New_temporary_materials) 中content字段，即可获取嵌入卡券的图文消息素材。
 
   特别注意：目前该接口仅支持填入非自定义code的卡券,自定义code的卡券需先进行code导入后调用。
   """
   @spec get_mp_news_html(WeChat.client(), Card.card_id()) :: WeChat.response()
   def get_mp_news_html(client, card_id) do
     Requester.post("/card/mpnews/gethtml", json_map(card_id: card_id),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -93,7 +94,7 @@ defmodule WeChat.CardDistributing do
         ]) :: WeChat.response()
   def set_test_whitelist(client, openid: openid_list) do
     Requester.post("/card/testwhitelist/set", json_map(openid: openid_list),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -103,7 +104,7 @@ defmodule WeChat.CardDistributing do
   @spec set_test_whitelist(WeChat.client(), [WeChat.username()]) :: WeChat.response()
   def set_test_whitelist(client, username: username_list) do
     Requester.post("/card/testwhitelist/set", json_map(username: username_list),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -116,7 +117,7 @@ defmodule WeChat.CardDistributing do
     Requester.post(
       "/card/testwhitelist/set",
       json_map(openid: openid_list, username: username_list),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

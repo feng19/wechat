@@ -6,7 +6,8 @@ defmodule WeChat.WebApp do
     * [网页授权](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html){:target="_blank"}
     * [JS-SDK](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html){:target="_blank"}
   """
-  alias WeChat.{Requester, Utils, Card}
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Utils, Card, Storage.Cache}
 
   @typedoc """
   授权范围
@@ -29,7 +30,7 @@ defmodule WeChat.WebApp do
   """
   @type js_api_ticket_type :: String.t()
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/OA_Web_Apps"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/OA_Web_Apps"
 
   @doc """
   请求`code` - [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#0){:target="_blank"}
@@ -131,12 +132,12 @@ defmodule WeChat.WebApp do
     appid = client.appid()
 
     appid
-    |> WeChat.get_cache(:js_api_ticket)
+    |> Cache.get_cache(:js_api_ticket)
     |> sign_jssdk(url)
     |> Map.put(:appId, appid)
   end
 
-  @spec sign_jssdk(jsapi_ticket :: ticket(), url()) :: JSSDKSignature.t()
+  @spec sign_jssdk(jsapi_ticket :: ticket(), url()) :: map()
   def sign_jssdk(jsapi_ticket, url) do
     url = String.replace(url, ~r/\#.*/, "")
     nonce_str = Utils.random_string(16)
@@ -165,7 +166,7 @@ defmodule WeChat.WebApp do
 
     card_ext =
       appid
-      |> WeChat.get_cache(:wx_card_ticket)
+      |> Cache.get_cache(:wx_card_ticket)
       |> sign_card(card_id)
       |> Map.merge(%{appid: client.appid(), outer_str: outer_str})
       |> Jason.encode!()
@@ -190,7 +191,7 @@ defmodule WeChat.WebApp do
 
     card_ext =
       appid
-      |> WeChat.get_cache(:wx_card_ticket)
+      |> Cache.get_cache(:wx_card_ticket)
       |> sign_card(card_id, openid)
       |> Map.merge(%{appid: client.appid(), outer_str: outer_str, openid: openid})
       |> Jason.encode!()
@@ -217,7 +218,7 @@ defmodule WeChat.WebApp do
   [卡券签名](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
   """
   @compile {:inline, sign_card: 1}
-  @spec sign_card(list :: [String.t()]) :: CardSignature.t()
+  @spec sign_card(list :: [String.t()]) :: map()
   def sign_card(list) do
     nonce_str = Utils.random_string(16)
     timestamp = Utils.now_unix()
@@ -241,7 +242,7 @@ defmodule WeChat.WebApp do
   @spec get_ticket(WeChat.client(), js_api_ticket_type()) :: WeChat.response()
   def get_ticket(client, type) do
     Requester.get("/cgi-bin/ticket/getticket",
-      query: [type: type, access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [type: type, access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

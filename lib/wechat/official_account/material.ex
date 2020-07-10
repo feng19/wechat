@@ -1,10 +1,11 @@
 defmodule WeChat.Material do
   @moduledoc "素材管理"
   import Jason.Helpers
+  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias Tesla.Multipart
-  alias WeChat.Requester
+  alias WeChat.{Requester, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Asset_Management"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Asset_Management"
 
   @typedoc """
   素材的类型
@@ -38,7 +39,7 @@ defmodule WeChat.Material do
       |> Multipart.add_field("type", type)
 
     Requester.post("/cgi-bin/media/upload", mp,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -58,7 +59,7 @@ defmodule WeChat.Material do
       |> Multipart.add_field("type", type)
 
     Requester.post("/cgi-bin/media/upload", mp,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -70,7 +71,7 @@ defmodule WeChat.Material do
     Requester.get("/cgi-bin/media/upload",
       query: [
         media_id: media_id,
-        access_token: WeChat.get_cache(client.appid(), :access_token)
+        access_token: Cache.get_cache(client.appid(), :access_token)
       ]
     )
   end
@@ -83,7 +84,7 @@ defmodule WeChat.Material do
     Requester.post(
       "/cgi-bin/material/add_news",
       json_map(articles: articles),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -92,11 +93,11 @@ defmodule WeChat.Material do
   #  """
   #  @spec upload_image(WeChat.client, file_path :: Path.t) :: WeChat.response
   #  def upload_image(client, file_path) do
-  #    Requester.post("/cgi-bin/media/uploadimg", mp, query: [access_token: WeChat.get_cache(client.appid(), :access_token)])
+  #    Requester.post("/cgi-bin/media/uploadimg", mp, query: [access_token: Cache.get_cache(client.appid(), :access_token)])
   #  end
   #  @spec upload_image(WeChat.client, file_name :: String.t, file_content :: binary) :: WeChat.response
   #  def upload_image(client, type, file_name, file_content) do
-  #    Requester.post("/cgi-bin/media/uploadimg", mp, query: [access_token: WeChat.get_cache(client.appid(), :access_token)])
+  #    Requester.post("/cgi-bin/media/uploadimg", mp, query: [access_token: Cache.get_cache(client.appid(), :access_token)])
   #  end
   #
   #  @doc """
@@ -114,7 +115,7 @@ defmodule WeChat.Material do
     Requester.post(
       "/cgi-bin/material/get_material",
       json_map(media_id: media_id),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -126,7 +127,7 @@ defmodule WeChat.Material do
     Requester.post(
       "/cgi-bin/material/del_material",
       json_map(media_id: media_id),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -148,7 +149,7 @@ defmodule WeChat.Material do
         index: index,
         article: article
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -158,7 +159,7 @@ defmodule WeChat.Material do
   @spec get_material_count(WeChat.client()) :: WeChat.response()
   def get_material_count(client) do
     Requester.get("/cgi-bin/material/get_materialcount",
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -176,7 +177,7 @@ defmodule WeChat.Material do
     Requester.post(
       "/cgi-bin/material/batchget_material",
       json_map(type: type, offset: offset, count: count),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

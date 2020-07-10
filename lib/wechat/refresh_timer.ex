@@ -2,7 +2,8 @@ defmodule WeChat.RefreshTimer do
   @moduledoc false
   use GenServer
   require Logger
-  alias WeChat.{Utils, StorageAdapter, Account, WebApp, Component, MiniProgram}
+  alias WeChat.Storage.Adapter, as: StorageAdapter
+  alias WeChat.{Utils, Account, WebApp, Component, MiniProgram, Storage.Cache}
 
   @type opts :: map()
   # 过期前10分钟刷新
@@ -43,7 +44,7 @@ defmodule WeChat.RefreshTimer do
 
   @impl true
   def init(state) do
-    WeChat.new_cache_table()
+    Cache.init_table()
 
     state =
       Map.new(state, fn
@@ -104,7 +105,7 @@ defmodule WeChat.RefreshTimer do
   end
 
   def cache_and_store(store_id, store_key, value, expired_time, client) do
-    WeChat.put_cache(store_id, store_key, value)
+    Cache.put_cache(store_id, store_key, value)
 
     storage = client.storage()
 
@@ -125,7 +126,7 @@ defmodule WeChat.RefreshTimer do
       diff = expired_time - Utils.now_unix()
 
       if diff > 0 do
-        WeChat.put_cache(store_id, store_key, value)
+        Cache.put_cache(store_id, store_key, value)
 
         Logger.info(
           "Get [#{store_id}] [#{store_key}] [expires_in: #{diff}] from #{storage} succeed."
@@ -167,7 +168,7 @@ defmodule WeChat.RefreshTimer do
     ]
 
   defp do_add(client, opts) do
-    WeChat.set_client(client)
+    Cache.set_client(client)
     role = client.role()
 
     refresh_list =

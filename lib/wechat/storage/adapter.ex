@@ -1,5 +1,5 @@
-defmodule WeChat.StorageAdapter do
-  @moduledoc false
+defmodule WeChat.Storage.Adapter do
+  @moduledoc "存储器适配器"
   @type store_id :: String.t()
   @type store_key :: atom() | String.t()
   @type value :: map()

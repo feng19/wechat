@@ -5,7 +5,8 @@ defmodule WeChat.Component do
   [API Docs Link](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Third_party_platform_appid.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.{Requester, WebApp}
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, WebApp, Storage.Cache}
 
   @typedoc """
   要授权的帐号类型:
@@ -19,7 +20,7 @@ defmodule WeChat.Component do
   @type auth_type :: 1 | 2 | 3
   @type biz_appid :: WeChat.appid()
 
-  @doc_link "#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/api"
+  @doc_link "#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api"
 
   @typedoc """
   选项名称及可选值说明 - [Official API Docs Link](#{@doc_link}/api_get_authorizer_option.html#选项名称及可选值说明){:target="_blank"}
@@ -37,7 +38,7 @@ defmodule WeChat.Component do
   @type option_name :: String.t()
 
   @doc """
-  生成授权链接 - [Official API Docs Link](#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/Authorization_Process_Technical_Description.html){:target="_blank"}
+  生成授权链接 - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Authorization_Process_Technical_Description.html){:target="_blank"}
   """
   @spec bind_component_url(WeChat.client(), WebApp.redirect_uri(), auth_type() | biz_appid()) ::
           url :: String.t() | WeChat.response()
@@ -67,7 +68,7 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  请求`code` - [Official API Docs Link](#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html){:target="_blank"}
+  请求`code` - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html){:target="_blank"}
   """
   @spec oauth2_authorize_url(WeChat.client(), WebApp.redirect_uri(), WebApp.scope()) ::
           url :: String.t()
@@ -84,7 +85,7 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  通过`code`换取网页授权`access_token` - [Official API Docs Link](#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html){:target="_blank"}
+  通过`code`换取网页授权`access_token` - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html){:target="_blank"}
   """
   @spec code2access_token(WeChat.client(), WebApp.code()) :: WeChat.response()
   def code2access_token(client, code) do
@@ -97,13 +98,13 @@ defmodule WeChat.Component do
         code: code,
         grant_type: "authorization_code",
         component_appid: component_appid,
-        component_access_token: WeChat.get_cache(component_appid, :component_access_token)
+        component_access_token: Cache.get_cache(component_appid, :component_access_token)
       ]
     )
   end
 
   @doc """
-  刷新`access_token` - [Official API Docs Link](#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html){:target="_blank"}
+  刷新`access_token` - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html){:target="_blank"}
 
   由于`access_token`拥有较短的有效期，当`access_token`超时后，可以使用`refresh_token`进行刷新，
 
@@ -119,13 +120,13 @@ defmodule WeChat.Component do
         grant_type: "refresh_token",
         refresh_token: refresh_token,
         component_appid: component_appid,
-        component_access_token: WeChat.get_cache(component_appid, :component_access_token)
+        component_access_token: Cache.get_cache(component_appid, :component_access_token)
       ]
     )
   end
 
   @doc """
-  接口调用次数清零 - [Official API Docs Link](#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
+  接口调用次数清零 - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
   """
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do
@@ -134,7 +135,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/clear_quota",
       json_map(component_appid: component_appid),
-      query: [component_access_token: WeChat.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
     )
   end
 
@@ -145,7 +146,7 @@ defmodule WeChat.Component do
   def get_component_token(client) do
     component_appid = client.component_appid()
 
-    with ticket when ticket != nil <- WeChat.get_cache(component_appid, :component_verify_ticket) do
+    with ticket when ticket != nil <- Cache.get_cache(component_appid, :component_verify_ticket) do
       Requester.post(
         "/cgi-bin/component/api_component_token",
         json_map(
@@ -167,7 +168,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/api_create_preauthcode",
       json_map(component_appid: component_appid),
-      query: [component_access_token: WeChat.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
     )
   end
 
@@ -184,7 +185,7 @@ defmodule WeChat.Component do
         component_appid: component_appid,
         authorization_code: authorization_code
       ),
-      query: [component_access_token: WeChat.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
     )
   end
 
@@ -196,7 +197,7 @@ defmodule WeChat.Component do
     appid = client.appid()
 
     with authorizer_refresh_token when authorizer_refresh_token != nil <-
-           WeChat.get_cache(appid, :authorizer_refresh_token) do
+           Cache.get_cache(appid, :authorizer_refresh_token) do
       component_appid = client.component_appid()
 
       Requester.post(
@@ -207,7 +208,7 @@ defmodule WeChat.Component do
           authorizer_refresh_token: authorizer_refresh_token
         ),
         query: [
-          component_access_token: WeChat.get_cache(component_appid, :component_access_token)
+          component_access_token: Cache.get_cache(component_appid, :component_access_token)
         ]
       )
     end
@@ -223,7 +224,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/api_get_authorizer_info",
       json_map(component_appid: component_appid, authorizer_appid: client.appid()),
-      query: [component_access_token: WeChat.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
     )
   end
 
@@ -241,7 +242,7 @@ defmodule WeChat.Component do
         authorizer_appid: client.appid(),
         option_name: option_name
       ),
-      query: [component_access_token: WeChat.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
     )
   end
 
@@ -256,7 +257,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/api_get_authorizer_list",
       json_map(component_appid: component_appid, offset: offset, count: count),
-      query: [component_access_token: WeChat.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
     )
   end
 
@@ -272,7 +273,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/open/create",
       json_map(appid: appid),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -288,7 +289,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/open/bind",
       json_map(appid: appid, open_appid: open_appid),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -304,7 +305,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/open/unbind",
       json_map(appid: appid, open_appid: open_appid),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -318,7 +319,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/open/get",
       json_map(appid: appid),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

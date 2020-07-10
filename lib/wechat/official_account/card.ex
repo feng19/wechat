@@ -5,9 +5,10 @@ defmodule WeChat.Card do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/WeChat_Coupon_Interface.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.Requester
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Cards_and_Offer"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer"
 
   @type card_id :: String.t()
   @typedoc """
@@ -59,7 +60,7 @@ defmodule WeChat.Card do
   @spec create(WeChat.client(), body :: map) :: WeChat.response()
   def create(client, body) do
     Requester.post("/card/create", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -81,7 +82,7 @@ defmodule WeChat.Card do
     Requester.post(
       "/card/paycell/set",
       json_map(card_id: card_id, is_open: is_open),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -102,7 +103,7 @@ defmodule WeChat.Card do
     Requester.post(
       "/card/selfconsumecell/set",
       json_map(card_id: card_id, is_open: is_open),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -117,7 +118,7 @@ defmodule WeChat.Card do
     Requester.post(
       "/card/code/get",
       json_map(card_id: card_id, code: card_code, check_consume: check_consume),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -131,7 +132,7 @@ defmodule WeChat.Card do
     Requester.post(
       "/card/code/consume",
       json_map(code: card_code),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -147,7 +148,7 @@ defmodule WeChat.Card do
     Requester.post(
       "/card/code/consume",
       json_map(card_id: card_id, code: card_code),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -161,7 +162,7 @@ defmodule WeChat.Card do
     Requester.post(
       "/card/code/decrypt",
       json_map(encrypt_code: encrypt_code),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

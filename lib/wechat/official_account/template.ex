@@ -5,9 +5,10 @@ defmodule WeChat.Template do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.Requester
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Message_Management/Template_Message_Interface.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Template_Message_Interface.html"
 
   @type template_id :: String.t()
   @type title :: String.t()
@@ -24,7 +25,7 @@ defmodule WeChat.Template do
     Requester.post(
       "/cgi-bin/template/api_set_industry",
       json_map(industry_id1: industry_id1, industry_id2: industry_id2),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -34,7 +35,7 @@ defmodule WeChat.Template do
   @spec get_industry(WeChat.client()) :: WeChat.response()
   def get_industry(client) do
     Requester.get("/cgi-bin/template/get_industry",
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -46,7 +47,7 @@ defmodule WeChat.Template do
     Requester.post(
       "/cgi-bin/template/api_add_template",
       json_map(template_id_short: template_id_short),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -56,7 +57,7 @@ defmodule WeChat.Template do
   @spec get_all_private_template(WeChat.client()) :: WeChat.response()
   def get_all_private_template(client) do
     Requester.get("/cgi-bin/template/get_all_private_template",
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -68,7 +69,7 @@ defmodule WeChat.Template do
     Requester.post(
       "/cgi-bin/template/del_private_template",
       json_map(template_id: template_id),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -85,7 +86,7 @@ defmodule WeChat.Template do
         template_id: template_id,
         data: data
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -95,7 +96,7 @@ defmodule WeChat.Template do
   @spec send_template_message(WeChat.client(), body :: map) :: WeChat.response()
   def send_template_message(client, body) do
     Requester.post("/cgi-bin/message/template/send", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

@@ -32,7 +32,7 @@ defmodule WeChat.ServerMessage.Encryptor do
   end
 
   @spec decrypt(msg_encrypted :: String.t(), encoding_aes_key()) ::
-          {WeChat.appid(), xml :: String.t()}
+          {WeChat.appid(), message :: String.t()}
   def decrypt(msg_encrypted, encoding_aes_key) do
     aes_key = aes_key(encoding_aes_key)
 

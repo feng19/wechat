@@ -1,16 +1,16 @@
-defmodule WeChat.DefaultStorage do
+defmodule WeChat.Storage.File do
   @moduledoc """
-  默认存储器
+  文件存储器(default)
 
   将数据存储在 `wechat/priv/wechat_app_tokens.json` 文件下
   """
-  @behaviour WeChat.StorageAdapter
+  @behaviour WeChat.Storage.Adapter
   @app :wechat
   @store_file "wechat_app_tokens.json"
-  alias WeChat.StorageAdapter
+  alias WeChat.Storage.Adapter
 
   @impl true
-  @spec store(StorageAdapter.store_id(), StorageAdapter.store_key(), StorageAdapter.value()) :: :ok | any()
+  @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any()
   def store(store_id, store_key, value) do
     file = Path.join([:code.priv_dir(@app), @store_file])
 
@@ -35,7 +35,7 @@ defmodule WeChat.DefaultStorage do
   end
 
   @impl true
-  @spec restore(StorageAdapter.store_id(), StorageAdapter.store_key()) :: {:ok, StorageAdapter.value()}
+  @spec restore(Adapter.store_id(), Adapter.store_key()) :: {:ok, Adapter.value()}
   def restore(store_id, store_key) do
     file = Path.join([:code.priv_dir(@app), @store_file])
 

@@ -13,4 +13,6 @@ defmodule WeChat.Utils do
 
   @spec now_unix() :: timestamp()
   def now_unix, do: System.system_time(:second)
+
+  def doc_link_prefix, do: "https://developers.weixin.qq.com"
 end

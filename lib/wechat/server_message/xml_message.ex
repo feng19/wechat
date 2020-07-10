@@ -5,11 +5,12 @@ defmodule WeChat.ServerMessage.XmlMessage do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html){:target="_blank"}
   """
   import Saxy.XML
+  import WeChat.Utils, only: [doc_link_prefix: 0]
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Message_Management/Passive_user_reply_message.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Passive_user_reply_message.html"
 
   @doc """
-  回包加密 - [Official API Docs Link](#{WeChat.doc_link_prefix()}/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html)
+  回包加密 - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html)
 
   ```xml
   <xml>

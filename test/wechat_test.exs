@@ -6,7 +6,7 @@ defmodule WeChatTest do
 
   test "Auto generate functions" do
     assert WxApp.role() == :official_account
-    assert WxApp.storage() == WeChat.DefaultStorage
+    assert WxApp.storage() == WeChat.Storage.File
     assert WxApp.appid() == "wx2c2769f8efd9abc2"
     assert WxApp.appsecret() == "appsecret"
     assert WxApp.encoding_aes_key() == "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG"

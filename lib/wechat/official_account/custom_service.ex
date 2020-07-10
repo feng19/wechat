@@ -5,9 +5,10 @@ defmodule WeChat.CustomService do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html#0){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.Requester
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Message_Management/Service_Center_messages.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Service_Center_messages.html"
 
   @type kf_account :: String.t()
   @type nickname :: String.t()
@@ -25,7 +26,7 @@ defmodule WeChat.CustomService do
         nickname: nickname,
         password: password
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -41,7 +42,7 @@ defmodule WeChat.CustomService do
         nickname: nickname,
         password: password
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -60,7 +61,7 @@ defmodule WeChat.CustomService do
         nickname: nickname,
         password: password
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -72,7 +73,7 @@ defmodule WeChat.CustomService do
   #  # todo upload file_path
   #  Requester.post("/cgi-bin/customservice/kfaccount/uploadheadimg", mp,
   #    query: [
-  #      kf_account: kf_account, access_token: WeChat.get_cache(client.appid(), :access_token)
+  #      kf_account: kf_account, access_token: Cache.get_cache(client.appid(), :access_token)
   #    ]
   #  )
   # end
@@ -83,7 +84,7 @@ defmodule WeChat.CustomService do
   @spec get_kf_list(WeChat.client()) :: WeChat.response()
   def get_kf_list(client) do
     Requester.get("/cgi-bin/customservice/getkflist",
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

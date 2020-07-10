@@ -5,12 +5,13 @@ defmodule WeChat.UserTag do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.Requester
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Storage.Cache}
 
   @type tag_id :: integer
   @type tag_name :: String.t()
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/User_Management/User_Tag_Management.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management/User_Tag_Management.html"
 
   @doc """
   创建标签 - [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
@@ -24,7 +25,7 @@ defmodule WeChat.UserTag do
           name: name
         }
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -34,7 +35,7 @@ defmodule WeChat.UserTag do
   @spec get(WeChat.client()) :: WeChat.response()
   def get(client) do
     Requester.get("/cgi-bin/tags/get",
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -51,7 +52,7 @@ defmodule WeChat.UserTag do
           name: name
         }
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -67,7 +68,7 @@ defmodule WeChat.UserTag do
           id: id
         }
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -79,7 +80,7 @@ defmodule WeChat.UserTag do
     Requester.post(
       "/cgi-bin/user/tag/get",
       json_map(tagid: id),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -95,7 +96,7 @@ defmodule WeChat.UserTag do
         tagid: id,
         next_openid: next_openid
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -110,7 +111,7 @@ defmodule WeChat.UserTag do
         tagid: id,
         openid_list: openid_list
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -125,7 +126,7 @@ defmodule WeChat.UserTag do
         tagid: id,
         openid_list: openid_list
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -137,7 +138,7 @@ defmodule WeChat.UserTag do
     Requester.post(
       "/cgi-bin/tags/getidlist",
       json_map(openid: openid),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

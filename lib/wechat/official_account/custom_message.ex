@@ -5,9 +5,10 @@ defmodule WeChat.CustomMessage do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.{Requester, Card, Material}
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Card, Material, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Message_Management/Service_Center_messages.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Service_Center_messages.html"
 
   @type template_id :: String.t()
   @type title :: String.t()
@@ -275,7 +276,7 @@ defmodule WeChat.CustomMessage do
   """
   def send_msg(client, body) do
     Requester.post("/cgi-bin/message/custom/send", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -291,7 +292,7 @@ defmodule WeChat.CustomMessage do
     Requester.post(
       "/cgi-bin/message/custom/typing",
       json_map(touser: openid, command: command),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

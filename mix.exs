@@ -1,6 +1,6 @@
 defmodule WeChat.MixProject do
   use Mix.Project
-  alias WeChat.{ServerMessage, MiniProgram}
+  alias WeChat.{ServerMessage, MiniProgram, Storage}
 
   def project do
     [
@@ -47,9 +47,9 @@ defmodule WeChat.MixProject do
         {"Basic",
          [
            WeChat,
-           WeChat.Requester,
-           WeChat.DefaultStorage
+           WeChat.Requester
          ]},
+        {"Storage", [Storage.Adapter, Storage.File, Storage.Cache]},
         {"Structure", [WeChat.Article]},
         {
           "用户管理 APIs",

@@ -5,9 +5,10 @@ defmodule WeChat.BatchSends do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.Requester
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html"
 
   @typedoc "消息发送任务的ID"
   @type msg_id :: String.t()
@@ -18,7 +19,7 @@ defmodule WeChat.BatchSends do
   @spec batch_send_by_tag(WeChat.client(), body :: map) :: WeChat.response()
   def batch_send_by_tag(client, body) do
     Requester.post("/cgi-bin/message/mass/sendall", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -28,7 +29,7 @@ defmodule WeChat.BatchSends do
   @spec batch_send_by_list(WeChat.client(), body :: map) :: WeChat.response()
   def batch_send_by_list(client, body) do
     Requester.post("/cgi-bin/message/mass/send", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -49,7 +50,7 @@ defmodule WeChat.BatchSends do
     Requester.post(
       "/cgi-bin/message/mass/delete",
       json_map(msg_id: msg_id, article_idx: article_idx),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -63,7 +64,7 @@ defmodule WeChat.BatchSends do
   @spec preview(WeChat.client(), body :: map) :: WeChat.response()
   def preview(client, body) do
     Requester.post("/cgi-bin/message/mass/preview", body,
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -77,7 +78,7 @@ defmodule WeChat.BatchSends do
   @spec get(WeChat.client(), msg_id) :: WeChat.response()
   def get(client, msg_id) do
     Requester.post("/cgi-bin/message/mass/get", json_map(msg_id: msg_id),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -87,7 +88,7 @@ defmodule WeChat.BatchSends do
   @spec get_speed(WeChat.client()) :: WeChat.response()
   def get_speed(client) do
     Requester.get("/cgi-bin/message/mass/speed/get",
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -109,7 +110,7 @@ defmodule WeChat.BatchSends do
   @spec set_speed(WeChat.client(), speed :: integer) :: WeChat.response()
   def set_speed(client, speed) do
     Requester.post("/cgi-bin/message/mass/speed/set", json_map(speed: speed),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

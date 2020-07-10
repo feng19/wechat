@@ -5,9 +5,10 @@ defmodule WeChat.Comment do
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Comments_management/Image_Comments_Management_Interface.html){:target="_blank"}
   """
   import Jason.Helpers
-  alias WeChat.Requester
+  import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Requester, Storage.Cache}
 
-  @doc_link "#{WeChat.doc_link_prefix()}/offiaccount/Comments_management/Image_Comments_Management_Interface.html"
+  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Comments_management/Image_Comments_Management_Interface.html"
 
   @type msg_data_id :: integer
   @type user_comment_id :: integer
@@ -28,7 +29,7 @@ defmodule WeChat.Comment do
     Requester.post(
       "/cgi-bin/comment/open",
       json_map(msg_data_id: msg_data_id, index: index),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -40,7 +41,7 @@ defmodule WeChat.Comment do
     Requester.post(
       "/cgi-bin/comment/close",
       json_map(msg_data_id: msg_data_id, index: index),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -75,7 +76,7 @@ defmodule WeChat.Comment do
         count: count,
         type: type
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -92,7 +93,7 @@ defmodule WeChat.Comment do
         index: index,
         user_comment_id: user_comment_id
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -109,7 +110,7 @@ defmodule WeChat.Comment do
         index: index,
         user_comment_id: user_comment_id
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -126,7 +127,7 @@ defmodule WeChat.Comment do
         index: index,
         user_comment_id: user_comment_id
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -144,7 +145,7 @@ defmodule WeChat.Comment do
         user_comment_id: user_comment_id,
         content: content
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 
@@ -161,7 +162,7 @@ defmodule WeChat.Comment do
         index: index,
         user_comment_id: user_comment_id
       ),
-      query: [access_token: WeChat.get_cache(client.appid(), :access_token)]
+      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
     )
   end
 end

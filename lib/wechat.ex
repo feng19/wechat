@@ -2,10 +2,14 @@ defmodule WeChat do
   @moduledoc """
   WeChat SDK for Elixir
   """
+  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.MiniProgram
 
   @type appid :: String.t()
   @type openid :: String.t()
+  @typedoc """
+  [UnionID机制说明](#{doc_link_prefix()}/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html)
+  """
   @type unionid :: String.t()
   @type username :: String.t()
 
@@ -22,12 +26,7 @@ defmodule WeChat do
   @type app_type :: :official_account | :mini_program | :both
   @type response :: Tesla.Env.result()
 
-  @type cache_id :: appid() | {appid(), appid()}
-  @type cache_sub_key :: atom()
-  @type cache_key :: {cache_id(), appid()}
-  @type cache_value :: String.t() | integer()
-
-  @default_opts [role: :official_account, storage: WeChat.DefaultStorage]
+  @default_opts [role: :official_account, storage: WeChat.Storage.File]
   @official_account_modules [
     WeChat.Material,
     WeChat.Card,
@@ -260,35 +259,5 @@ defmodule WeChat do
       {:need_open_comment, 1},
       {:only_fans_can_comment, 1}
     ]
-  end
-
-  def doc_link_prefix, do: "https://developers.weixin.qq.com/doc"
-
-  def new_cache_table() do
-    :ets.new(:wechat, [:named_table, :set, :public, read_concurrency: true])
-  end
-
-  @spec set_client(client()) :: true
-  def set_client(client), do: put_cache(client.appid(), :client, client)
-
-  @spec search_client(appid()) :: nil | client()
-  def search_client(appid), do: get_cache(appid, :client)
-
-  @spec put_cache(cache_id(), cache_sub_key(), cache_value()) :: true
-  def put_cache(id, sub_key, value) do
-    :ets.insert(:wechat, {{id, sub_key}, value})
-  end
-
-  @spec get_cache(cache_id(), cache_sub_key()) :: nil | cache_value()
-  def get_cache(id, sub_key) do
-    case :ets.lookup(:wechat, {id, sub_key}) do
-      [{_, value}] -> value
-      _ -> nil
-    end
-  end
-
-  @spec del_cache(cache_id(), cache_sub_key()) :: true
-  def del_cache(id, sub_key) do
-    :ets.delete(:wechat, {id, sub_key})
   end
 end
