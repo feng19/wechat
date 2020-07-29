@@ -237,4 +237,52 @@ defmodule WeChat.ServerMessage.XmlMessage do
     ])
     |> Saxy.encode!(nil)
   end
+
+  @doc """
+  消息转发客服消息 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
+
+  ```xml
+  <xml>
+    <ToUserName><![CDATA[touser]]></ToUserName>
+    <FromUserName><![CDATA[fromuser]]></FromUserName>
+    <CreateTime>1399197672</CreateTime>
+    <MsgType><![CDATA[transfer_customer_service]]></MsgType>
+  </xml>
+  ```
+  """
+  def transfer_customer_service(to_openid, from_wx_no, timestamp) do
+    element("xml", [], [
+      element("ToUserName", [], cdata(to_openid)),
+      element("FromUserName", [], cdata(from_wx_no)),
+      element("CreateTime", [], to_string(timestamp)),
+      element("MsgType", [], "transfer_customer_service")
+    ])
+    |> Saxy.encode!(nil)
+  end
+
+  @doc """
+  消息转发到指定客服 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
+
+  ```xml
+  <xml>
+    <ToUserName><![CDATA[touser]]></ToUserName>
+    <FromUserName><![CDATA[fromuser]]></FromUserName>
+    <CreateTime>1399197672</CreateTime>
+    <MsgType><![CDATA[transfer_customer_service]]></MsgType>
+    <TransInfo>
+      <KfAccount><![CDATA[test1@test]]></KfAccount>
+    </TransInfo>
+  </xml>
+  ```
+  """
+  def transfer_customer_service(to_openid, from_wx_no, timestamp, kf_account) do
+    element("xml", [], [
+      element("ToUserName", [], cdata(to_openid)),
+      element("FromUserName", [], cdata(from_wx_no)),
+      element("CreateTime", [], to_string(timestamp)),
+      element("MsgType", [], "transfer_customer_service"),
+      element("TransInfo", [], element("KfAccount", [], cdata(kf_account)))
+    ])
+    |> Saxy.encode!(nil)
+  end
 end
