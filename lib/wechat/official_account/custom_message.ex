@@ -6,7 +6,7 @@ defmodule WeChat.CustomMessage do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Card, Material, Storage.Cache}
+  alias WeChat.{Requester, Card, Material}
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Service_Center_messages.html"
 
@@ -276,7 +276,7 @@ defmodule WeChat.CustomMessage do
   """
   def send_msg(client, body) do
     Requester.post("/cgi-bin/message/custom/send", body,
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 
@@ -292,7 +292,7 @@ defmodule WeChat.CustomMessage do
     Requester.post(
       "/cgi-bin/message/custom/typing",
       json_map(touser: openid, command: command),
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 end

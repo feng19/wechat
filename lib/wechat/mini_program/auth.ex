@@ -3,7 +3,7 @@ defmodule WeChat.MiniProgram.Auth do
   权限接口
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Utils, Storage.Cache, ServerMessage.Encryptor}
+  alias WeChat.{Requester, Utils, ServerMessage.Encryptor}
 
   @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api"
 
@@ -77,7 +77,7 @@ defmodule WeChat.MiniProgram.Auth do
     Requester.get("/wxa/getpaidunionid",
       query: [
         openid: openid,
-        access_token: Cache.get_cache(client.appid(), :access_token)
+        access_token: client.get_access_token()
       ]
     )
   end
@@ -98,7 +98,7 @@ defmodule WeChat.MiniProgram.Auth do
       query: [
         openid: openid,
         transaction_id: transaction_id,
-        access_token: Cache.get_cache(client.appid(), :access_token)
+        access_token: client.get_access_token()
       ]
     )
   end
@@ -127,7 +127,7 @@ defmodule WeChat.MiniProgram.Auth do
         openid: openid,
         mch_id: mch_id,
         out_trade_no: out_trade_no,
-        access_token: Cache.get_cache(client.appid(), :access_token)
+        access_token: client.get_access_token()
       ]
     )
   end

@@ -3,7 +3,7 @@ defmodule WeChat do
   WeChat SDK for Elixir
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.MiniProgram
+  alias WeChat.{Component, MiniProgram}
 
   @type appid :: String.t()
   @type openid :: String.t()
@@ -59,13 +59,13 @@ defmodule WeChat do
         :component ->
           case Keyword.get(opts, :app_type, :official_account) do
             :official_account ->
-              [WeChat.Component | @official_account_modules]
+              [Component | @official_account_modules]
 
             :mini_program ->
-              [WeChat.Component | @mini_program_modules]
+              [Component | @mini_program_modules]
 
             :both ->
-              [WeChat.Component | @official_account_modules ++ @mini_program_modules]
+              [Component | @official_account_modules ++ @mini_program_modules]
           end
 
         :mini_program ->
@@ -117,9 +117,21 @@ defmodule WeChat do
   end
 
   defp gen_get_function(default_opts) do
+    appid =
+      case Keyword.get(default_opts, :appid) do
+        appid when is_binary(appid) ->
+          appid
+
+        _ ->
+          raise ArgumentError, "please set appid"
+      end
+
     [
       quote do
         def default_opts, do: unquote(default_opts)
+      end,
+      quote do
+        def get_access_token, do: WeChat.Storage.Cache.get_cache(unquote(appid), :access_token)
       end
       | Enum.map(default_opts, fn {key, value} ->
           quote do

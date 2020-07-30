@@ -2,7 +2,7 @@ defmodule WeChat.User do
   @moduledoc "用户管理"
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Storage.Cache}
+  alias WeChat.Requester
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management"
 
@@ -14,7 +14,7 @@ defmodule WeChat.User do
     Requester.post(
       "/cgi-bin/user/info/updateremark",
       json_map(openid: openid, remark: remark),
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 
@@ -26,7 +26,7 @@ defmodule WeChat.User do
     Requester.get("/cgi-bin/user/info",
       query: [
         openid: openid,
-        access_token: Cache.get_cache(client.appid(), :access_token)
+        access_token: client.get_access_token()
       ]
     )
   end
@@ -40,7 +40,7 @@ defmodule WeChat.User do
       query: [
         openid: openid,
         lang: lang,
-        access_token: Cache.get_cache(client.appid(), :access_token)
+        access_token: client.get_access_token()
       ]
     )
   end
@@ -53,7 +53,7 @@ defmodule WeChat.User do
     Requester.post(
       "/cgi-bin/user/info/batchget",
       json_map(user_list: user_list),
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 
@@ -63,7 +63,7 @@ defmodule WeChat.User do
   @spec get_users(WeChat.client()) :: WeChat.response()
   def get_users(client) do
     Requester.get("/cgi-bin/user/get",
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 
@@ -75,7 +75,7 @@ defmodule WeChat.User do
     Requester.get("/cgi-bin/user/get",
       query: [
         next_openid: next_openid,
-        access_token: Cache.get_cache(client.appid(), :access_token)
+        access_token: client.get_access_token()
       ]
     )
   end

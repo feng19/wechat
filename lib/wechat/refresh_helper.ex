@@ -3,7 +3,7 @@ defmodule WeChat.RefreshHelper do
   alias WeChat.{Account, WebApp, Component, MiniProgram}
 
   def get_refresh_list_by_client(client) do
-    case client.role do
+    case client.role() do
       :official_account ->
         official_account_refresh_list()
 

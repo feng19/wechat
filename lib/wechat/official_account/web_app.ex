@@ -31,53 +31,114 @@ defmodule WeChat.WebApp do
   @type js_api_ticket_type :: String.t()
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/OA_Web_Apps"
+  @component_doc_link "#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html"
 
   @doc """
-  请求`code` - [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#0){:target="_blank"}
+  请求`code`
+
+  Official API Docs Link:
+  * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#0){:target="_blank"}
+  * [Component](#{@component_doc_link}){:target="_blank"}
   """
   @spec oauth2_authorize_url(WeChat.client(), redirect_uri(), state(), scope()) :: url()
   def oauth2_authorize_url(client, redirect_uri, scope \\ "snsapi_base", state \\ "") do
-    "https://open.weixin.qq.com/connect/oauth2/authorize?" <>
-      URI.encode_query(
-        appid: client.appid(),
-        redirect_uri: redirect_uri,
-        response_type: "code",
-        scope: scope,
-        state: state
-      ) <> "#wechat_redirect"
+    query =
+      case client.role() do
+        :official_account ->
+          URI.encode_query(
+            appid: client.appid(),
+            redirect_uri: redirect_uri,
+            response_type: "code",
+            scope: scope,
+            state: state
+          )
+
+        :component ->
+          URI.encode_query(
+            appid: client.appid(),
+            redirect_uri: redirect_uri,
+            response_type: "code",
+            scope: scope,
+            state: state,
+            component_appid: client.component_appid()
+          )
+      end
+
+    "https://open.weixin.qq.com/connect/oauth2/authorize?" <> query <> "#wechat_redirect"
   end
 
   @doc """
-  通过`code`换取网页授权`access_token` - [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#1){:target="_blank"}
+  通过`code`换取网页授权`access_token`
+
+  Official API Docs Link:
+    * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#1){:target="_blank"}
+    * [Component](#{@component_doc_link}){:target="_blank"}
   """
   @spec code2access_token(WeChat.client(), code()) :: WeChat.response()
   def code2access_token(client, code) do
-    Requester.get("/sns/oauth2/access_token",
-      query: [
-        appid: client.appid(),
-        secret: client.appsecret(),
-        code: code,
-        grant_type: "authorization_code"
-      ]
-    )
+    case client.role() do
+      :official_account ->
+        Requester.get("/sns/oauth2/access_token",
+          query: [
+            appid: client.appid(),
+            secret: client.appsecret(),
+            code: code,
+            grant_type: "authorization_code"
+          ]
+        )
+
+      :component ->
+        component_appid = client.component_appid()
+
+        Requester.get(
+          "/sns/oauth2/component/access_token",
+          query: [
+            appid: client.appid(),
+            code: code,
+            grant_type: "authorization_code",
+            component_appid: component_appid,
+            component_access_token: Cache.get_cache(component_appid, :component_access_token)
+          ]
+        )
+    end
   end
 
   @doc """
-  刷新`access_token` - [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#2){:target="_blank"}
+  刷新`access_token`
 
   由于`access_token`拥有较短的有效期，当`access_token`超时后，可以使用`refresh_token`进行刷新，
 
   `refresh_token`有效期为30天，当`refresh_token`失效之后，需要用户重新授权。
+
+  Official API Docs Link:
+    * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#2){:target="_blank"}
+    * [Component](#{@component_doc_link}){:target="_blank"}
   """
   @spec refresh_token(WeChat.client(), refresh_token()) :: WeChat.response()
   def refresh_token(client, refresh_token) do
-    Requester.get("/sns/oauth2/refresh_token",
-      query: [
-        appid: client.appid(),
-        grant_type: "refresh_token",
-        refresh_token: refresh_token
-      ]
-    )
+    case client.role() do
+      :official_account ->
+        Requester.get("/sns/oauth2/refresh_token",
+          query: [
+            appid: client.appid(),
+            grant_type: "refresh_token",
+            refresh_token: refresh_token
+          ]
+        )
+
+      :component ->
+        component_appid = client.component_appid()
+
+        Requester.get("/sns/oauth2/component/refresh_token",
+          query: [
+            appid: client.appid(),
+            grant_type: "refresh_token",
+            refresh_token: refresh_token,
+            component_appid: component_appid,
+            component_access_token: Cache.get_cache(component_appid, :component_access_token)
+          ]
+        )
+    end
   end
 
   @doc """
@@ -232,7 +293,7 @@ defmodule WeChat.WebApp do
   @spec get_ticket(WeChat.client(), js_api_ticket_type()) :: WeChat.response()
   def get_ticket(client, type) do
     Requester.get("/cgi-bin/ticket/getticket",
-      query: [type: type, access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [type: type, access_token: client.get_access_token()]
     )
   end
 end

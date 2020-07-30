@@ -2,7 +2,7 @@ defmodule WeChat.Account do
   @moduledoc "账号管理"
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Storage.Cache}
+  alias WeChat.Requester
 
   @typedoc """
   二维码类型
@@ -56,7 +56,7 @@ defmodule WeChat.Account do
           }
         }
       ),
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 
@@ -71,7 +71,7 @@ defmodule WeChat.Account do
         action: "long2short",
         long_url: long_url
       ),
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 
@@ -81,7 +81,7 @@ defmodule WeChat.Account do
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do
     Requester.post("/cgi-bin/clear_quota", json_map(appid: client.appid()),
-      query: [access_token: Cache.get_cache(client.appid(), :access_token)]
+      query: [access_token: client.get_access_token()]
     )
   end
 end
