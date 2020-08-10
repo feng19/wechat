@@ -26,6 +26,9 @@ defmodule WeChat do
   @type app_type :: :official_account | :mini_program | :both
   @type response :: Tesla.Env.result()
 
+  @spec get_client_by_appid(appid()) :: nil | client()
+  defdelegate get_client_by_appid(appid), to: WeChat.Storage.Cache, as: :search_client
+
   defmacro __using__(opts \\ []) do
     quote do
       use WeChat.ClientBuilder, unquote(opts)
