@@ -42,29 +42,22 @@ defmodule WeChat.WebApp do
   """
   @spec oauth2_authorize_url(WeChat.client(), redirect_uri(), state(), scope()) :: url()
   def oauth2_authorize_url(client, redirect_uri, scope \\ "snsapi_base", state \\ "") do
-    query =
-      case client.role() do
-        :official_account ->
-          URI.encode_query(
-            appid: client.appid(),
-            redirect_uri: redirect_uri,
-            response_type: "code",
-            scope: scope,
-            state: state
-          )
+    redirect_uri = URI.encode_www_form(redirect_uri)
 
-        :component ->
-          URI.encode_query(
-            appid: client.appid(),
-            redirect_uri: redirect_uri,
-            response_type: "code",
-            scope: scope,
-            state: state,
-            component_appid: client.component_appid()
-          )
-      end
+    base_url =
+      "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" <>
+        client.appid() <>
+        "&redirect_uri=" <>
+        redirect_uri <>
+        "&response_type=code&scope=" <> scope <> "&state=" <> state
 
-    "https://open.weixin.qq.com/connect/oauth2/authorize?" <> query <> "#wechat_redirect"
+    case client.role() do
+      :official_account ->
+        base_url <> "#wechat_redirect"
+
+      :component ->
+        base_url <> "&component_appid=" <> client.component_appid() <> "#wechat_redirect"
+    end
   end
 
   @doc """
