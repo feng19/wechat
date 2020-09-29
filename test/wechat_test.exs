@@ -24,7 +24,7 @@ defmodule WeChatTest do
         timestamp,
         "hello world"
       )
-      |> EventHandler.encode_msg(timestamp, WxApp)
+      |> EventHandler.encode_xml_msg(timestamp, WxApp)
 
     assert is_binary(xml_string) == true
   end

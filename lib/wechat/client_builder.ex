@@ -54,14 +54,11 @@ defmodule WeChat.ClientBuilder do
       end
 
     {sub_module_ast_list, files} =
-      Enum.map_reduce(
-        sub_modules,
-        [],
-        fn module, acc ->
-          {file, ast} = gen_sub_module(module, __CALLER__.module)
-          {ast, [quote(do: @external_resource(unquote(file))) | acc]}
-        end
-      )
+      if Keyword.get(opts, :gen_sub_module?, true) do
+        gen_sub_modules(sub_modules, __CALLER__.module)
+      else
+        {[], []}
+      end
 
     default_opts = Macro.prewalk(opts, &Macro.expand(&1, __CALLER__))
 
@@ -117,6 +114,17 @@ defmodule WeChat.ClientBuilder do
           end
         end)
     ]
+  end
+
+  defp gen_sub_modules(sub_modules, parent_module) do
+    Enum.map_reduce(
+      sub_modules,
+      [],
+      fn module, acc ->
+        {file, ast} = gen_sub_module(module, parent_module)
+        {ast, [quote(do: @external_resource(unquote(file))) | acc]}
+      end
+    )
   end
 
   defp gen_sub_module(module, parent_module) do
