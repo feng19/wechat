@@ -45,7 +45,7 @@ defmodule WeChat.Account do
            ] do
     scene_key = (action_name in ["QR_STR_SCENE", "QR_LIMIT_STR_SCENE"] && :scene_str) || :scene_id
 
-    Requester.get(
+    Requester.post(
       "/cgi-bin/qrcode/create",
       json_map(
         action_name: action_name,
