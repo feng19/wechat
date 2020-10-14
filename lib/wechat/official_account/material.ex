@@ -143,7 +143,7 @@ defmodule WeChat.Material do
       json_map(
         media_id: media_id,
         index: index,
-        article: article
+        articles: article
       ),
       query: [access_token: client.get_access_token()]
     )
