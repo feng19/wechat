@@ -176,4 +176,24 @@ defmodule WeChat.Material do
       query: [access_token: client.get_access_token()]
     )
   end
+
+  @doc """
+  获取素材列表 - [Official API Docs Link](#{@doc_link}/Get_materials_list.html){:target="_blank"}
+
+  ## 参数说明:
+    * type:   素材的类型，图片（image）、视频（video）、语音 （voice）、图文（news）
+    * count:  返回素材的数量，取值在1到20之间
+  """
+  @spec stream_unfold_material(WeChat.client(), material_type, material_count) :: Stream.t()
+  def stream_unfold_material(client, type, count \\ 20) do
+    Stream.unfold(0, fn offset ->
+      with {:ok, 200, %{"item" => items}} when items != [] <-
+             batch_get_material(client, type, count, offset) do
+        {items, offset + count}
+      else
+        _ -> nil
+      end
+    end)
+    |> Stream.flat_map(& &1)
+  end
 end
