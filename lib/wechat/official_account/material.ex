@@ -64,7 +64,7 @@ defmodule WeChat.Material do
   """
   @spec get_media(WeChat.client(), media_id) :: WeChat.response()
   def get_media(client, media_id) do
-    Requester.get("/cgi-bin/media/upload",
+    Requester.get("/cgi-bin/media/get",
       query: [
         media_id: media_id,
         access_token: client.get_access_token()
