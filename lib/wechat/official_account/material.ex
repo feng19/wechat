@@ -184,7 +184,7 @@ defmodule WeChat.Material do
     * type:   素材的类型，图片（image）、视频（video）、语音 （voice）、图文（news）
     * count:  返回素材的数量，取值在1到20之间
   """
-  @spec stream_unfold_material(WeChat.client(), material_type, material_count) :: Stream.t()
+  @spec stream_unfold_material(WeChat.client(), material_type, material_count) :: Enumerable.t()
   def stream_unfold_material(client, type, count \\ 20) do
     Stream.unfold(0, fn offset ->
       with {:ok, 200, %{"item" => items}} when items != [] <-

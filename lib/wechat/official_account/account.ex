@@ -61,6 +61,46 @@ defmodule WeChat.Account do
   end
 
   @doc """
+  生成并获取二维码链接 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  """
+  @spec get_qrcode_url(
+          WeChat.client(),
+          scene_id :: String.t(),
+          qrcode_action_name,
+          expire_seconds :: integer
+        ) :: WeChat.response() | {:ok, url :: String.t()}
+  def get_qrcode_url(client, scene_id, action_name \\ "QR_LIMIT_SCENE", expire_seconds \\ 1800) do
+    with {:ok, 200, %{"ticket" => ticket}} <-
+           create_qrcode(client, scene_id, action_name, expire_seconds) do
+      {:ok, "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=#{ticket}"}
+    end
+  end
+
+  @doc """
+  生成并下载二维码 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  """
+  @spec download_qrcode(
+          WeChat.client(),
+          scene_id :: String.t(),
+          qrcode_action_name,
+          expire_seconds :: integer,
+          dir_name :: Path.t()
+        ) :: WeChat.response() | {Collectable.t(), exit_status :: non_neg_integer}
+  def download_qrcode(
+        client,
+        scene_id,
+        action_name \\ "QR_LIMIT_SCENE",
+        expire_seconds \\ 1800,
+        dir_name \\ "."
+      ) do
+    File.mkdir_p!(dir_name)
+
+    with {:ok, url} <- get_qrcode_url(client, scene_id, action_name, expire_seconds) do
+      System.cmd("wget", ["-qO", "#{scene_id}.jpg", url], cd: dir_name)
+    end
+  end
+
+  @doc """
   长链接转成短链接 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/URL_Shortener.html){:target="_blank"}
   """
   @spec short_url(WeChat.client(), long_url :: String.t()) :: WeChat.response()
