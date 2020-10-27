@@ -187,8 +187,9 @@ defmodule WeChat.Material do
   @spec stream_unfold_material(WeChat.client(), material_type, material_count) :: Enumerable.t()
   def stream_unfold_material(client, type, count \\ 20) do
     Stream.unfold(0, fn offset ->
-      with {:ok, 200, %{"item" => items}} when items != [] <-
-             batch_get_material(client, type, count, offset) do
+      with {:ok, %{status: 200, body: body}} <-
+             batch_get_material(client, type, count, offset),
+           %{"item" => items} when items != [] <- body do
         {items, offset + count}
       else
         _ -> nil

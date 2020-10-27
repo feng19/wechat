@@ -70,7 +70,7 @@ defmodule WeChat.Account do
           expire_seconds :: integer
         ) :: WeChat.response() | {:ok, url :: String.t()}
   def get_qrcode_url(client, scene_id, action_name \\ "QR_LIMIT_SCENE", expire_seconds \\ 1800) do
-    with {:ok, 200, %{"ticket" => ticket}} <-
+    with {:ok, %{status: 200, body: %{"ticket" => ticket}}} <-
            create_qrcode(client, scene_id, action_name, expire_seconds) do
       {:ok, "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=#{ticket}"}
     end

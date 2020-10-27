@@ -87,10 +87,10 @@ defmodule WeChat.User do
   def stream_get_user(client) do
     Stream.unfold(nil, fn
       nil ->
-        case get_users(client) do
-          {:ok, 200, %{"data" => %{"openid" => openid_list}, "next_openid" => next_openid}} ->
-            {openid_list, next_openid}
-
+        with {:ok, %{status: 200, body: body}} <- get_users(client),
+             %{"data" => %{"openid" => openid_list}, "next_openid" => next_openid} <- body do
+          {openid_list, next_openid}
+        else
           _ ->
             nil
         end
@@ -99,10 +99,10 @@ defmodule WeChat.User do
         nil
 
       next_openid ->
-        case get_users(client, next_openid) do
-          {:ok, 200, %{"data" => %{"openid" => openid_list}, "next_openid" => next_openid}} ->
-            {openid_list, next_openid}
-
+        with {:ok, %{status: 200, body: body}} <- get_users(client, next_openid),
+             %{"data" => %{"openid" => openid_list}, "next_openid" => next_openid} <- body do
+          {openid_list, next_openid}
+        else
           _ ->
             nil
         end
