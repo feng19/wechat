@@ -134,20 +134,20 @@ defmodule WeChat.RefreshTimer do
         Cache.put_cache(store_id, store_key, value)
 
         Logger.info(
-          "Get [#{store_id}] [#{store_key}] [expires_in: #{diff}] from #{storage} succeed."
+          "Get [#{store_id}] [#{store_key}] [expires_in: #{diff}] from storage: #{storage} succeed."
         )
 
         {true, diff}
       else
-        Logger.info("Get [#{store_id}] [#{store_key}] from #{storage} token expired.")
+        Logger.info("Get [#{store_id}] [#{store_key}] from storage: #{storage} token expired.")
         false
       end
     else
-      nil ->
+      false ->
         false
 
       error ->
-        Logger.warn("Get [#{store_id}] [#{store_key}] from #{storage} error: #{inspect(error)}.")
+        Logger.warn("Get [#{store_id}] [#{store_key}] from storage: #{storage} error: #{inspect(error)}.")
         false
     end
   end
