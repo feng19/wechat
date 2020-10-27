@@ -79,4 +79,34 @@ defmodule WeChat.User do
       ]
     )
   end
+
+  @doc """
+  获取用户列表 - [Official API Docs Link](#{@doc_link}/Getting_a_User_List.html){:target="_blank"}
+  """
+  @spec stream_get_user(WeChat.client()) :: Enumerable.t()
+  def stream_get_user(client) do
+    Stream.unfold(nil, fn
+      nil ->
+        case get_users(client) do
+          {:ok, 200, %{"data" => %{"openid" => openid_list}, "next_openid" => next_openid}} ->
+            {openid_list, next_openid}
+
+          _ ->
+            nil
+        end
+
+      "" ->
+        nil
+
+      next_openid ->
+        case get_users(client, next_openid) do
+          {:ok, 200, %{"data" => %{"openid" => openid_list}, "next_openid" => next_openid}} ->
+            {openid_list, next_openid}
+
+          _ ->
+            nil
+        end
+    end)
+    |> Stream.flat_map(& &1)
+  end
 end
