@@ -24,11 +24,7 @@ defmodule WeChat.CustomMessage do
   def send_text(client, openid, content) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "text",
-        text: %{content: content}
-      )
+      json_map(touser: openid, msgtype: "text", text: %{content: content})
     )
   end
 
@@ -57,11 +53,7 @@ defmodule WeChat.CustomMessage do
   def send_image(client, openid, media_id) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "image",
-        image: %{media_id: media_id}
-      )
+      json_map(touser: openid, msgtype: "image", image: %{media_id: media_id})
     )
   end
 
@@ -73,11 +65,7 @@ defmodule WeChat.CustomMessage do
   def send_voice(client, openid, media_id) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "voice",
-        voice: %{media_id: media_id}
-      )
+      json_map(touser: openid, msgtype: "voice", voice: %{media_id: media_id})
     )
   end
 
@@ -99,11 +87,7 @@ defmodule WeChat.CustomMessage do
   def send_video(client, openid, map) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "video",
-        video: map
-      )
+      json_map(touser: openid, msgtype: "video", video: map)
     )
   end
 
@@ -126,11 +110,7 @@ defmodule WeChat.CustomMessage do
   def send_music(client, openid, map) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "music",
-        music: map
-      )
+      json_map(touser: openid, msgtype: "music", music: map)
     )
   end
 
@@ -156,11 +136,7 @@ defmodule WeChat.CustomMessage do
       json_map(
         touser: openid,
         msgtype: "news",
-        news: %{
-          articles: [
-            %{title: title, description: description, url: url, picurl: pic_url}
-          ]
-        }
+        news: %{articles: [%{title: title, description: description, url: url, picurl: pic_url}]}
       )
     )
   end
@@ -172,13 +148,7 @@ defmodule WeChat.CustomMessage do
   def send_news(client, openid, article) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "news",
-        news: %{
-          articles: [article]
-        }
-      )
+      json_map(touser: openid, msgtype: "news", news: %{articles: [article]})
     )
   end
 
@@ -189,11 +159,7 @@ defmodule WeChat.CustomMessage do
   def send_mp_news(client, openid, media_id) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "mpnews",
-        mpnews: %{media_id: media_id}
-      )
+      json_map(touser: openid, msgtype: "mpnews", mpnews: %{media_id: media_id})
     )
   end
 
@@ -223,11 +189,7 @@ defmodule WeChat.CustomMessage do
   def send_menu(client, openid, map) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "msgmenu",
-        msgmenu: map
-      )
+      json_map(touser: openid, msgtype: "msgmenu", msgmenu: map)
     )
   end
 
@@ -238,11 +200,7 @@ defmodule WeChat.CustomMessage do
   def send_card(client, openid, card_id) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "wxcard",
-        wxcard: %{card_id: card_id}
-      )
+      json_map(touser: openid, msgtype: "wxcard", wxcard: %{card_id: card_id})
     )
   end
 
@@ -263,11 +221,7 @@ defmodule WeChat.CustomMessage do
   def send_mini_program_page(client, openid, map) do
     send_msg(
       client,
-      json_map(
-        touser: openid,
-        msgtype: "miniprogrampage",
-        miniprogrampage: map
-      )
+      json_map(touser: openid, msgtype: "miniprogrampage", miniprogrampage: map)
     )
   end
 

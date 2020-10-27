@@ -96,9 +96,6 @@ defmodule WeChat.CardDistributing do
     )
   end
 
-  @doc """
-  设置测试白名单 - [Official API Docs Link](#{@doc_link}#12){:target="_blank"}
-  """
   @spec set_test_whitelist(WeChat.client(), [WeChat.username()]) :: WeChat.response()
   def set_test_whitelist(client, username: username_list) do
     Requester.post("/card/testwhitelist/set", json_map(username: username_list),

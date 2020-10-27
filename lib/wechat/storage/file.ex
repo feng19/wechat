@@ -4,18 +4,19 @@ defmodule WeChat.Storage.File do
 
   将数据存储在 `wechat/priv/wechat_app_tokens.json` 文件下
   """
+  alias WeChat.Storage.Adapter
   @behaviour WeChat.Storage.Adapter
+
   @app :wechat
   @store_file "wechat_app_tokens.json"
-  alias WeChat.Storage.Adapter
 
   @impl true
   @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any()
   def store(store_id, store_key, value) do
     file = Path.join([:code.priv_dir(@app), @store_file])
+    store_key = to_string(store_key)
 
-    with store_key <- to_string(store_key),
-         {:ok, string} <- File.read(file) do
+    with {:ok, string} <- File.read(file) do
       content =
         string
         |> Jason.decode!()
@@ -25,9 +26,7 @@ defmodule WeChat.Storage.File do
       File.write(file, content)
     else
       {:error, :enoent} ->
-        with :ok <-
-               Path.dirname(file)
-               |> File.mkdir_p() do
+        with :ok <- Path.dirname(file) |> File.mkdir_p() do
           content = Jason.encode!(%{store_id => %{store_key => value}})
           File.write(file, content)
         end
@@ -38,9 +37,9 @@ defmodule WeChat.Storage.File do
   @spec restore(Adapter.store_id(), Adapter.store_key()) :: {:ok, Adapter.value()}
   def restore(store_id, store_key) do
     file = Path.join([:code.priv_dir(@app), @store_file])
+    store_key = to_string(store_key)
 
-    with store_key <- to_string(store_key),
-         {:ok, string} <- File.read(file) do
+    with {:ok, string} <- File.read(file) do
       value =
         string
         |> Jason.decode!()

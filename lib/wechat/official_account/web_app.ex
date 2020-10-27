@@ -142,10 +142,7 @@ defmodule WeChat.WebApp do
   @spec user_info(WeChat.openid(), access_token()) :: WeChat.response()
   def user_info(openid, access_token) do
     Requester.get("/sns/userinfo",
-      query: [
-        access_token: access_token,
-        openid: openid
-      ]
+      query: [access_token: access_token, openid: openid]
     )
   end
 
@@ -171,10 +168,7 @@ defmodule WeChat.WebApp do
   @spec auth(WeChat.openid(), access_token()) :: WeChat.response()
   def auth(openid, access_token) do
     Requester.get("/sns/auth",
-      query: [
-        access_token: access_token,
-        openid: openid
-      ]
+      query: [access_token: access_token, openid: openid]
     )
   end
 
@@ -223,10 +217,7 @@ defmodule WeChat.WebApp do
       |> Map.merge(%{appid: client.appid(), outer_str: outer_str})
       |> Jason.encode!()
 
-    %{
-      cardId: card_id,
-      cardExt: card_ext
-    }
+    %{cardId: card_id, cardExt: card_ext}
   end
 
   @doc """
@@ -248,10 +239,7 @@ defmodule WeChat.WebApp do
       |> Map.merge(%{appid: client.appid(), outer_str: outer_str, openid: openid})
       |> Jason.encode!()
 
-    %{
-      cardId: card_id,
-      cardExt: card_ext
-    }
+    %{cardId: card_id, cardExt: card_ext}
   end
 
   @doc """

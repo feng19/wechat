@@ -158,7 +158,7 @@ defmodule WeChat.RefreshTimer do
     refresh_list = init_refresh_list(client, opts)
 
     Logger.info(
-      "Initialize WeChat App: #{client} by Role: #{client.role()}, Storage: #{client.storage}."
+      "Initialize WeChat App: #{client} by Role: #{client.role()}, Storage: #{client.storage()}."
     )
 
     refresh_list =

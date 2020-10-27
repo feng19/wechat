@@ -81,11 +81,7 @@ defmodule WeChat.Template do
   def send_template_message(client, openid, template_id, data) do
     Requester.post(
       "/cgi-bin/message/template/send",
-      json_map(
-        touser: openid,
-        template_id: template_id,
-        data: data
-      ),
+      json_map(touser: openid, template_id: template_id, data: data),
       query: [access_token: client.get_access_token()]
     )
   end

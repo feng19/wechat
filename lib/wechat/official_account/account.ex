@@ -107,10 +107,7 @@ defmodule WeChat.Account do
   def short_url(client, long_url) do
     Requester.get(
       "/cgi-bin/shorturl",
-      json_map(
-        action: "long2short",
-        long_url: long_url
-      ),
+      json_map(action: "long2short", long_url: long_url),
       query: [access_token: client.get_access_token()]
     )
   end

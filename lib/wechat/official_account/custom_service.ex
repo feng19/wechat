@@ -21,11 +21,7 @@ defmodule WeChat.CustomService do
   def add_kf_account(client, kf_account, nickname, password) do
     Requester.post(
       "/cgi-bin/customservice/kfaccount/add",
-      json_map(
-        kf_account: kf_account,
-        nickname: nickname,
-        password: password
-      ),
+      json_map(kf_account: kf_account, nickname: nickname, password: password),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -37,11 +33,7 @@ defmodule WeChat.CustomService do
   def update_kf_account(client, kf_account, nickname, password) do
     Requester.post(
       "/cgi-bin/customservice/kfaccount/update",
-      json_map(
-        kf_account: kf_account,
-        nickname: nickname,
-        password: password
-      ),
+      json_map(kf_account: kf_account, nickname: nickname, password: password),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -56,11 +48,7 @@ defmodule WeChat.CustomService do
   def del_kf_account(client, kf_account, nickname, password) do
     Requester.post(
       "/cgi-bin/customservice/kfaccount/del",
-      json_map(
-        kf_account: kf_account,
-        nickname: nickname,
-        password: password
-      ),
+      json_map(kf_account: kf_account, nickname: nickname, password: password),
       query: [access_token: client.get_access_token()]
     )
   end

@@ -20,11 +20,7 @@ defmodule WeChat.UserTag do
   def create(client, name) do
     Requester.post(
       "/cgi-bin/tags/create",
-      json_map(
-        tag: %{
-          name: name
-        }
-      ),
+      json_map(tag: %{name: name}),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -46,12 +42,7 @@ defmodule WeChat.UserTag do
   def update(client, id, name) do
     Requester.post(
       "/cgi-bin/tags/update",
-      json_map(
-        tag: %{
-          id: id,
-          name: name
-        }
-      ),
+      json_map(tag: %{id: id, name: name}),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -63,11 +54,7 @@ defmodule WeChat.UserTag do
   def delete(client, id) do
     Requester.post(
       "/cgi-bin/tags/delete",
-      json_map(
-        tag: %{
-          id: id
-        }
-      ),
+      json_map(tag: %{id: id}),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -92,10 +79,7 @@ defmodule WeChat.UserTag do
   def get_tag_users(client, id, next_openid) do
     Requester.post(
       "/cgi-bin/user/tag/get",
-      json_map(
-        tagid: id,
-        next_openid: next_openid
-      ),
+      json_map(tagid: id, next_openid: next_openid),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -107,10 +91,7 @@ defmodule WeChat.UserTag do
   def batch_tagging_users(client, id, openid_list) do
     Requester.post(
       "/cgi-bin/tags/members/batchtagging",
-      json_map(
-        tagid: id,
-        openid_list: openid_list
-      ),
+      json_map(tagid: id, openid_list: openid_list),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -122,10 +103,7 @@ defmodule WeChat.UserTag do
   def batch_untagging_users(client, id, openid_list) do
     Requester.post(
       "/cgi-bin/tags/members/batchuntagging",
-      json_map(
-        tagid: id,
-        openid_list: openid_list
-      ),
+      json_map(tagid: id, openid_list: openid_list),
       query: [access_token: client.get_access_token()]
     )
   end
