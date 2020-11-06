@@ -4,8 +4,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
 
   [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html){:target="_blank"}
   """
-  import Saxy.XML
-  import WeChat.Utils, only: [doc_link_prefix: 0]
+  import WeChat.Utils, only: [doc_link_prefix: 0, def_eex: 2]
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Passive_user_reply_message.html"
 
@@ -21,14 +20,15 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def reply_msg(signature, nonce, timestamp, encrypt_content) do
-    element("xml", [], [
-      element("Encrypt", [], cdata(encrypt_content)),
-      element("MsgSignature", [], cdata(signature)),
-      element("TimeStamp", [], to_string(timestamp)),
-      element("Nonce", [], cdata(nonce))
-    ])
-    |> Saxy.encode!(nil)
+  def_eex reply_msg(signature, nonce, timestamp, encrypt_content) do
+    """
+    <xml>
+      <Encrypt><![CDATA[<%= encrypt_content %>]]></Encrypt>
+      <MsgSignature><![CDATA[<%= signature %>]]></MsgSignature>
+      <TimeStamp><%= timestamp %></TimeStamp>
+      <Nonce><![CDATA[<%= nonce %>]]></Nonce>
+    </xml>
+    """
   end
 
   @doc """
@@ -44,15 +44,16 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def reply_text(to_openid, from_wx_no, timestamp, content) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "text"),
-      element("Content", [], cdata(content))
-    ])
-    |> Saxy.encode!(nil)
+  def_eex reply_text(to_openid, from_wx_no, timestamp, content) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>text</MsgType>
+      <Content><![CDATA[<%= content %>]]></Content>
+    </xml>
+    """
   end
 
   @doc """
@@ -70,15 +71,18 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def reply_image(to_openid, from_wx_no, timestamp, media_id) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "image"),
-      element("Image", [], element("MediaId", [], cdata(media_id)))
-    ])
-    |> Saxy.encode!(nil)
+  def_eex reply_image(to_openid, from_wx_no, timestamp, media_id) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>image</MsgType>
+      <Image>
+        <MediaId><![CDATA[<%= media_id %>]]></MediaId>
+      </Image>
+    </xml>
+    """
   end
 
   @doc """
@@ -96,15 +100,18 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def reply_voice(to_openid, from_wx_no, timestamp, media_id) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "voice"),
-      element("Voice", [], element("MediaId", [], cdata(media_id)))
-    ])
-    |> Saxy.encode!(nil)
+  def_eex reply_voice(to_openid, from_wx_no, timestamp, media_id) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>voice</MsgType>
+      <Voice>
+        <MediaId><![CDATA[<%= media_id %>]]></MediaId>
+      </Voice>
+    </xml>
+    """
   end
 
   @doc """
@@ -124,19 +131,20 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def reply_video(to_openid, from_wx_no, timestamp, media_id, title, desc) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "video"),
-      element("Video", [], [
-        element("MediaId", [], cdata(media_id)),
-        element("Title", [], cdata(title)),
-        element("Description", [], cdata(desc))
-      ])
-    ])
-    |> Saxy.encode!(nil)
+  def_eex reply_video(to_openid, from_wx_no, timestamp, media_id, title, desc) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>video</MsgType>
+      <Video>
+        <MediaId><![CDATA[<%= media_id %>]]></MediaId>
+        <Title><![CDATA[<%= title %>]]></Title>
+        <Description><![CDATA[<%= desc %>]]></Description>
+      </Video>
+    </xml>
+    """
   end
 
   @doc """
@@ -158,51 +166,31 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def reply_music(
-        to_openid,
-        from_wx_no,
-        timestamp,
-        thumb_media_id,
-        title,
-        desc,
-        music_url,
-        hq_music_url
-      ) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "music"),
-      element("Music", [], [
-        element("Title", [], cdata(title)),
-        element("Description", [], cdata(desc)),
-        element("MusicUrl", [], cdata(music_url)),
-        element("HQMusicUrl", [], cdata(hq_music_url)),
-        element("ThumbMediaId", [], cdata(thumb_media_id))
-      ])
-    ])
-    |> Saxy.encode!(nil)
-  end
-
-  @doc """
-  回复图文消息 - 文章item - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
-
-  ```xml
-  <item>
-    <Title><![CDATA[title1]]></Title>
-    <Description><![CDATA[description1]]></Description>
-    <PicUrl><![CDATA[picurl]]></PicUrl>
-    <Url><![CDATA[url]]></Url>
-  </item>
-  ```
-  """
-  def article_item(title, desc, pic_url, url) do
-    element("item", [], [
-      element("Title", [], cdata(title)),
-      element("Description", [], cdata(desc)),
-      element("PicUrl", [], cdata(pic_url)),
-      element("Url", [], cdata(url))
-    ])
+  def_eex reply_music(
+            to_openid,
+            from_wx_no,
+            timestamp,
+            title,
+            desc,
+            music_url,
+            hq_music_url,
+            thumb_media_id
+          ) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>music</MsgType>
+      <Music>
+        <Title><![CDATA[<%= title %>]]></Title>
+        <Description><![CDATA[<%= desc %>]]></Description>
+        <MusicUrl><![CDATA[<%= music_url %>]]></MusicUrl>
+        <HQMusicUrl><![CDATA[<%= hq_music_url %>]]></HQMusicUrl>
+        <ThumbMediaId><![CDATA[<%= thumb_media_id %>]]></ThumbMediaId>
+      </Music>
+    </xml>
+    """
   end
 
   @doc """
@@ -226,16 +214,26 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def reply_news(to_openid, from_wx_no, timestamp, article_items) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "news"),
-      element("ArticleCount", [], to_string(length(article_items))),
-      element("Articles", [], article_items)
-    ])
-    |> Saxy.encode!(nil)
+  def_eex reply_news(to_openid, from_wx_no, timestamp, article_items) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>news</MsgType>
+      <ArticleCount><%= length(article_items) %></ArticleCount>
+      <Articles>
+        <%= for article_item <- article_items do %>
+        <item>
+          <Title><![CDATA[<%= article_item.title %>]]></Title>
+          <Description><![CDATA[<%= article_item.desc %>]]></Description>
+          <PicUrl><![CDATA[<%= article_item.pic_url %>]]></PicUrl>
+          <Url><![CDATA[<%= article_item.url %>]]></Url>
+        </item>
+        <% end %>
+      </Articles>
+    </xml>
+    """
   end
 
   @doc """
@@ -250,14 +248,15 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def transfer_customer_service(to_openid, from_wx_no, timestamp) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "transfer_customer_service")
-    ])
-    |> Saxy.encode!(nil)
+  def_eex transfer_customer_service(to_openid, from_wx_no, timestamp) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>transfer_customer_service</MsgType>
+    </xml>
+    """
   end
 
   @doc """
@@ -275,14 +274,17 @@ defmodule WeChat.ServerMessage.XmlMessage do
   </xml>
   ```
   """
-  def transfer_customer_service(to_openid, from_wx_no, timestamp, kf_account) do
-    element("xml", [], [
-      element("ToUserName", [], cdata(to_openid)),
-      element("FromUserName", [], cdata(from_wx_no)),
-      element("CreateTime", [], to_string(timestamp)),
-      element("MsgType", [], "transfer_customer_service"),
-      element("TransInfo", [], element("KfAccount", [], cdata(kf_account)))
-    ])
-    |> Saxy.encode!(nil)
+  def_eex transfer_customer_service(to_openid, from_wx_no, timestamp, kf_account) do
+    """
+    <xml>
+      <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
+      <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
+      <CreateTime><%= timestamp %></CreateTime>
+      <MsgType>transfer_customer_service</MsgType>
+      <TransInfo>
+        <KfAccount><![CDATA[<%= kf_account %>]]></KfAccount>
+      </TransInfo>
+    </xml>
+    """
   end
 end

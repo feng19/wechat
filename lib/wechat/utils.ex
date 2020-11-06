@@ -24,4 +24,19 @@ defmodule WeChat.Utils do
   def sha1(string) when is_binary(string) do
     :crypto.hash(:sha, string) |> Base.encode16(case: :lower)
   end
+
+  defmacro def_eex({name, _, args}, do: source) do
+    args = Enum.map(args, &elem(&1, 0))
+
+    quote do
+      require EEx
+
+      EEx.function_from_string(
+        :def,
+        unquote(name),
+        String.replace(unquote(source), ["\n", "\n  ", "\n    ", "\n      "], ""),
+        unquote(args)
+      )
+    end
+  end
 end
