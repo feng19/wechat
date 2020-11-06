@@ -33,6 +33,7 @@ defmodule WeChat.MixProject do
       {:tesla, "~> 1.3"},
       {:hackney, "~> 1.15.2"},
       {:jason, "~> 1.2"},
+      {:saxy, "~> 1.2"},
       {:ex_doc, "~> 0.22", only: [:docs, :dev], runtime: false}
     ]
   end
