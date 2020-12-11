@@ -6,9 +6,11 @@ defmodule WeChat.Application do
   use Application
 
   def start(_type, _args) do
+    finch_pool = Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
     refresh_timer = Application.get_env(:wechat, :refresh_timer, WeChat.RefreshTimer)
 
     children = [
+      {Finch, name: WeChat.Finch, pools: %{:default => finch_pool}},
       refresh_timer
     ]
 

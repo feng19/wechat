@@ -30,8 +30,8 @@ defmodule WeChat.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:tesla, "~> 1.3"},
-      {:hackney, "~> 1.15.2"},
+      {:tesla, "~> 1.4"},
+      {:finch, "~> 0.5"},
       {:jason, "~> 1.2"},
       {:saxy, "~> 1.2"},
       {:ex_doc, "~> 0.22", only: [:docs, :dev], runtime: false}
