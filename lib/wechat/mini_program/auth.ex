@@ -3,7 +3,7 @@ defmodule WeChat.MiniProgram.Auth do
   权限接口
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Utils, ServerMessage.Encryptor}
+  alias WeChat.{Requester, Utils, ServerMessage.Encryptor, Storage.Cache}
 
   @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api"
 
@@ -49,18 +49,38 @@ defmodule WeChat.MiniProgram.Auth do
   end
 
   @doc """
-  登录 - [Official API Docs Link](#{@doc_link}/login/auth.code2Session.html){:target="_blank"}
+  小程序登录
+
+  Official API Docs Link:
+    * [Mini Program](#{@doc_link}/login/auth.code2Session.html){:target="_blank"}
+    * [Component](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Mini_Programs/WeChat_login.html){:target="_blank"}
   """
   @spec code2session(WeChat.client(), code :: String.t()) :: WeChat.response()
   def code2session(client, code) do
-    Requester.get("/sns/jscode2session",
-      query: [
-        appid: client.appid(),
-        secret: client.appsecret(),
-        js_code: code,
-        grant_type: "authorization_code"
-      ]
-    )
+    case client.role() do
+      :mini_program ->
+        Requester.get("/sns/jscode2session",
+          query: [
+            appid: client.appid(),
+            secret: client.appsecret(),
+            js_code: code,
+            grant_type: "authorization_code"
+          ]
+        )
+
+      :component ->
+        component_appid = client.component_appid()
+
+        Requester.get("/sns/jscode2session",
+          query: [
+            appid: client.appid(),
+            js_code: code,
+            grant_type: "authorization_code",
+            component_appid: component_appid,
+            component_access_token: Cache.get_cache(component_appid, :component_access_token)
+          ]
+        )
+    end
   end
 
   @doc """
