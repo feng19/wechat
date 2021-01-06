@@ -135,6 +135,7 @@ defmodule WeChat.MiniProgram.Auth do
   @doc """
   获取AccessToken - [Official API Docs Link](#{@doc_link}/access-token/auth.getAccessToken.html){:target="_blank"}
   """
+  @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do
     Requester.get("/cgi-bin/token",
       query: [
