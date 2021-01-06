@@ -6,11 +6,12 @@ defmodule WeChat.MiniProgram.Auth do
   alias WeChat.{Requester, Utils, ServerMessage.Encryptor, Storage.Cache}
 
   @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api"
+  @open_ability_doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/open-ability"
 
   @doc """
-  服务端获取开放数据 - [Official API Docs Link](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/signature.html)
+  服务端获取开放数据 - [Official API Docs Link](#{@open_ability_doc_link}/signature.html)
 
-  [小程序登录](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/login.html)
+  [小程序登录](#{@open_ability_doc_link}/login.html)
   """
   @spec decode_user_info(
           session_key :: String.t(),
@@ -28,10 +29,10 @@ defmodule WeChat.MiniProgram.Auth do
   end
 
   @doc """
-  服务端获取开放数据 - 包含敏感数据 - [Official API Docs Link](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/signature.html)
+  服务端获取开放数据 - 包含敏感数据 - [Official API Docs Link](#{@open_ability_doc_link}/signature.html)
 
-  * [小程序登录](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/login.html)
-  * [加密数据解密算法](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/signature.html#加密数据解密算法)
+  * [小程序登录](#{@open_ability_doc_link}/login.html)
+  * [加密数据解密算法](#{@open_ability_doc_link}/signature.html#加密数据解密算法)
   """
   @spec decode_get_user_sensitive_info(
           session_key :: String.t(),
