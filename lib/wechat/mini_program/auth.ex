@@ -71,7 +71,7 @@ defmodule WeChat.MiniProgram.Auth do
       :component ->
         component_appid = client.component_appid()
 
-        Requester.get("/sns/jscode2session",
+        Requester.get("/sns/component/jscode2session",
           query: [
             appid: client.appid(),
             js_code: code,
