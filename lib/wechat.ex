@@ -35,6 +35,20 @@ defmodule WeChat do
     end
   end
 
+  def build_client(module_name, opts) do
+    with {:module, module, _binary, _term} <-
+           Module.create(
+             module_name,
+             quote do
+               @moduledoc "#{unquote(module_name)}"
+               use WeChat.ClientBuilder, unquote(opts)
+             end,
+             Macro.Env.location(__ENV__)
+           ) do
+      {:ok, module}
+    end
+  end
+
   defmodule Article do
     @moduledoc "文章"
 

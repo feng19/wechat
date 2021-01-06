@@ -14,6 +14,18 @@ defmodule WeChatTest do
     assert is_list(WxApp.default_opts()) == true
   end
 
+  test "build client" do
+    opts = [
+      appid: "wx2c2769f8efd9abc2",
+      appsecret: "appsecret",
+      encoding_aes_key: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG",
+      token: "spamtest"
+    ]
+
+    assert {:ok, WxApp3} = WeChat.build_client(WxApp3, opts)
+    assert WxApp.appid() == "wx2c2769f8efd9abc2"
+  end
+
   test "Encrypt Msg" do
     timestamp = Utils.now_unix()
 

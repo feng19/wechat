@@ -101,19 +101,20 @@ defmodule WeChat.ClientBuilder do
           raise ArgumentError, "please set appid"
       end
 
-    [
+    base =
       quote do
         def default_opts, do: unquote(default_opts)
-      end,
-      quote do
         def get_access_token, do: WeChat.Storage.Cache.get_cache(unquote(appid), :access_token)
       end
-      | Enum.map(default_opts, fn {key, value} ->
-          quote do
-            def unquote(key)(), do: unquote(value)
-          end
-        end)
-    ]
+
+    get_funs =
+      Enum.map(default_opts, fn {key, value} ->
+        quote do
+          def unquote(key)(), do: unquote(value)
+        end
+      end)
+
+    [base | get_funs]
   end
 
   defp gen_sub_modules(sub_modules, parent_module) do
