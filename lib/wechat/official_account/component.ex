@@ -80,7 +80,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/clear_quota",
       json_map(component_appid: component_appid),
-      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: get_access_token(component_appid)]
     )
   end
 
@@ -113,7 +113,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/api_create_preauthcode",
       json_map(component_appid: component_appid),
-      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: get_access_token(component_appid)]
     )
   end
 
@@ -130,7 +130,7 @@ defmodule WeChat.Component do
         component_appid: component_appid,
         authorization_code: authorization_code
       ),
-      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: get_access_token(component_appid)]
     )
   end
 
@@ -152,9 +152,7 @@ defmodule WeChat.Component do
           authorizer_appid: appid,
           authorizer_refresh_token: authorizer_refresh_token
         ),
-        query: [
-          component_access_token: Cache.get_cache(component_appid, :component_access_token)
-        ]
+        query: [component_access_token: get_access_token(component_appid)]
       )
     end
   end
@@ -169,7 +167,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/api_get_authorizer_info",
       json_map(component_appid: component_appid, authorizer_appid: client.appid()),
-      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: get_access_token(component_appid)]
     )
   end
 
@@ -187,7 +185,7 @@ defmodule WeChat.Component do
         authorizer_appid: client.appid(),
         option_name: option_name
       ),
-      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: get_access_token(component_appid)]
     )
   end
 
@@ -202,7 +200,7 @@ defmodule WeChat.Component do
     Requester.post(
       "/cgi-bin/component/api_get_authorizer_list",
       json_map(component_appid: component_appid, offset: offset, count: count),
-      query: [component_access_token: Cache.get_cache(component_appid, :component_access_token)]
+      query: [component_access_token: get_access_token(component_appid)]
     )
   end
 
@@ -267,4 +265,7 @@ defmodule WeChat.Component do
       query: [access_token: client.get_access_token()]
     )
   end
+
+  def get_access_token(component_appid),
+    do: Cache.get_cache(component_appid, :component_access_token)
 end

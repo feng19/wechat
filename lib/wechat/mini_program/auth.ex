@@ -119,8 +119,7 @@ defmodule WeChat.MiniProgram.Auth do
           WeChat.openid(),
           mch_id :: String.t(),
           out_trade_no :: String.t()
-        ) ::
-          WeChat.response()
+        ) :: WeChat.response()
   def get_paid_unionid(client, openid, mch_id, out_trade_no) do
     Requester.get("/wxa/getpaidunionid",
       query: [

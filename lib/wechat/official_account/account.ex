@@ -51,9 +51,7 @@ defmodule WeChat.Account do
         action_name: action_name,
         expire_seconds: expire_seconds,
         action_info: %{
-          scene: %{
-            scene_key => scene_id
-          }
+          scene: %{scene_key => scene_id}
         }
       ),
       query: [access_token: client.get_access_token()]
