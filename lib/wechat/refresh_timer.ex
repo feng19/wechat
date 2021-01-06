@@ -6,8 +6,8 @@ defmodule WeChat.RefreshTimer do
   alias WeChat.{Utils, Storage.Cache}
 
   @type opts :: map()
-  # 过期前10分钟刷新
-  @refresh_before_time 10 * 60
+  # 过期前30分钟刷新
+  @refresh_before_time 30 * 60
   # 刷新失败重试时间间隔 1分钟
   @refresh_retry_interval 60_000
 
@@ -100,7 +100,7 @@ defmodule WeChat.RefreshTimer do
       opts when opts != nil ->
         key = {store_id, store_key}
         {{_key, fun, _timer}, refresh_list} = List.keytake(opts.refresh_list, key, 0)
-        timer = refresh_token(store_id, store_key, fun, client)
+        timer = refresh_token(store_id, store_key, fun, client, opts)
         state = Map.put(state, client, %{opts | refresh_list: [{key, fun, timer} | refresh_list]})
         {:noreply, state}
 
@@ -147,12 +147,21 @@ defmodule WeChat.RefreshTimer do
         false
 
       error ->
-        Logger.warn("Get [#{store_id}] [#{store_key}] from storage: #{storage} error: #{inspect(error)}.")
+        Logger.warn(
+          "Get [#{store_id}] [#{store_key}] from storage: #{storage} error: #{inspect(error)}."
+        )
+
         false
     end
   end
 
   defp do_add(client, opts) do
+    opts =
+      Map.merge(opts, %{
+        refresh_before_time: Map.get(opts, :refresh_before_time, @refresh_before_time),
+        refresh_retry_interval: Map.get(opts, :refresh_retry_interval, @refresh_retry_interval)
+      })
+
     Cache.set_client(client)
 
     refresh_list = init_refresh_list(client, opts)
@@ -168,11 +177,10 @@ defmodule WeChat.RefreshTimer do
         timer =
           case restore_and_cache(store_id, store_key, client) do
             false ->
-              refresh_token(store_id, store_key, fun, client)
+              refresh_token(store_id, store_key, fun, client, opts)
 
             {true, expires_in} ->
-              # 过期前10分钟刷新
-              (max(0, expires_in - @refresh_before_time) * 1000)
+              (max(0, expires_in - opts.refresh_before_time) * 1000)
               |> :erlang.start_timer(self(), {store_id, store_key, client})
           end
 
@@ -188,7 +196,7 @@ defmodule WeChat.RefreshTimer do
     refresh_list =
       for {{store_id, store_key}, fun, timer} <- refresh_list do
         :erlang.cancel_timer(timer)
-        timer = refresh_token(store_id, store_key, fun, client)
+        timer = refresh_token(store_id, store_key, fun, client, opts)
         {{store_id, store_key}, fun, timer}
       end
 
@@ -199,7 +207,7 @@ defmodule WeChat.RefreshTimer do
   def get_store_id_by_id_type(:appid, client), do: client.appid()
   def get_store_id_by_id_type(:component_appid, client), do: client.component_appid()
 
-  defp refresh_token(store_id, store_key, fun, client) do
+  defp refresh_token(store_id, store_key, fun, client, opts) do
     case fun.(client) do
       {:ok, list, expires_in} when is_list(list) ->
         now = Utils.now_unix()
@@ -212,7 +220,7 @@ defmodule WeChat.RefreshTimer do
         Logger.info("Refresh [#{store_id}] [#{store_key}] [expires_in: #{expires_in}] succeed.")
 
         :erlang.start_timer(
-          (expires_in - @refresh_before_time) * 1000,
+          (expires_in - opts.refresh_before_time) * 1000,
           self(),
           {store_id, store_key, client}
         )
@@ -223,7 +231,7 @@ defmodule WeChat.RefreshTimer do
         Logger.info("Refresh [#{store_id}] [#{store_key}] [expires_in: #{expires_in}] succeed.")
 
         :erlang.start_timer(
-          (expires_in - @refresh_before_time) * 1000,
+          (expires_in - opts.refresh_before_time) * 1000,
           self(),
           {store_id, store_key, client}
         )
@@ -234,7 +242,7 @@ defmodule WeChat.RefreshTimer do
             inspect(error) <> ", Will be retry again one minute later."
         )
 
-        :erlang.start_timer(@refresh_retry_interval, self(), {store_id, store_key, client})
+        :erlang.start_timer(opts.refresh_retry_interval, self(), {store_id, store_key, client})
     end
   end
 

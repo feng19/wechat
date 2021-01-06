@@ -15,48 +15,48 @@ defmodule WeChat.RefreshHelper do
     end
   end
 
-  defp official_account_refresh_list,
+  def official_account_refresh_list,
     do: [
-      {:appid, :access_token, &refresh_access_token/1},
-      {:appid, :js_api_ticket, &refresh_ticket("jsapi", &1)},
-      {:appid, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
+      {:appid, :access_token, &__MODULE__.refresh_access_token/1},
+      {:appid, :js_api_ticket, &__MODULE__.refresh_ticket("jsapi", &1)},
+      {:appid, :wx_card_ticket, &__MODULE__.refresh_ticket("wx_card", &1)}
     ]
 
-  defp component_refresh_list,
+  def component_refresh_list,
     do: [
-      {:component_appid, :component_access_token, &refresh_component_access_token/1},
-      {:appid, :access_token, &refresh_authorizer_access_token/1},
-      {:appid, :js_api_ticket, &refresh_ticket("jsapi", &1)},
-      {:appid, :wx_card_ticket, &refresh_ticket("wx_card", &1)}
+      {:component_appid, :component_access_token, &__MODULE__.refresh_component_access_token/1},
+      {:appid, :access_token, &__MODULE__.refresh_authorizer_access_token/1},
+      {:appid, :js_api_ticket, &__MODULE__.refresh_ticket("jsapi", &1)},
+      {:appid, :wx_card_ticket, &__MODULE__.refresh_ticket("wx_card", &1)}
     ]
 
-  defp mini_program_refresh_list,
+  def mini_program_refresh_list,
     do: [
-      {:appid, :access_token, &refresh_mini_program_access_token/1}
+      {:appid, :access_token, &__MODULE__.refresh_mini_program_access_token/1}
     ]
 
-  defp refresh_access_token(client) do
+  def refresh_access_token(client) do
     with {:ok, %{status: 200, body: data}} <- Account.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
     end
   end
 
-  defp refresh_ticket(ticket_type, client) do
+  def refresh_ticket(ticket_type, client) do
     with {:ok, %{status: 200, body: data}} <- WebApp.get_ticket(client, ticket_type),
          %{"ticket" => ticket, "expires_in" => expires_in} <- data do
       {:ok, ticket, expires_in}
     end
   end
 
-  defp refresh_component_access_token(client) do
+  def refresh_component_access_token(client) do
     with {:ok, %{status: 200, body: data}} <- Component.get_component_token(client),
          %{"component_access_token" => component_access_token, "expires_in" => expires_in} <- data do
       {:ok, component_access_token, expires_in}
     end
   end
 
-  defp refresh_authorizer_access_token(client) do
+  def refresh_authorizer_access_token(client) do
     with {:ok, %{status: 200, body: data}} <- Component.authorizer_token(client),
          %{
            "authorizer_access_token" => authorizer_access_token,
@@ -73,7 +73,7 @@ defmodule WeChat.RefreshHelper do
     end
   end
 
-  defp refresh_mini_program_access_token(client) do
+  def refresh_mini_program_access_token(client) do
     with {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
