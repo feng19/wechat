@@ -44,8 +44,6 @@ defmodule WeChat.RefreshTimer do
 
   @impl true
   def init(state) do
-    Cache.init_table()
-
     state =
       Map.new(state, fn
         client when is_atom(client) ->
