@@ -6,7 +6,6 @@ defmodule WeChat.Comment do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.Requester
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Comments_management/Image_Comments_Management_Interface.html"
 
@@ -26,7 +25,7 @@ defmodule WeChat.Comment do
   """
   @spec open(WeChat.client(), msg_data_id, index :: integer) :: WeChat.response()
   def open(client, msg_data_id, index \\ 0) do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/open",
       json_map(msg_data_id: msg_data_id, index: index),
       query: [access_token: client.get_access_token()]
@@ -38,7 +37,7 @@ defmodule WeChat.Comment do
   """
   @spec close(WeChat.client(), msg_data_id, index :: integer) :: WeChat.response()
   def close(client, msg_data_id, index \\ 0) do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/close",
       json_map(msg_data_id: msg_data_id, index: index),
       query: [access_token: client.get_access_token()]
@@ -67,7 +66,7 @@ defmodule WeChat.Comment do
         ) :: WeChat.response()
   def list(client, msg_data_id, begin, count, type, index \\ 0)
       when count <= 50 and type in 0..2 do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/list",
       json_map(
         msg_data_id: msg_data_id,
@@ -86,7 +85,7 @@ defmodule WeChat.Comment do
   @spec mark_elect(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()
   def mark_elect(client, msg_data_id, user_comment_id, index \\ 0) do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/markelect",
       json_map(
         msg_data_id: msg_data_id,
@@ -103,7 +102,7 @@ defmodule WeChat.Comment do
   @spec unmark_elect(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()
   def unmark_elect(client, msg_data_id, user_comment_id, index \\ 0) do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/unmarkelect",
       json_map(
         msg_data_id: msg_data_id,
@@ -120,7 +119,7 @@ defmodule WeChat.Comment do
   @spec delete(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()
   def delete(client, msg_data_id, user_comment_id, index \\ 0) do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/delete",
       json_map(
         msg_data_id: msg_data_id,
@@ -137,7 +136,7 @@ defmodule WeChat.Comment do
   @spec add_reply(WeChat.client(), msg_data_id, user_comment_id, content, index :: integer) ::
           WeChat.response()
   def add_reply(client, msg_data_id, user_comment_id, content, index \\ 0) do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/reply/add",
       json_map(
         msg_data_id: msg_data_id,
@@ -155,7 +154,7 @@ defmodule WeChat.Comment do
   @spec delete_reply(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()
   def delete_reply(client, msg_data_id, user_comment_id, index \\ 0) do
-    Requester.post(
+    client.post(
       "/cgi-bin/comment/reply/delete",
       json_map(
         msg_data_id: msg_data_id,

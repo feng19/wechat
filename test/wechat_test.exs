@@ -12,6 +12,8 @@ defmodule WeChatTest do
     assert WxApp.encoding_aes_key() == "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG"
     assert WxApp.token() == "spamtest"
     assert is_list(WxApp.default_opts()) == true
+    assert true = Enum.all?(1..3, &function_exported?(WxApp, :get, &1))
+    assert true = Enum.all?(2..4, &function_exported?(WxApp, :post, &1))
   end
 
   test "build client" do

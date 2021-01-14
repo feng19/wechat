@@ -3,7 +3,6 @@ defmodule WeChat.Material do
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
   alias Tesla.Multipart
-  alias WeChat.Requester
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Asset_Management"
 
@@ -38,7 +37,7 @@ defmodule WeChat.Material do
       |> Multipart.add_file(file_path, name: "media", detect_content_type: true)
       |> Multipart.add_field("type", type)
 
-    Requester.post("/cgi-bin/media/upload", mp, query: [access_token: client.get_access_token()])
+    client.post("/cgi-bin/media/upload", mp, query: [access_token: client.get_access_token()])
   end
 
   @doc """
@@ -56,7 +55,7 @@ defmodule WeChat.Material do
       |> Multipart.add_file_content(file_content, file_name, name: "media")
       |> Multipart.add_field("type", type)
 
-    Requester.post("/cgi-bin/media/upload", mp, query: [access_token: client.get_access_token()])
+    client.post("/cgi-bin/media/upload", mp, query: [access_token: client.get_access_token()])
   end
 
   @doc """
@@ -64,7 +63,7 @@ defmodule WeChat.Material do
   """
   @spec get_media(WeChat.client(), media_id) :: WeChat.response()
   def get_media(client, media_id) do
-    Requester.get("/cgi-bin/media/get",
+    client.get("/cgi-bin/media/get",
       query: [
         media_id: media_id,
         access_token: client.get_access_token()
@@ -77,7 +76,7 @@ defmodule WeChat.Material do
   """
   @spec add_news(WeChat.client(), articles :: [article]) :: WeChat.response()
   def add_news(client, articles) do
-    Requester.post(
+    client.post(
       "/cgi-bin/material/add_news",
       json_map(articles: articles),
       query: [access_token: client.get_access_token()]
@@ -89,11 +88,11 @@ defmodule WeChat.Material do
   #  """
   #  @spec upload_image(WeChat.client, file_path :: Path.t) :: WeChat.response
   #  def upload_image(client, file_path) do
-  #    Requester.post("/cgi-bin/media/uploadimg", mp, query: [access_token: client.get_access_token()])
+  #    client.post("/cgi-bin/media/uploadimg", mp, query: [access_token: client.get_access_token()])
   #  end
   #  @spec upload_image(WeChat.client, file_name :: String.t, file_content :: binary) :: WeChat.response
   #  def upload_image(client, type, file_name, file_content) do
-  #    Requester.post("/cgi-bin/media/uploadimg", mp, query: [access_token: client.get_access_token()])
+  #    client.post("/cgi-bin/media/uploadimg", mp, query: [access_token: client.get_access_token()])
   #  end
   #
   #  @doc """
@@ -108,7 +107,7 @@ defmodule WeChat.Material do
   """
   @spec get_material(WeChat.client(), media_id) :: WeChat.response()
   def get_material(client, media_id) do
-    Requester.post(
+    client.post(
       "/cgi-bin/material/get_material",
       json_map(media_id: media_id),
       query: [access_token: client.get_access_token()]
@@ -120,7 +119,7 @@ defmodule WeChat.Material do
   """
   @spec del_material(WeChat.client(), media_id) :: WeChat.response()
   def del_material(client, media_id) do
-    Requester.post(
+    client.post(
       "/cgi-bin/material/del_material",
       json_map(media_id: media_id),
       query: [access_token: client.get_access_token()]
@@ -138,7 +137,7 @@ defmodule WeChat.Material do
       |> Map.from_struct()
       |> Map.drop([:need_open_comment, :only_fans_can_comment])
 
-    Requester.post(
+    client.post(
       "/cgi-bin/material/update_news",
       json_map(
         media_id: media_id,
@@ -154,7 +153,7 @@ defmodule WeChat.Material do
   """
   @spec get_material_count(WeChat.client()) :: WeChat.response()
   def get_material_count(client) do
-    Requester.get("/cgi-bin/material/get_materialcount",
+    client.get("/cgi-bin/material/get_materialcount",
       query: [access_token: client.get_access_token()]
     )
   end
@@ -170,7 +169,7 @@ defmodule WeChat.Material do
   @spec batch_get_material(WeChat.client(), material_type, material_count, offset :: integer) ::
           WeChat.response()
   def batch_get_material(client, type, count \\ 10, offset \\ 0) when count in 1..20 do
-    Requester.post(
+    client.post(
       "/cgi-bin/material/batchget_material",
       json_map(type: type, offset: offset, count: count),
       query: [access_token: client.get_access_token()]

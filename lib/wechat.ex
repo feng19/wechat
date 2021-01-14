@@ -22,6 +22,7 @@ defmodule WeChat do
   @type lang :: String.t()
 
   @type client :: module()
+  @type requester :: module()
   @type role :: :official_account | :component | :mini_program
   @type app_type :: :official_account | :mini_program | :both
   @type response :: Tesla.Env.result()

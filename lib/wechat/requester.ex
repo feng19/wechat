@@ -1,4 +1,5 @@
 defmodule WeChat.Requester do
+  @moduledoc "http client"
   use Tesla, only: [:get, :post]
 
   adapter(Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000)

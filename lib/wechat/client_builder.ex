@@ -1,10 +1,15 @@
 defmodule WeChat.ClientBuilder do
   @moduledoc """
-  build client
+  client builder
   """
   alias WeChat.{Component, MiniProgram}
 
-  @default_opts [role: :official_account, storage: WeChat.Storage.File]
+  @base_option_fields [:role, :storage, :appid, :encoding_aes_key, :token, :requester]
+  @default_opts [
+    role: :official_account,
+    storage: WeChat.Storage.File,
+    requester: WeChat.Requester
+  ]
   @official_account_modules [
     WeChat.Material,
     WeChat.Card,
@@ -67,27 +72,19 @@ defmodule WeChat.ClientBuilder do
 
   defp gen_get_function(:official_account, default_opts) do
     default_opts
-    |> Keyword.take([:role, :storage, :appid, :appsecret, :encoding_aes_key, :token])
+    |> Keyword.take([:appsecret | @base_option_fields])
     |> gen_get_function()
   end
 
   defp gen_get_function(:component, default_opts) do
     default_opts
-    |> Keyword.take([
-      :role,
-      :storage,
-      :appid,
-      :component_appid,
-      :component_appsecret,
-      :encoding_aes_key,
-      :token
-    ])
+    |> Keyword.take([:component_appid, :component_appsecret | @base_option_fields])
     |> gen_get_function()
   end
 
   defp gen_get_function(:mini_program, default_opts) do
     default_opts
-    |> Keyword.take([:role, :storage, :appid, :appsecret, :encoding_aes_key, :token])
+    |> Keyword.take([:appsecret | @base_option_fields])
     |> gen_get_function()
   end
 
@@ -101,10 +98,18 @@ defmodule WeChat.ClientBuilder do
           raise ArgumentError, "please set appid"
       end
 
+    {requester, default_opts} = Keyword.pop(default_opts, :requester)
+
     base =
       quote do
         def default_opts, do: unquote(default_opts)
         def get_access_token, do: WeChat.Storage.Cache.get_cache(unquote(appid), :access_token)
+        defdelegate get(url), to: unquote(requester)
+        defdelegate get(url, opts), to: unquote(requester)
+        defdelegate get(client, url, opts), to: unquote(requester)
+        defdelegate post(url, body), to: unquote(requester)
+        defdelegate post(url, body, opts), to: unquote(requester)
+        defdelegate post(client, url, body, opts), to: unquote(requester)
       end
 
     get_funs =
@@ -174,13 +179,13 @@ defmodule WeChat.ClientBuilder do
             {:defmodule, c_m, [{:__aliases__, c_a, [new_module_name]}, do_list]}
 
           {:spec, c_s, ast} ->
-            # del first argument
             ast =
               Macro.prewalk(
                 ast,
                 fn
                   {fun_name, context, [{{:., _, [{:__aliases__, _, _}, :client]}, _, _} | args]}
                   when is_atom(fun_name) ->
+                    # del first argument
                     {fun_name, context, args}
 
                   sub_ast ->
@@ -196,7 +201,7 @@ defmodule WeChat.ClientBuilder do
                 ast,
                 fn
                   {:., context, [{:client, c_c, nil}, fun_name]} ->
-                    # replace first argument
+                    # replace client
                     {:., context, [{:__aliases__, c_c, [client_module]}, fun_name]}
 
                   {fun_name, context, [{:client, _, nil} | args]} when is_atom(fun_name) ->
@@ -211,7 +216,6 @@ defmodule WeChat.ClientBuilder do
             {:def, c_s, ast}
 
           ast ->
-            # IO.inspect(ast)
             ast
         end
       )

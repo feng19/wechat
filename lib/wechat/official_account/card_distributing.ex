@@ -6,7 +6,7 @@ defmodule WeChat.CardDistributing do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Card}
+  alias WeChat.Card
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html"
 
@@ -21,7 +21,7 @@ defmodule WeChat.CardDistributing do
   """
   @spec create_qrcode(WeChat.client(), body :: map) :: WeChat.response()
   def create_qrcode(client, body) do
-    Requester.post("/card/qrcode/create", body, query: [access_token: client.get_access_token()])
+    client.post("/card/qrcode/create", body, query: [access_token: client.get_access_token()])
   end
 
   @doc """
@@ -31,7 +31,7 @@ defmodule WeChat.CardDistributing do
   """
   @spec create_landing_page(WeChat.client(), body :: map) :: WeChat.response()
   def create_landing_page(client, body) do
-    Requester.post("/card/landingpage/create", body,
+    client.post("/card/landingpage/create", body,
       query: [access_token: client.get_access_token()]
     )
   end
@@ -41,7 +41,7 @@ defmodule WeChat.CardDistributing do
   """
   @spec import_code(WeChat.client(), Card.card_id(), [Card.card_code()]) :: WeChat.response()
   def import_code(client, card_id, code_list) do
-    Requester.post(
+    client.post(
       "/card/code/deposit",
       json_map(card_id: card_id, code: code_list),
       query: [access_token: client.get_access_token()]
@@ -53,7 +53,7 @@ defmodule WeChat.CardDistributing do
   """
   @spec get_code_count(WeChat.client(), Card.card_id()) :: WeChat.response()
   def get_code_count(client, card_id) do
-    Requester.post("/card/code/getdepositcount", json_map(card_id: card_id),
+    client.post("/card/code/getdepositcount", json_map(card_id: card_id),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -63,7 +63,7 @@ defmodule WeChat.CardDistributing do
   """
   @spec check_code(WeChat.client(), Card.card_id(), [Card.card_code()]) :: WeChat.response()
   def check_code(client, card_id, code_list) do
-    Requester.post(
+    client.post(
       "/card/code/checkcode",
       json_map(card_id: card_id, code: code_list),
       query: [access_token: client.get_access_token()]
@@ -79,7 +79,7 @@ defmodule WeChat.CardDistributing do
   """
   @spec get_mp_news_html(WeChat.client(), Card.card_id()) :: WeChat.response()
   def get_mp_news_html(client, card_id) do
-    Requester.post("/card/mpnews/gethtml", json_map(card_id: card_id),
+    client.post("/card/mpnews/gethtml", json_map(card_id: card_id),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -91,14 +91,14 @@ defmodule WeChat.CardDistributing do
           {:openid, [WeChat.openid()]} | {:username, [WeChat.username()]}
         ]) :: WeChat.response()
   def set_test_whitelist(client, openid: openid_list) do
-    Requester.post("/card/testwhitelist/set", json_map(openid: openid_list),
+    client.post("/card/testwhitelist/set", json_map(openid: openid_list),
       query: [access_token: client.get_access_token()]
     )
   end
 
   @spec set_test_whitelist(WeChat.client(), [WeChat.username()]) :: WeChat.response()
   def set_test_whitelist(client, username: username_list) do
-    Requester.post("/card/testwhitelist/set", json_map(username: username_list),
+    client.post("/card/testwhitelist/set", json_map(username: username_list),
       query: [access_token: client.get_access_token()]
     )
   end
@@ -109,7 +109,7 @@ defmodule WeChat.CardDistributing do
   @spec set_test_whitelist(WeChat.client(), [WeChat.openid()], [WeChat.username()]) ::
           WeChat.response()
   def set_test_whitelist(client, openid_list, username_list) do
-    Requester.post(
+    client.post(
       "/card/testwhitelist/set",
       json_map(openid: openid_list, username: username_list),
       query: [access_token: client.get_access_token()]

@@ -2,7 +2,6 @@ defmodule WeChat.User do
   @moduledoc "用户管理"
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.Requester
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management"
 
@@ -11,7 +10,7 @@ defmodule WeChat.User do
   """
   @spec update_remark(WeChat.client(), WeChat.openid(), remark :: String.t()) :: WeChat.response()
   def update_remark(client, openid, remark) do
-    Requester.post(
+    client.post(
       "/cgi-bin/user/info/updateremark",
       json_map(openid: openid, remark: remark),
       query: [access_token: client.get_access_token()]
@@ -23,7 +22,7 @@ defmodule WeChat.User do
   """
   @spec user_info(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def user_info(client, openid) do
-    Requester.get("/cgi-bin/user/info",
+    client.get("/cgi-bin/user/info",
       query: [
         openid: openid,
         access_token: client.get_access_token()
@@ -36,7 +35,7 @@ defmodule WeChat.User do
   """
   @spec user_info(WeChat.client(), WeChat.openid(), WeChat.lang()) :: WeChat.response()
   def user_info(client, openid, lang) do
-    Requester.get("/cgi-bin/user/info",
+    client.get("/cgi-bin/user/info",
       query: [
         openid: openid,
         lang: lang,
@@ -50,7 +49,7 @@ defmodule WeChat.User do
   """
   @spec batch_get_user_info(WeChat.client(), [map]) :: WeChat.response()
   def batch_get_user_info(client, user_list) do
-    Requester.post(
+    client.post(
       "/cgi-bin/user/info/batchget",
       json_map(user_list: user_list),
       query: [access_token: client.get_access_token()]
@@ -62,7 +61,7 @@ defmodule WeChat.User do
   """
   @spec get_users(WeChat.client()) :: WeChat.response()
   def get_users(client) do
-    Requester.get("/cgi-bin/user/get",
+    client.get("/cgi-bin/user/get",
       query: [access_token: client.get_access_token()]
     )
   end
@@ -72,7 +71,7 @@ defmodule WeChat.User do
   """
   @spec get_users(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_users(client, next_openid) do
-    Requester.get("/cgi-bin/user/get",
+    client.get("/cgi-bin/user/get",
       query: [
         next_openid: next_openid,
         access_token: client.get_access_token()

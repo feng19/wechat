@@ -6,7 +6,6 @@ defmodule WeChat.UserBlacklist do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.Requester
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management/Manage_blacklist.html"
 
@@ -15,7 +14,7 @@ defmodule WeChat.UserBlacklist do
   """
   @spec get_black_list(WeChat.client()) :: WeChat.response()
   def get_black_list(client) do
-    Requester.post("/cgi-bin/tags/members/getblacklist", %{},
+    client.post("/cgi-bin/tags/members/getblacklist", %{},
       query: [access_token: client.get_access_token()]
     )
   end
@@ -25,7 +24,7 @@ defmodule WeChat.UserBlacklist do
   """
   @spec get_black_list(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_black_list(client, begin_openid) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/members/getblacklist",
       json_map(begin_openid: begin_openid),
       query: [access_token: client.get_access_token()]
@@ -37,7 +36,7 @@ defmodule WeChat.UserBlacklist do
   """
   @spec batch_blacklist(WeChat.client(), [WeChat.openid()]) :: WeChat.response()
   def batch_blacklist(client, openid_list) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/members/batchblacklist",
       json_map(openid_list: openid_list),
       query: [access_token: client.get_access_token()]
@@ -49,7 +48,7 @@ defmodule WeChat.UserBlacklist do
   """
   @spec batch_unblacklist(WeChat.client(), [WeChat.openid()]) :: WeChat.response()
   def batch_unblacklist(client, openid_list) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/members/batchunblacklist",
       json_map(openid_list: openid_list),
       query: [access_token: client.get_access_token()]

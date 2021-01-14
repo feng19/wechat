@@ -6,7 +6,6 @@ defmodule WeChat.UserTag do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.Requester
 
   @type tag_id :: integer
   @type tag_name :: String.t()
@@ -18,7 +17,7 @@ defmodule WeChat.UserTag do
   """
   @spec create(WeChat.client(), tag_name) :: WeChat.response()
   def create(client, name) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/create",
       json_map(tag: %{name: name}),
       query: [access_token: client.get_access_token()]
@@ -30,7 +29,7 @@ defmodule WeChat.UserTag do
   """
   @spec get(WeChat.client()) :: WeChat.response()
   def get(client) do
-    Requester.get("/cgi-bin/tags/get",
+    client.get("/cgi-bin/tags/get",
       query: [access_token: client.get_access_token()]
     )
   end
@@ -40,7 +39,7 @@ defmodule WeChat.UserTag do
   """
   @spec update(WeChat.client(), tag_id, tag_name) :: WeChat.response()
   def update(client, id, name) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/update",
       json_map(tag: %{id: id, name: name}),
       query: [access_token: client.get_access_token()]
@@ -52,7 +51,7 @@ defmodule WeChat.UserTag do
   """
   @spec delete(WeChat.client(), tag_id) :: WeChat.response()
   def delete(client, id) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/delete",
       json_map(tag: %{id: id}),
       query: [access_token: client.get_access_token()]
@@ -64,7 +63,7 @@ defmodule WeChat.UserTag do
   """
   @spec get_tag_users(WeChat.client(), tag_id) :: WeChat.response()
   def get_tag_users(client, id) do
-    Requester.post(
+    client.post(
       "/cgi-bin/user/tag/get",
       json_map(tagid: id),
       query: [access_token: client.get_access_token()]
@@ -77,7 +76,7 @@ defmodule WeChat.UserTag do
   @spec get_tag_users(WeChat.client(), tag_id, next_openid :: WeChat.openid()) ::
           WeChat.response()
   def get_tag_users(client, id, next_openid) do
-    Requester.post(
+    client.post(
       "/cgi-bin/user/tag/get",
       json_map(tagid: id, next_openid: next_openid),
       query: [access_token: client.get_access_token()]
@@ -89,7 +88,7 @@ defmodule WeChat.UserTag do
   """
   @spec batch_tagging_users(WeChat.client(), tag_id, [WeChat.openid()]) :: WeChat.response()
   def batch_tagging_users(client, id, openid_list) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/members/batchtagging",
       json_map(tagid: id, openid_list: openid_list),
       query: [access_token: client.get_access_token()]
@@ -101,7 +100,7 @@ defmodule WeChat.UserTag do
   """
   @spec batch_untagging_users(WeChat.client(), tag_id, [WeChat.openid()]) :: WeChat.response()
   def batch_untagging_users(client, id, openid_list) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/members/batchuntagging",
       json_map(tagid: id, openid_list: openid_list),
       query: [access_token: client.get_access_token()]
@@ -113,7 +112,7 @@ defmodule WeChat.UserTag do
   """
   @spec get_user_tags(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_user_tags(client, openid) do
-    Requester.post(
+    client.post(
       "/cgi-bin/tags/getidlist",
       json_map(openid: openid),
       query: [access_token: client.get_access_token()]

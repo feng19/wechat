@@ -6,7 +6,7 @@ defmodule WeChat.CardManaging do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Card}
+  alias WeChat.Card
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Managing_Coupons_Vouchers_and_Cards.html"
 
@@ -15,7 +15,7 @@ defmodule WeChat.CardManaging do
   """
   @spec get_user_card_list(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_user_card_list(client, openid) do
-    Requester.post(
+    client.post(
       "/card/user/getcardlist",
       json_map(openid: openid),
       query: [access_token: client.get_access_token()]
@@ -23,7 +23,7 @@ defmodule WeChat.CardManaging do
   end
 
   def get_user_card_list(client, openid, card_id) do
-    Requester.post(
+    client.post(
       "/card/user/getcardlist",
       json_map(openid: openid, card_id: card_id),
       query: [access_token: client.get_access_token()]
@@ -35,7 +35,7 @@ defmodule WeChat.CardManaging do
   """
   @spec get_card_info(WeChat.client(), Card.card_id()) :: WeChat.response()
   def get_card_info(client, card_id) do
-    Requester.post(
+    client.post(
       "/card/get",
       json_map(card_id: card_id),
       query: [access_token: client.get_access_token()]
@@ -47,7 +47,7 @@ defmodule WeChat.CardManaging do
   """
   @spec batch_get_cards(WeChat.client(), count :: integer, offset :: integer) :: WeChat.response()
   def batch_get_cards(client, count, offset) when count <= 50 do
-    Requester.post(
+    client.post(
       "/card/batchget",
       json_map(offset: offset, count: count),
       query: [access_token: client.get_access_token()]
@@ -65,7 +65,7 @@ defmodule WeChat.CardManaging do
         ) ::
           WeChat.response()
   def batch_get_cards(client, status_list, count, offset) when count <= 50 do
-    Requester.post(
+    client.post(
       "/card/batchget",
       json_map(offset: offset, count: count, status_list: status_list),
       query: [access_token: client.get_access_token()]
@@ -78,7 +78,7 @@ defmodule WeChat.CardManaging do
   @spec update_card_info(WeChat.client(), Card.card_id(), Card.card_type(), card_info :: map) ::
           WeChat.response()
   def update_card_info(client, card_id, card_type, card_info) do
-    Requester.post(
+    client.post(
       "/card/update",
       %{
         "card_id" => card_id,
@@ -102,7 +102,7 @@ defmodule WeChat.CardManaging do
       end
       |> Jason.encode!()
 
-    Requester.post("/card/modifystock", body, query: [access_token: client.get_access_token()])
+    client.post("/card/modifystock", body, query: [access_token: client.get_access_token()])
   end
 
   @doc """
@@ -111,7 +111,7 @@ defmodule WeChat.CardManaging do
   @spec update_card_code(WeChat.client(), Card.card_id(), Card.card_code(), Card.card_code()) ::
           WeChat.response()
   def update_card_code(client, card_id, old_code, new_code) do
-    Requester.post(
+    client.post(
       "/card/code/update",
       json_map(card_id: card_id, code: old_code, new_code: new_code),
       query: [access_token: client.get_access_token()]
@@ -123,7 +123,7 @@ defmodule WeChat.CardManaging do
   """
   @spec check_card_code(WeChat.client(), Card.card_id()) :: WeChat.response()
   def check_card_code(client, card_id) do
-    Requester.post(
+    client.post(
       "/card/delete",
       json_map(card_id: card_id),
       query: [access_token: client.get_access_token()]
@@ -136,7 +136,7 @@ defmodule WeChat.CardManaging do
   @spec unavailable_card_code(WeChat.client(), Card.card_code(), reason :: String.t()) ::
           WeChat.response()
   def unavailable_card_code(client, code, reason) do
-    Requester.post(
+    client.post(
       "/card/code/unavailable",
       json_map(code: code, reason: reason),
       query: [access_token: client.get_access_token()]
@@ -154,7 +154,7 @@ defmodule WeChat.CardManaging do
         ) ::
           WeChat.response()
   def unavailable_card_code(client, card_id, code, reason) do
-    Requester.post(
+    client.post(
       "/card/code/unavailable",
       json_map(card_id: card_id, code: code, reason: reason),
       query: [access_token: client.get_access_token()]
@@ -173,7 +173,7 @@ defmodule WeChat.CardManaging do
           WeChat.response()
   def get_card_bizuin_info(client, begin_date, end_date, cond_source \\ 1)
       when cond_source in 0..1 do
-    Requester.post(
+    client.post(
       "/datacube/getcardbizuininfo",
       json_map(begin_date: begin_date, end_date: end_date, cond_source: cond_source),
       query: [access_token: client.get_access_token()]
@@ -191,7 +191,7 @@ defmodule WeChat.CardManaging do
         ) ::
           WeChat.response()
   def get_card_analysis(client, begin_date, end_date, cond_source) when cond_source in 0..1 do
-    Requester.post(
+    client.post(
       "/datacube/getcardcardinfo",
       json_map(begin_date: begin_date, end_date: end_date, cond_source: cond_source),
       query: [access_token: client.get_access_token()]
@@ -210,7 +210,7 @@ defmodule WeChat.CardManaging do
         ) :: WeChat.response()
   def get_card_analysis(client, card_id, begin_date, end_date, cond_source)
       when cond_source in 0..1 do
-    Requester.post(
+    client.post(
       "/datacube/getcardcardinfo",
       json_map(
         begin_date: begin_date,

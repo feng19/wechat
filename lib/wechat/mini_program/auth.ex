@@ -3,7 +3,7 @@ defmodule WeChat.MiniProgram.Auth do
   权限接口
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Utils, ServerMessage.Encryptor, Storage.Cache}
+  alias WeChat.{Utils, ServerMessage.Encryptor, Storage.Cache}
 
   @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api"
   @open_ability_doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/open-ability"
@@ -60,7 +60,7 @@ defmodule WeChat.MiniProgram.Auth do
   def code2session(client, code) do
     case client.role() do
       :mini_program ->
-        Requester.get("/sns/jscode2session",
+        client.get("/sns/jscode2session",
           query: [
             appid: client.appid(),
             secret: client.appsecret(),
@@ -72,7 +72,7 @@ defmodule WeChat.MiniProgram.Auth do
       :component ->
         component_appid = client.component_appid()
 
-        Requester.get("/sns/component/jscode2session",
+        client.get("/sns/component/jscode2session",
           query: [
             appid: client.appid(),
             js_code: code,
@@ -95,7 +95,7 @@ defmodule WeChat.MiniProgram.Auth do
   """
   @spec get_paid_unionid(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_paid_unionid(client, openid) do
-    Requester.get("/wxa/getpaidunionid",
+    client.get("/wxa/getpaidunionid",
       query: [
         openid: openid,
         access_token: client.get_access_token()
@@ -115,7 +115,7 @@ defmodule WeChat.MiniProgram.Auth do
   @spec get_paid_unionid(WeChat.client(), WeChat.openid(), transaction_id :: String.t()) ::
           WeChat.response()
   def get_paid_unionid(client, openid, transaction_id) do
-    Requester.get("/wxa/getpaidunionid",
+    client.get("/wxa/getpaidunionid",
       query: [
         openid: openid,
         transaction_id: transaction_id,
@@ -142,7 +142,7 @@ defmodule WeChat.MiniProgram.Auth do
           out_trade_no :: String.t()
         ) :: WeChat.response()
   def get_paid_unionid(client, openid, mch_id, out_trade_no) do
-    Requester.get("/wxa/getpaidunionid",
+    client.get("/wxa/getpaidunionid",
       query: [
         openid: openid,
         mch_id: mch_id,
@@ -157,7 +157,7 @@ defmodule WeChat.MiniProgram.Auth do
   """
   @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do
-    Requester.get("/cgi-bin/token",
+    client.get("/cgi-bin/token",
       query: [
         grant_type: "client_credential",
         appid: client.appid(),

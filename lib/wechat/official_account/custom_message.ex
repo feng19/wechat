@@ -6,7 +6,7 @@ defmodule WeChat.CustomMessage do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Card, Material}
+  alias WeChat.{Card, Material}
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Service_Center_messages.html"
 
@@ -229,7 +229,7 @@ defmodule WeChat.CustomMessage do
   客服消息接口 - [Official API Docs Link](#{@doc_link}#7){:target="_blank"}
   """
   def send_msg(client, body) do
-    Requester.post("/cgi-bin/message/custom/send", body,
+    client.post("/cgi-bin/message/custom/send", body,
       query: [access_token: client.get_access_token()]
     )
   end
@@ -243,7 +243,7 @@ defmodule WeChat.CustomMessage do
   def typing(client, openid, is_typing \\ true) do
     command = if(is_typing, do: "Typing", else: "CancelTyping")
 
-    Requester.post(
+    client.post(
       "/cgi-bin/message/custom/typing",
       json_map(touser: openid, command: command),
       query: [access_token: client.get_access_token()]

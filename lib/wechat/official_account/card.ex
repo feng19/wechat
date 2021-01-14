@@ -6,7 +6,6 @@ defmodule WeChat.Card do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.Requester
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer"
 
@@ -59,7 +58,7 @@ defmodule WeChat.Card do
   """
   @spec create(WeChat.client(), body :: map) :: WeChat.response()
   def create(client, body) do
-    Requester.post("/card/create", body, query: [access_token: client.get_access_token()])
+    client.post("/card/create", body, query: [access_token: client.get_access_token()])
   end
 
   @doc """
@@ -77,7 +76,7 @@ defmodule WeChat.Card do
   """
   @spec set_pay_cell(WeChat.client(), card_id, is_open :: boolean) :: WeChat.response()
   def set_pay_cell(client, card_id, is_open) do
-    Requester.post(
+    client.post(
       "/card/paycell/set",
       json_map(card_id: card_id, is_open: is_open),
       query: [access_token: client.get_access_token()]
@@ -98,7 +97,7 @@ defmodule WeChat.Card do
   """
   @spec set_self_consume_cell(WeChat.client(), card_id, is_open :: boolean) :: WeChat.response()
   def set_self_consume_cell(client, card_id, is_open) do
-    Requester.post(
+    client.post(
       "/card/selfconsumecell/set",
       json_map(card_id: card_id, is_open: is_open),
       query: [access_token: client.get_access_token()]
@@ -113,7 +112,7 @@ defmodule WeChat.Card do
   @spec check_card_code(WeChat.client(), card_id, card_code, check_consume :: boolean) ::
           WeChat.response()
   def check_card_code(client, card_id, card_code, check_consume \\ true) do
-    Requester.post(
+    client.post(
       "/card/code/get",
       json_map(card_id: card_id, code: card_code, check_consume: check_consume),
       query: [access_token: client.get_access_token()]
@@ -127,7 +126,7 @@ defmodule WeChat.Card do
   """
   @spec consume_code(WeChat.client(), card_code) :: WeChat.response()
   def consume_code(client, card_code) do
-    Requester.post(
+    client.post(
       "/card/code/consume",
       json_map(code: card_code),
       query: [access_token: client.get_access_token()]
@@ -143,7 +142,7 @@ defmodule WeChat.Card do
   """
   @spec consume_code(WeChat.client(), card_id, card_code) :: WeChat.response()
   def consume_code(client, card_id, card_code) do
-    Requester.post(
+    client.post(
       "/card/code/consume",
       json_map(card_id: card_id, code: card_code),
       query: [access_token: client.get_access_token()]
@@ -157,7 +156,7 @@ defmodule WeChat.Card do
   """
   @spec decrypt_code(WeChat.client(), encrypt_code :: String.t()) :: WeChat.response()
   def decrypt_code(client, encrypt_code) do
-    Requester.post(
+    client.post(
       "/card/code/decrypt",
       json_map(encrypt_code: encrypt_code),
       query: [access_token: client.get_access_token()]
