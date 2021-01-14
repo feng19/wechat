@@ -155,7 +155,6 @@ defmodule WeChat.WebApp do
     )
   end
 
-  @doc "See `user_info/2`"
   @spec user_info(WeChat.openid(), access_token(), WeChat.lang()) :: WeChat.response()
   def user_info(openid, access_token, lang) do
     Requester.get("/sns/userinfo",
