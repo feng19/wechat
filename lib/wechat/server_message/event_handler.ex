@@ -18,18 +18,30 @@ defmodule WeChat.ServerMessage.EventHandler do
   @type json :: map()
   @type json_string :: String.t()
 
+  @spec check_signature?(params :: map(), WeChat.client()) :: boolean()
+  def check_signature?(params, client) do
+    with signature when signature != nil <- params["signature"],
+         nonce when nonce != nil <- params["nonce"],
+         timestamp when timestamp != nil <- params["timestamp"] do
+      signature == Utils.sha1([client.token(), nonce, to_string(timestamp)])
+    else
+      _ -> false
+    end
+  end
+
   @spec handle_event_xml(params :: map(), body :: String.t(), WeChat.client()) ::
           {:ok, data_type(), xml()} | {:error, String.t()}
   def handle_event_xml(params, body, client) do
-    with {:ok, %{"Encrypt" => encrypt_content}} <- XmlParser.parse(body) do
-      decode_xml_msg(
-        encrypt_content,
-        params["msg_signature"],
-        params["nonce"],
-        params["timestamp"],
-        client
-      )
-    else
+    case XmlParser.parse(body) do
+      {:ok, %{"Encrypt" => encrypt_content}} ->
+        decode_xml_msg(
+          encrypt_content,
+          params["msg_signature"],
+          params["nonce"],
+          params["timestamp"],
+          client
+        )
+
       {:ok, xml} when is_map(xml) ->
         # 明文模式
         {:ok, :plaqin_text, xml}
@@ -42,15 +54,16 @@ defmodule WeChat.ServerMessage.EventHandler do
   @spec handle_event_json(params :: map(), body :: String.t(), WeChat.client()) ::
           {:ok, data_type(), json()} | {:error, String.t()}
   def handle_event_json(params, body, client) when is_map(body) do
-    with %{"Encrypt" => encrypt_content} <- body do
-      decode_json_msg(
-        encrypt_content,
-        params["msg_signature"],
-        params["nonce"],
-        params["timestamp"],
-        client
-      )
-    else
+    case body do
+      %{"Encrypt" => encrypt_content} ->
+        decode_json_msg(
+          encrypt_content,
+          params["msg_signature"],
+          params["nonce"],
+          params["timestamp"],
+          client
+        )
+
       {:ok, json} when is_map(json) ->
         # 明文模式
         {:ok, :plaqin_text, json}
@@ -61,15 +74,16 @@ defmodule WeChat.ServerMessage.EventHandler do
   end
 
   def handle_event_json(params, body, client) do
-    with {:ok, %{"Encrypt" => encrypt_content}} <- Jason.decode(body) do
-      decode_xml_msg(
-        encrypt_content,
-        params["msg_signature"],
-        params["nonce"],
-        params["timestamp"],
-        client
-      )
-    else
+    case Jason.decode(body) do
+      {:ok, %{"Encrypt" => encrypt_content}} ->
+        decode_xml_msg(
+          encrypt_content,
+          params["msg_signature"],
+          params["nonce"],
+          params["timestamp"],
+          client
+        )
+
       {:ok, json} when is_map(json) ->
         # 明文模式
         {:ok, :plaqin_text, json}
@@ -85,46 +99,41 @@ defmodule WeChat.ServerMessage.EventHandler do
   * [验证票据](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
   * [授权相关推送通知](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/authorize_event.html)
   """
-  def handle_component_message(message) do
-    with %{"InfoType" => info_type} <- message do
-      component_appid = message["AppId"]
+  def handle_component_message(%{"InfoType" => info_type, "AppId" => component_appid} = message) do
+    case info_type do
+      "component_verify_ticket" ->
+        # 验证票据
+        component_verify_ticket = message["ComponentVerifyTicket"]
+        Cache.put_cache(component_appid, :component_verify_ticket, component_verify_ticket)
+        Logger.info("#{component_appid} Received [component_verify_ticket] info.")
+        :handled
 
-      case info_type do
-        "component_verify_ticket" ->
-          # 验证票据
-          component_verify_ticket = message["ComponentVerifyTicket"]
-          Cache.put_cache(component_appid, :component_verify_ticket, component_verify_ticket)
-          Logger.info("#{component_appid} Received [component_verify_ticket] info.")
-          :handled
+      "authorized" ->
+        # 授权成功通知
+        authorized_message(component_appid, info_type, message)
 
-        "authorized" ->
-          # 授权成功通知
-          authorized_message(component_appid, info_type, message)
+      "updateauthorized" ->
+        # 授权更新通知
+        authorized_message(component_appid, info_type, message)
 
-        "updateauthorized" ->
-          # 授权更新通知
-          authorized_message(component_appid, info_type, message)
+      "unauthorized" ->
+        # 取消授权通知
+        authorizer_appid = message["AuthorizerAppid"]
 
-        "unauthorized" ->
-          # 取消授权通知
-          authorizer_appid = message["AuthorizerAppid"]
+        Logger.info(
+          "#{component_appid} Received AuthorizerAppid: #{authorizer_appid}, [unauthorized] info."
+        )
 
-          Logger.info(
-            "#{component_appid} Received AuthorizerAppid: #{authorizer_appid}, [unauthorized] info."
-          )
+        Cache.del_cache(authorizer_appid, :authorization_code)
+        Cache.del_cache(authorizer_appid, :authorization_code_expired_time)
+        :handled
 
-          Cache.del_cache(authorizer_appid, :authorization_code)
-          Cache.del_cache(authorizer_appid, :authorization_code_expired_time)
-          :handled
-
-        _ ->
-          :ignore
-      end
-    else
       _ ->
         :ignore
     end
   end
+
+  def handle_component_message(_message), do: :ignore
 
   defp authorized_message(component_appid, info_type, message) do
     authorizer_appid = message["AuthorizerAppid"]
