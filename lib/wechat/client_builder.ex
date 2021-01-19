@@ -123,17 +123,23 @@ defmodule WeChat.ClientBuilder do
   end
 
   defp gen_sub_modules(sub_modules, parent_module) do
+    client_module =
+      parent_module
+      |> Module.split()
+      |> List.last()
+      |> String.to_atom()
+
     Enum.map_reduce(
       sub_modules,
       [],
       fn module, acc ->
-        {file, ast} = gen_sub_module(module, parent_module)
+        {file, ast} = gen_sub_module(module, parent_module, client_module)
         {ast, [quote(do: @external_resource(unquote(file))) | acc]}
       end
     )
   end
 
-  defp gen_sub_module(module, parent_module) do
+  defp gen_sub_module(module, parent_module, client_module) do
     file = module.__info__(:compile)[:source]
 
     {:ok, ast} =
@@ -147,17 +153,11 @@ defmodule WeChat.ClientBuilder do
       |> Enum.drop_while(&(&1 != "wechat"))
       |> Path.join()
 
-    client_module =
-      parent_module
-      |> Module.split()
-      |> List.last()
-      |> String.to_atom()
-
-    new_module_name =
+    new_module_name_alias =
       module
       |> Module.split()
-      |> List.last()
-      |> String.to_atom()
+      |> List.delete_at(0)
+      |> Enum.map(&String.to_atom/1)
 
     ast =
       Macro.prewalk(
@@ -176,7 +176,7 @@ defmodule WeChat.ClientBuilder do
                  ]}
             ]
 
-            {:defmodule, c_m, [{:__aliases__, c_a, [new_module_name]}, do_list]}
+            {:defmodule, c_m, [{:__aliases__, c_a, new_module_name_alias}, do_list]}
 
           {:spec, c_s, ast} ->
             ast =
