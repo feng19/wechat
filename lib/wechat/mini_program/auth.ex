@@ -9,7 +9,8 @@ defmodule WeChat.MiniProgram.Auth do
   @open_ability_doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/open-ability"
 
   @doc """
-  服务端获取开放数据 - [Official API Docs Link](#{@open_ability_doc_link}/signature.html)
+  服务端获取开放数据 -
+  [Official API Docs Link](#{@open_ability_doc_link}/signature.html){:target="_blank"}
 
   [小程序登录](#{@open_ability_doc_link}/login.html)
   """
@@ -29,7 +30,8 @@ defmodule WeChat.MiniProgram.Auth do
   end
 
   @doc """
-  服务端获取开放数据 - 包含敏感数据 - [Official API Docs Link](#{@open_ability_doc_link}/signature.html)
+  服务端获取开放数据 - 包含敏感数据 -
+  [Official API Docs Link](#{@open_ability_doc_link}/signature.html){:target="_blank"}
 
   * [小程序登录](#{@open_ability_doc_link}/login.html)
   * [加密数据解密算法](#{@open_ability_doc_link}/signature.html#加密数据解密算法)
@@ -85,7 +87,8 @@ defmodule WeChat.MiniProgram.Auth do
   end
 
   @doc """
-  支付后获取用户的`UnionId` - [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
+  支付后获取用户的`UnionId` -
+  [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -104,7 +107,8 @@ defmodule WeChat.MiniProgram.Auth do
   end
 
   @doc """
-  支付后获取用户的`UnionId` - 微信支付订单号(`transaction_id`) - [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
+  支付后获取用户的`UnionId` - 微信支付订单号(`transaction_id`) -
+  [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -125,9 +129,8 @@ defmodule WeChat.MiniProgram.Auth do
   end
 
   @doc """
-  支付后获取用户的`UnionId` - 微信支付商户订单号和微信支付商户号(`out_trade_no`及`mch_id`) - [Official API Docs Link](#{
-    @doc_link
-  }/user-info/auth.getPaidUnionId.html){:target="_blank"}
+  支付后获取用户的`UnionId` - 微信支付商户订单号和微信支付商户号(`out_trade_no`及`mch_id`) -
+  [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -153,7 +156,8 @@ defmodule WeChat.MiniProgram.Auth do
   end
 
   @doc """
-  获取AccessToken - [Official API Docs Link](#{@doc_link}/access-token/auth.getAccessToken.html){:target="_blank"}
+  获取AccessToken -
+  [Official API Docs Link](#{@doc_link}/access-token/auth.getAccessToken.html){:target="_blank"}
   """
   @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do

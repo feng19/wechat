@@ -10,7 +10,8 @@ defmodule WeChat.UserBlacklist do
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management/Manage_blacklist.html"
 
   @doc """
-  获取公众号的黑名单列表 - [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
+  获取公众号的黑名单列表 -
+  [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
   """
   @spec get_black_list(WeChat.client()) :: WeChat.response()
   def get_black_list(client) do
@@ -20,7 +21,8 @@ defmodule WeChat.UserBlacklist do
   end
 
   @doc """
-  获取公众号的黑名单列表 - 翻页 - [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
+  获取公众号的黑名单列表 - 翻页 -
+  [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
   """
   @spec get_black_list(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_black_list(client, begin_openid) do
@@ -32,7 +34,8 @@ defmodule WeChat.UserBlacklist do
   end
 
   @doc """
-  拉黑用户 - [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
+  拉黑用户 -
+  [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
   """
   @spec batch_blacklist(WeChat.client(), [WeChat.openid()]) :: WeChat.response()
   def batch_blacklist(client, openid_list) do
@@ -44,7 +47,8 @@ defmodule WeChat.UserBlacklist do
   end
 
   @doc """
-  取消拉黑用户 - [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
+  取消拉黑用户 -
+  [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
   """
   @spec batch_unblacklist(WeChat.client(), [WeChat.openid()]) :: WeChat.response()
   def batch_unblacklist(client, openid_list) do

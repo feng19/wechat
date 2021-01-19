@@ -136,7 +136,8 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  拉取用户信息(需`scope`为`snsapi_userinfo`) - [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#3){:target="_blank"}
+  拉取用户信息(需`scope`为`snsapi_userinfo`) -
+  [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#3){:target="_blank"}
 
   如果网页授权作用域为`snsapi_userinfo`,则此时开发者可以通过access_token和openid拉取用户信息了.
   """
@@ -180,7 +181,8 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  检验授权凭证(`access_token`)是否有效 - [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#4){:target="_blank"}
+  检验授权凭证(`access_token`)是否有效 -
+  [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#4){:target="_blank"}
   """
   @spec auth(WeChat.openid(), access_token()) :: WeChat.response()
   def auth(requester \\ Requester, openid, access_token) do
@@ -190,7 +192,8 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  JS-SDK配置 - [Official API Docs Link](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
+  JS-SDK配置 -
+  [Official API Docs Link](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
   """
   @spec js_sdk_config(WeChat.client(), url()) :: WeChat.response()
   def js_sdk_config(client, url) do
@@ -282,7 +285,8 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  获取`api_ticket` - [Official API Docs Link](#{@doc_link}/JS-SDK.html#62){:target="_blank"}
+  获取`api_ticket` -
+  [Official API Docs Link](#{@doc_link}/JS-SDK.html#62){:target="_blank"}
   """
   @spec get_ticket(WeChat.client(), js_api_ticket_type()) :: WeChat.response()
   def get_ticket(client, type) do

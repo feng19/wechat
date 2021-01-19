@@ -13,7 +13,8 @@ defmodule WeChat.Account do
   @type qrcode_action_name :: String.t()
 
   @doc """
-  获取AccessToken - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Basic_Information/Get_access_token.html){:target="_blank"}
+  获取AccessToken -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Basic_Information/Get_access_token.html){:target="_blank"}
   """
   @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do
@@ -27,7 +28,8 @@ defmodule WeChat.Account do
   end
 
   @doc """
-  生成二维码 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  生成二维码 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
   """
   @spec create_qrcode(
           WeChat.client(),
@@ -58,7 +60,8 @@ defmodule WeChat.Account do
   end
 
   @doc """
-  生成并获取二维码链接 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  生成并获取二维码链接 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
   """
   @spec get_qrcode_url(
           WeChat.client(),
@@ -74,7 +77,8 @@ defmodule WeChat.Account do
   end
 
   @doc """
-  生成并下载二维码 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  生成并下载二维码 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
   """
   @spec download_qrcode(
           WeChat.client(),
@@ -98,7 +102,8 @@ defmodule WeChat.Account do
   end
 
   @doc """
-  长链接转成短链接 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/URL_Shortener.html){:target="_blank"}
+  长链接转成短链接 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Account_Management/URL_Shortener.html){:target="_blank"}
   """
   @spec short_url(WeChat.client(), long_url :: String.t()) :: WeChat.response()
   def short_url(client, long_url) do
@@ -110,7 +115,8 @@ defmodule WeChat.Account do
   end
 
   @doc """
-  接口调用次数清零 - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
+  接口调用次数清零 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
   """
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do

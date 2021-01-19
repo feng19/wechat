@@ -13,7 +13,8 @@ defmodule WeChat.BatchSends do
   @type msg_id :: String.t()
 
   @doc """
-  根据标签进行群发【订阅号与服务号认证后均可用】 - [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
+  根据标签进行群发【订阅号与服务号认证后均可用】 -
+  [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
   """
   @spec batch_send_by_tag(WeChat.client(), body :: map) :: WeChat.response()
   def batch_send_by_tag(client, body) do
@@ -23,7 +24,8 @@ defmodule WeChat.BatchSends do
   end
 
   @doc """
-  根据OpenID列表群发【订阅号不可用，服务号认证后可用】 - [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
+  根据OpenID列表群发【订阅号不可用，服务号认证后可用】 -
+  [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
   """
   @spec batch_send_by_list(WeChat.client(), body :: map) :: WeChat.response()
   def batch_send_by_list(client, body) do
@@ -33,7 +35,8 @@ defmodule WeChat.BatchSends do
   end
 
   @doc """
-  删除群发【订阅号与服务号认证后均可用】 - [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
+  删除群发【订阅号与服务号认证后均可用】 -
+  [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
 
   群发之后，随时可以通过该接口删除群发。
 
@@ -54,7 +57,8 @@ defmodule WeChat.BatchSends do
   end
 
   @doc """
-  预览接口【订阅号与服务号认证后均可用】 - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  预览接口【订阅号与服务号认证后均可用】 -
+  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
 
   开发者可通过该接口发送消息给指定用户，在手机端查看消息的样式和排版。
 
@@ -68,7 +72,8 @@ defmodule WeChat.BatchSends do
   end
 
   @doc """
-  查询群发消息发送状态【订阅号与服务号认证后均可用】 - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  查询群发消息发送状态【订阅号与服务号认证后均可用】 -
+  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
 
   开发者可通过该接口发送消息给指定用户，在手机端查看消息的样式和排版。
 
@@ -82,7 +87,8 @@ defmodule WeChat.BatchSends do
   end
 
   @doc """
-  群发速度 - 获取 - [Official API Docs Link](#{@doc_link}#9){:target="_blank"}
+  群发速度 - 获取 -
+  [Official API Docs Link](#{@doc_link}#9){:target="_blank"}
   """
   @spec get_speed(WeChat.client()) :: WeChat.response()
   def get_speed(client) do
@@ -92,7 +98,8 @@ defmodule WeChat.BatchSends do
   end
 
   @doc """
-  群发速度 - 设置 - [Official API Docs Link](#{@doc_link}#9){:target="_blank"}
+  群发速度 - 设置 -
+  [Official API Docs Link](#{@doc_link}#9){:target="_blank"}
 
   群发速度的级别，是一个0到4的整数，数字越大表示群发速度越慢。
 

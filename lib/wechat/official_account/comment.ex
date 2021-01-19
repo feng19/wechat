@@ -21,7 +21,8 @@ defmodule WeChat.Comment do
   @type content :: String.t()
 
   @doc """
-  打开已群发文章评论 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  打开已群发文章评论 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
   """
   @spec open(WeChat.client(), msg_data_id, index :: integer) :: WeChat.response()
   def open(client, msg_data_id, index \\ 0) do
@@ -33,7 +34,8 @@ defmodule WeChat.Comment do
   end
 
   @doc """
-  关闭已群发文章评论 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  关闭已群发文章评论 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
   """
   @spec close(WeChat.client(), msg_data_id, index :: integer) :: WeChat.response()
   def close(client, msg_data_id, index \\ 0) do
@@ -45,7 +47,8 @@ defmodule WeChat.Comment do
   end
 
   @doc """
-  查看指定文章的评论数据 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  查看指定文章的评论数据 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
     
   ## 参数说明
   | 参数 | 是否必须 | 类型 | 说明 |
@@ -80,7 +83,8 @@ defmodule WeChat.Comment do
   end
 
   @doc """
-  将评论标记精选 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  将评论标记精选 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
   """
   @spec mark_elect(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()
@@ -97,7 +101,8 @@ defmodule WeChat.Comment do
   end
 
   @doc """
-  将评论取消精选 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  将评论取消精选 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
   """
   @spec unmark_elect(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()
@@ -114,7 +119,8 @@ defmodule WeChat.Comment do
   end
 
   @doc """
-  删除评论 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  删除评论 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
   """
   @spec delete(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()
@@ -131,7 +137,8 @@ defmodule WeChat.Comment do
   end
 
   @doc """
-  回复评论 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  回复评论 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
   """
   @spec add_reply(WeChat.client(), msg_data_id, user_comment_id, content, index :: integer) ::
           WeChat.response()
@@ -149,7 +156,8 @@ defmodule WeChat.Comment do
   end
 
   @doc """
-  删除回复 - [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  删除回复 -
+  [Official API Docs Link](#{@doc_link}){:target="_blank"}
   """
   @spec delete_reply(WeChat.client(), msg_data_id, user_comment_id, index :: integer) ::
           WeChat.response()

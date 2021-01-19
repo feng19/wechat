@@ -17,7 +17,8 @@ defmodule WeChat.Template do
   @type industry_id :: integer
 
   @doc """
-  设置所属行业 - [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
+  设置所属行业 -
+  [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
   """
   @spec api_set_industry(WeChat.client(), industry_id, industry_id) :: WeChat.response()
   def api_set_industry(client, industry_id1, industry_id2) do
@@ -29,7 +30,8 @@ defmodule WeChat.Template do
   end
 
   @doc """
-  获取设置的行业信息 - [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
+  获取设置的行业信息 -
+  [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
   """
   @spec get_industry(WeChat.client()) :: WeChat.response()
   def get_industry(client) do
@@ -39,7 +41,8 @@ defmodule WeChat.Template do
   end
 
   @doc """
-  获得模板ID - [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
+  获得模板ID -
+  [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
   """
   @spec api_add_template(WeChat.client(), template_id_short :: String.t()) :: WeChat.response()
   def api_add_template(client, template_id_short) do
@@ -51,7 +54,8 @@ defmodule WeChat.Template do
   end
 
   @doc """
-  获取模板列表 - [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
+  获取模板列表 -
+  [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
   """
   @spec get_all_private_template(WeChat.client()) :: WeChat.response()
   def get_all_private_template(client) do
@@ -61,7 +65,8 @@ defmodule WeChat.Template do
   end
 
   @doc """
-  删除模板 - [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
+  删除模板 -
+  [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
   """
   @spec del_private_template(WeChat.client(), template_id) :: WeChat.response()
   def del_private_template(client, template_id) do
@@ -73,7 +78,8 @@ defmodule WeChat.Template do
   end
 
   @doc """
-  发送模板消息 - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  发送模板消息 -
+  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
   """
   @spec send_template_message(WeChat.client(), WeChat.openid(), template_id, data :: map) ::
           WeChat.response()
@@ -86,7 +92,8 @@ defmodule WeChat.Template do
   end
 
   @doc """
-  发送模板消息 - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  发送模板消息 -
+  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
   """
   @spec send_template_message(WeChat.client(), body :: map) :: WeChat.response()
   def send_template_message(client, body) do

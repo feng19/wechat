@@ -23,7 +23,8 @@ defmodule WeChat.Component do
   @doc_link "#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api"
 
   @typedoc """
-  选项名称及可选值说明 - [Official API Docs Link](#{@doc_link}/api_get_authorizer_option.html#选项名称及可选值说明){:target="_blank"}
+  选项名称及可选值说明 -
+  [Official API Docs Link](#{@doc_link}/api_get_authorizer_option.html#选项名称及可选值说明){:target="_blank"}
 
   |   option_name    |   选项名说明    | option_value | 选项值说明 |
   | ---------------- | ------------  | ------------ | -------- |
@@ -38,7 +39,8 @@ defmodule WeChat.Component do
   @type option_name :: String.t()
 
   @doc """
-  生成授权链接 - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Authorization_Process_Technical_Description.html){:target="_blank"}
+  生成授权链接 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Authorization_Process_Technical_Description.html){:target="_blank"}
   """
   @spec bind_component_url(WeChat.client(), redirect_uri :: String.t(), auth_type() | biz_appid()) ::
           url :: String.t() | WeChat.response()
@@ -71,7 +73,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  接口调用次数清零 - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
+  接口调用次数清零 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
   """
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do
@@ -85,7 +88,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  获取令牌 - [Official API Docs Link](#{@doc_link}/component_access_token.html){:target="_blank"}
+  获取令牌 -
+  [Official API Docs Link](#{@doc_link}/component_access_token.html){:target="_blank"}
   """
   @spec get_component_token(WeChat.client()) :: nil | WeChat.response()
   def get_component_token(client) do
@@ -104,7 +108,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  获取预授权码 - [Official API Docs Link](#{@doc_link}/pre_auth_code.html){:target="_blank"}
+  获取预授权码 -
+  [Official API Docs Link](#{@doc_link}/pre_auth_code.html){:target="_blank"}
   """
   @spec create_pre_auth_code(WeChat.client()) :: WeChat.response()
   def create_pre_auth_code(client) do
@@ -118,7 +123,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  使用授权码获取授权信息 - [Official API Docs Link](#{@doc_link}/authorization_info.html){:target="_blank"}
+  使用授权码获取授权信息 -
+  [Official API Docs Link](#{@doc_link}/authorization_info.html){:target="_blank"}
   """
   @spec query_auth(WeChat.client(), authorization_code :: String.t()) :: WeChat.response()
   def query_auth(client, authorization_code) do
@@ -135,7 +141,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  获取/刷新接口调用令牌 - [Official API Docs Link](#{@doc_link}/api_authorizer_token.html){:target="_blank"}
+  获取/刷新接口调用令牌 -
+  [Official API Docs Link](#{@doc_link}/api_authorizer_token.html){:target="_blank"}
   """
   @spec authorizer_token(WeChat.client()) :: nil | WeChat.response()
   def authorizer_token(client) do
@@ -158,7 +165,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  获取授权方的帐号基本信息 - [Official API Docs Link](#{@doc_link}/api_get_authorizer_info.html){:target="_blank"}
+  获取授权方的帐号基本信息 -
+  [Official API Docs Link](#{@doc_link}/api_get_authorizer_info.html){:target="_blank"}
   """
   @spec get_authorizer_info(WeChat.client()) :: WeChat.response()
   def get_authorizer_info(client) do
@@ -172,7 +180,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  获取授权方选项信息 - [Official API Docs Link](#{@doc_link}/api_get_authorizer_option.html){:target="_blank"}
+  获取授权方选项信息 -
+  [Official API Docs Link](#{@doc_link}/api_get_authorizer_option.html){:target="_blank"}
   """
   @spec get_authorizer_option(WeChat.client(), option_name) :: WeChat.response()
   def get_authorizer_option(client, option_name) do
@@ -190,7 +199,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  拉取所有已授权的帐号信息 - [Official API Docs Link](#{@doc_link}/api_get_authorizer_list.html){:target="_blank"}
+  拉取所有已授权的帐号信息 -
+  [Official API Docs Link](#{@doc_link}/api_get_authorizer_list.html){:target="_blank"}
   """
   @spec get_authorizer_list(WeChat.client(), offset :: integer, count :: integer) ::
           WeChat.response()
@@ -205,7 +215,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  创建开放平台帐号并绑定公众号/小程序 - [Official API Docs Link](#{@doc_link}/account/create.html){:target="_blank"}
+  创建开放平台帐号并绑定公众号/小程序 -
+  [Official API Docs Link](#{@doc_link}/account/create.html){:target="_blank"}
 
   该 API 用于创建一个开放平台帐号，并将一个尚未绑定开放平台帐号的公众号/小程序绑定至该开放平台帐号上。
 
@@ -221,7 +232,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  将公众号/小程序绑定到开放平台帐号下 - [Official API Docs Link](#{@doc_link}/account/bind.html){:target="_blank"}
+  将公众号/小程序绑定到开放平台帐号下 -
+  [Official API Docs Link](#{@doc_link}/account/bind.html){:target="_blank"}
 
   该 API 用于将一个尚未绑定开放平台帐号的公众号或小程序绑定至指定开放平台帐号上。
 
@@ -237,7 +249,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  将公众号/小程序从开放平台帐号下解绑 - [Official API Docs Link](#{@doc_link}/account/unbind.html){:target="_blank"}
+  将公众号/小程序从开放平台帐号下解绑 -
+  [Official API Docs Link](#{@doc_link}/account/unbind.html){:target="_blank"}
 
   该 API 用于将一个公众号或小程序与指定开放平台帐号解绑。
 
@@ -253,7 +266,8 @@ defmodule WeChat.Component do
   end
 
   @doc """
-  获取公众号/小程序所绑定的开放平台帐号 - [Official API Docs Link](#{@doc_link}/account/get.html){:target="_blank"}
+  获取公众号/小程序所绑定的开放平台帐号 -
+  [Official API Docs Link](#{@doc_link}/account/get.html){:target="_blank"}
 
   该 API 用于获取公众号或小程序所绑定的开放平台帐号。
   """

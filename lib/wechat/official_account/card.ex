@@ -54,7 +54,8 @@ defmodule WeChat.Card do
   @type cond_source :: 0 | 1
 
   @doc """
-  创建卡券 - [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#8){:target="_blank"}
+  创建卡券 -
+  [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#8){:target="_blank"}
   """
   @spec create(WeChat.client(), body :: map) :: WeChat.response()
   def create(client, body) do
@@ -62,7 +63,8 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  设置快速买单 - [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#11){:target="_blank"}
+  设置快速买单 -
+  [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#11){:target="_blank"}
 
   ## 功能介绍
 
@@ -84,7 +86,8 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  设置自助核销 - [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#14){:target="_blank"}
+  设置自助核销 -
+  [Official API Docs Link](#{@doc_link}/Create_a_Coupon_Voucher_or_Card.html#14){:target="_blank"}
 
   ## 功能介绍
 
@@ -105,7 +108,8 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  查询Code - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#1){:target="_blank"}
+  查询Code -
+  [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#1){:target="_blank"}
 
   我们强烈建议开发者在调用核销code接口之前调用查询code接口，并在核销之前对非法状态的code(如转赠中、已删除、已核销等)做出处理。
   """
@@ -120,7 +124,8 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  核销Code接口 - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
+  核销Code接口 -
+  [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
 
   消耗code接口是核销卡券的唯一接口,开发者可以调用当前接口将用户的优惠券进行核销，该过程不可逆。
   """
@@ -134,7 +139,8 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  核销Code接口 - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
+  核销Code接口 -
+  [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#2){:target="_blank"}
 
   消耗code接口是核销卡券的唯一接口,开发者可以调用当前接口将用户的优惠券进行核销，该过程不可逆。
 
@@ -150,7 +156,8 @@ defmodule WeChat.Card do
   end
 
   @doc """
-  Code解码接口 - [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#3){:target="_blank"}
+  Code解码接口 -
+  [Official API Docs Link](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#3){:target="_blank"}
 
   消耗code接口是核销卡券的唯一接口,开发者可以调用当前接口将用户的优惠券进行核销，该过程不可逆。
   """

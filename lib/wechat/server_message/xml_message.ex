@@ -9,7 +9,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Passive_user_reply_message.html"
 
   @doc """
-  回包加密 - [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html)
+  回包加密 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html)
 
   ```xml
   <xml>
@@ -32,7 +33,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复文本消息 - [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
+  回复文本消息 -
+  [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
 
   ```xml
   <xml>
@@ -57,7 +59,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复图片消息 - [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
+  回复图片消息 -
+  [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
 
   ```xml
   <xml>
@@ -86,7 +89,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复语音消息 - [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
+  回复语音消息 -
+  [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
 
   ```xml
   <xml>
@@ -115,7 +119,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复视频消息 - [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
+  回复视频消息 -
+  [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
 
   ```xml
   <xml>
@@ -148,7 +153,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复音乐消息 - [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
+  回复音乐消息 -
+  [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
 
   ```xml
   <xml>
@@ -194,7 +200,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  回复图文消息 - [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  回复图文消息 -
+  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
 
   ```xml
   <xml>
@@ -237,7 +244,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  消息转发客服消息 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
+  消息转发客服消息 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
 
   ```xml
   <xml>
@@ -260,7 +268,8 @@ defmodule WeChat.ServerMessage.XmlMessage do
   end
 
   @doc """
-  消息转发到指定客服 - [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
+  消息转发到指定客服 -
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
 
   ```xml
   <xml>
