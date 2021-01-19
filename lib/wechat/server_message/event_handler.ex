@@ -18,6 +18,68 @@ defmodule WeChat.ServerMessage.EventHandler do
   @type json :: map()
   @type json_string :: String.t()
 
+  @doc """
+  验证消息的确来自微信服务器
+  """
+  @spec handle_get(params :: map()) :: String.t()
+  def handle_get(params) do
+    with appid <- params["appid"],
+         client when client != nil <- WeChat.get_client_by_appid(appid),
+         true <- check_signature?(params, client) do
+      params["echostr"]
+    else
+      _ -> "invalid request"
+    end
+  end
+
+  @doc """
+  接受事件推送
+  """
+  @spec handle_post(
+          Plug.Conn.t(),
+          params :: map(),
+          (WeChat.client(), message :: map() ->
+             {:reply, reply_msg :: String.t(), timestamp :: integer()})
+        ) :: String.t()
+  def handle_post(conn = %{body_params: body_params}, params, callback)
+      when is_struct(body_params) do
+    # xml data for official_account
+    with appid <- params["appid"],
+         client when client != nil <- WeChat.get_client_by_appid(appid),
+         true <- check_signature?(params, client),
+         {:ok, body, _conn} <- Plug.Conn.read_body(conn),
+         {:ok, reply_type, message} <- handle_event_xml(params, body, client) do
+      case callback.(client, message) do
+        {:reply, reply_msg, timestamp} -> reply_msg(reply_type, reply_msg, timestamp, client)
+        :retry -> "please retry"
+        :error -> "please retry"
+        {:error, _} -> "please retry"
+        _ -> "success"
+      end
+    else
+      _ -> "invalid request"
+    end
+  end
+
+  def handle_post(%{body_params: body_params, query_params: query_params}, params, callback) do
+    # json data for mini_program
+    with appid <- params["appid"],
+         client when client != nil <- WeChat.get_client_by_appid(appid),
+         true <- check_signature?(query_params, client),
+         {:ok, _reply_type, message} <- handle_event_json(query_params, body_params, client) do
+      case callback.(client, message) do
+        reply_msg when is_binary(reply_msg) -> reply_msg
+        :retry -> "please retry"
+        :error -> "please retry"
+        {:error, _} -> "please retry"
+        _ -> "success"
+      end
+    else
+      _ -> "invalid request"
+    end
+  end
+
+  @doc "验证消息的确来自微信服务器"
   @spec check_signature?(params :: map(), WeChat.client()) :: boolean()
   def check_signature?(params, client) do
     with signature when signature != nil <- params["signature"],
