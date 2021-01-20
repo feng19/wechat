@@ -8,7 +8,16 @@ defmodule WeChat.Application do
   def start(_type, _args) do
     WeChat.Storage.Cache.init_table()
     finch_pool = Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
-    refresh_timer = Application.get_env(:wechat, :refresh_timer, WeChat.RefreshTimer)
+
+    refresh_timer =
+      case Application.get_env(:wechat, :refresh_timer, WeChat.RefreshTimer) do
+        refresh_timer when is_atom(refresh_timer) ->
+          refresh_settings = Application.get_env(:wechat, :refresh_settings, %{})
+          {refresh_timer, refresh_settings}
+
+        child = {refresh_timer, _} when is_atom(refresh_timer) ->
+          child
+      end
 
     children = [
       {Finch, name: WeChat.Finch, pools: %{:default => finch_pool}},
