@@ -116,7 +116,9 @@ defmodule WeChat.RefreshTimer do
       result =
         storage.store(store_id, store_key, %{"value" => value, "expired_time" => expired_time})
 
-      Logger.info("Store [#{store_id}] [#{store_key}] by #{storage} => #{result}.")
+      Logger.info(
+        "Store appid: #{store_id}, key: #{store_key} by #{inspect(storage)} => #{inspect(result)}."
+      )
     end
   end
 
@@ -132,12 +134,17 @@ defmodule WeChat.RefreshTimer do
         Cache.put_cache(store_id, store_key, value)
 
         Logger.info(
-          "Get [#{store_id}] [#{store_key}] [expires_in: #{diff}] from storage: #{storage} succeed."
+          "Get appid: #{store_id}, key: #{store_key}, expires_in: #{diff} from storage: #{
+            inspect(storage)
+          } succeed."
         )
 
         {true, diff}
       else
-        Logger.info("Get [#{store_id}] [#{store_key}] from storage: #{storage} token expired.")
+        Logger.info(
+          "Get appid: #{store_id}, key: #{store_key}] from storage: #{inspect(storage)} token expired."
+        )
+
         false
       end
     else
@@ -146,7 +153,9 @@ defmodule WeChat.RefreshTimer do
 
       error ->
         Logger.warn(
-          "Get [#{store_id}] [#{store_key}] from storage: #{storage} error: #{inspect(error)}."
+          "Get appid: #{store_id}, key: #{store_key} from storage: #{inspect(storage)} error: #{
+            inspect(error)
+          }."
         )
 
         false
@@ -165,7 +174,9 @@ defmodule WeChat.RefreshTimer do
     refresh_list = init_refresh_list(client, opts)
 
     Logger.info(
-      "Initialize WeChat App: #{client} by Role: #{client.role()}, Storage: #{client.storage()}."
+      "Initialize WeChat Client: #{inspect(client)} by Role: #{client.role()}, Storage: #{
+        inspect(client.storage())
+      }."
     )
 
     refresh_list =
@@ -189,7 +200,9 @@ defmodule WeChat.RefreshTimer do
   end
 
   defp do_refresh(client, %{refresh_list: refresh_list} = opts) do
-    Logger.info("Refreshing WeChat App: #{client}, list: #{inspect(refresh_list)}.")
+    Logger.info(
+      "Refreshing WeChat Client: #{inspect(client)} with list: #{inspect(refresh_list)}."
+    )
 
     refresh_list =
       for {{store_id, store_key}, fun, timer} <- refresh_list do
@@ -215,7 +228,9 @@ defmodule WeChat.RefreshTimer do
           cache_and_store(store_id, key, token, expired_time, client)
         end)
 
-        Logger.info("Refresh [#{store_id}] [#{store_key}] [expires_in: #{expires_in}] succeed.")
+        Logger.info(
+          "Refresh appid: #{store_id}, key: #{store_key}, expires_in: #{expires_in} succeed."
+        )
 
         :erlang.start_timer(
           (expires_in - opts.refresh_before_time) * 1000,
@@ -226,7 +241,10 @@ defmodule WeChat.RefreshTimer do
       {:ok, token, expires_in} ->
         expired_time = Utils.now_unix() + expires_in
         cache_and_store(store_id, store_key, token, expired_time, client)
-        Logger.info("Refresh [#{store_id}] [#{store_key}] [expires_in: #{expires_in}] succeed.")
+
+        Logger.info(
+          "Refresh appid: #{store_id}, key: #{store_key}, expires_in: #{expires_in} succeed."
+        )
 
         :erlang.start_timer(
           (expires_in - opts.refresh_before_time) * 1000,
@@ -236,8 +254,7 @@ defmodule WeChat.RefreshTimer do
 
       error ->
         Logger.warn(
-          "Refresh [#{store_id}] [#{store_key}] error:" <>
-            inspect(error) <> ", Will be retry again one minute later."
+          "Refresh appid: #{store_id}, key: #{store_key} error: #{inspect(error)}, Will be retry again one minute later."
         )
 
         :erlang.start_timer(opts.refresh_retry_interval, self(), {store_id, store_key, client})
