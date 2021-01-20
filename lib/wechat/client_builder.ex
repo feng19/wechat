@@ -41,14 +41,8 @@ defmodule WeChat.ClientBuilder do
 
         :component ->
           case Keyword.get(opts, :app_type, :official_account) do
-            :official_account ->
-              [Component | @official_account_modules]
-
-            :mini_program ->
-              [Component | @mini_program_modules]
-
-            :both ->
-              [Component | @official_account_modules ++ @mini_program_modules]
+            :official_account -> [Component | @official_account_modules]
+            :mini_program -> [Component | @mini_program_modules]
           end
 
         :mini_program ->

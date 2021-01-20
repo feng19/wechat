@@ -24,7 +24,7 @@ defmodule WeChat do
   @type client :: module()
   @type requester :: module()
   @type role :: :official_account | :component | :mini_program
-  @type app_type :: :official_account | :mini_program | :both
+  @type app_type :: :official_account | :mini_program
   @type response :: Tesla.Env.result()
 
   @spec get_client_by_appid(appid()) :: nil | client()

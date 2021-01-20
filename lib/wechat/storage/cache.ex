@@ -1,10 +1,12 @@
 defmodule WeChat.Storage.Cache do
   @moduledoc "缓存存储器"
 
-  @type cache_id :: WeChat.appid() | {WeChat.appid(), WeChat.appid()}
-  @type cache_sub_key :: atom()
-  @type cache_key :: {cache_id(), WeChat.appid()}
-  @type cache_value :: String.t() | integer()
+  @type cache_id :: WeChat.appid()
+  @type cache_sub_key :: atom
+  @type cache_key :: {cache_id, cache_sub_key}
+  @type cache_value :: String.t() | integer
+
+  @compile {:inline, put_cache: 2, get_cache: 1, del_cache: 1}
 
   def init_table() do
     :ets.new(:wechat, [:named_table, :set, :public, read_concurrency: true])
@@ -16,7 +18,6 @@ defmodule WeChat.Storage.Cache do
   @spec search_client(WeChat.appid()) :: nil | WeChat.client()
   def search_client(appid), do: get_cache(appid, :client)
 
-  @compile {:inline, put_cache: 2, get_cache: 1, del_cache: 1}
   @spec put_cache(cache_id(), cache_sub_key(), cache_value()) :: true
   def put_cache(id, sub_key, value) do
     put_cache({id, sub_key}, value)
