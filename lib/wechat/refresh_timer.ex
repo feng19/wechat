@@ -202,7 +202,7 @@ defmodule WeChat.RefreshTimer do
         false
       end
     else
-      false ->
+      nil ->
         false
 
       error ->
