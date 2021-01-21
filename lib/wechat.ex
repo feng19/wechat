@@ -1,6 +1,61 @@
 defmodule WeChat do
   @moduledoc """
   WeChat SDK for Elixir
+
+  ## 定义 `Client` 模块
+
+  ### 公众号(默认):
+
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat,
+    appid: "wx-appid",
+    appsecret: "appsecret"
+  end
+  ```
+
+  ### 小程序:
+
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat,
+    role: :mini_program,
+    appid: "wx-appid",
+    appsecret: "appsecret"
+  end
+  ```
+
+  ### 第三方应用:
+
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat,
+    role: :component,
+    app_type: :official_account | :mini_program, # 默认为 :official_account
+    appid: "wx-appid",
+    component_appid: "wx-third-appid", # 第三方 appid
+  end
+  ```
+
+  ## 参数说明
+
+  请看 `t:options/0`
+
+  ## 接口调用
+
+  支持两种方式调用:
+
+  - 调用 `client` 方法
+
+      `YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)`
+
+  - 原生调用方法
+
+      `WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)`
+
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
 
@@ -84,63 +139,6 @@ defmodule WeChat do
   @spec get_client_by_appid(appid) :: nil | client
   defdelegate get_client_by_appid(appid), to: WeChat.Storage.Cache, as: :search_client
 
-  @doc """
-  定义 `Client` 模块
-
-  ### 公众号(默认):
-
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    appid: "wx-appid",
-    appsecret: "appsecret"
-  end
-  ```
-
-  ### 小程序:
-
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    role: :mini_program,
-    appid: "wx-appid",
-    appsecret: "appsecret"
-  end
-  ```
-
-  ### 第三方应用:
-
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    role: :component,
-    app_type: :official_account | :mini_program, # 默认为 :official_account
-    appid: "wx-appid",
-    component_appid: "wx-third-appid", # 第三方 appid
-  end
-  ```
-
-  ## 参数说明
-
-  请看 `t:options/0`
-
-  ## 接口调用
-
-  支持两种方式调用
-
-  ### 调用 `client` 方法
-  ```elixir
-  YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)
-  ```
-
-  ### 原生调用方法
-  ```elixir
-  WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
-  ```
-  """
   defmacro __using__(options \\ []) do
     quote do
       use WeChat.ClientBuilder, unquote(options)
