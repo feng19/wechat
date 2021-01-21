@@ -10,6 +10,11 @@ defmodule WeChatTest do
     assert WxApp.appid() == "wx2c2769f8efd9abc2"
     assert WxApp.appsecret() == "appsecret"
     assert WxApp.encoding_aes_key() == "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG"
+
+    aes_key =
+      WeChat.ServerMessage.Encryptor.aes_key("abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG")
+
+    assert WxApp.aes_key() == aes_key
     assert WxApp.token() == "spamtest"
     assert is_list(WxApp.default_opts()) == true
     assert true = Enum.all?(1..3, &function_exported?(WxApp, :get, &1))

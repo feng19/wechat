@@ -17,6 +17,7 @@ defmodule WeChat.ServerMessage.EventHandler do
   @type xml_string :: String.t()
   @type json :: map()
   @type json_string :: String.t()
+  @typep timestamp :: non_neg_integer
 
   @doc """
   验证消息的确来自微信服务器
@@ -38,8 +39,7 @@ defmodule WeChat.ServerMessage.EventHandler do
   @spec handle_post(
           Plug.Conn.t(),
           params :: map(),
-          (WeChat.client(), message :: map() ->
-             {:reply, reply_msg :: String.t(), timestamp :: integer()})
+          (WeChat.client(), message :: map() -> {:reply, reply_msg :: String.t(), timestamp})
         ) :: String.t()
   def handle_post(conn = %{body_params: body_params}, params, callback)
       when is_struct(body_params) do
@@ -244,8 +244,7 @@ defmodule WeChat.ServerMessage.EventHandler do
     :handled
   end
 
-  @spec reply_msg(data_type(), xml_string(), timestamp :: integer(), WeChat.client()) ::
-          String.t()
+  @spec reply_msg(data_type(), xml_string(), timestamp, WeChat.client()) :: String.t()
   def reply_msg(:plaqin_text, reply_msg, _timestamp, _client), do: reply_msg
 
   def reply_msg(:encrypted_xml, reply_msg, timestamp, client) do
@@ -262,15 +261,14 @@ defmodule WeChat.ServerMessage.EventHandler do
           encrypt_content :: String.t(),
           signature :: String.t(),
           nonce :: String.t(),
-          timestamp :: integer,
+          timestamp,
           WeChat.client()
-        ) ::
-          {:ok, :encrypted, xml_string()} | {:error, String.t()}
+        ) :: {:ok, :encrypted, xml_string()} | {:error, String.t()}
   def decode_xml_msg(encrypt_content, signature, nonce, timestamp, client) do
     with ^signature <-
            Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
          appid <- client.appid(),
-         {^appid, xml_string} <- Encryptor.decrypt(encrypt_content, client.encoding_aes_key()),
+         {^appid, xml_string} <- Encryptor.decrypt(encrypt_content, client.aes_key()),
          {:ok, xml} <- XmlParser.parse(xml_string) do
       {:ok, :encrypted_xml, xml}
     else
@@ -283,15 +281,14 @@ defmodule WeChat.ServerMessage.EventHandler do
           encrypt_content :: String.t(),
           signature :: String.t(),
           nonce :: String.t(),
-          timestamp :: integer,
+          timestamp,
           WeChat.client()
-        ) ::
-          {:ok, :encrypted, json_string()} | {:error, String.t()}
+        ) :: {:ok, :encrypted, json_string()} | {:error, String.t()}
   def decode_json_msg(encrypt_content, signature, nonce, timestamp, client) do
     with ^signature <-
            Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
          appid <- client.appid(),
-         {^appid, json_string} <- Encryptor.decrypt(encrypt_content, client.encoding_aes_key()),
+         {^appid, json_string} <- Encryptor.decrypt(encrypt_content, client.aes_key()),
          {:ok, json} <- Jason.decode(json_string) do
       {:ok, :encrypted_json, json}
     else
@@ -300,10 +297,9 @@ defmodule WeChat.ServerMessage.EventHandler do
     end
   end
 
-  @spec encode_xml_msg(reply_msg :: xml_string(), timestamp :: integer(), WeChat.client()) ::
-          String.t()
+  @spec encode_xml_msg(reply_msg :: xml_string(), timestamp, WeChat.client()) :: String.t()
   def encode_xml_msg(reply_msg, timestamp, client) do
-    encrypt_content = Encryptor.encrypt(reply_msg, client.appid(), client.encoding_aes_key())
+    encrypt_content = Encryptor.encrypt(reply_msg, client.appid(), client.aes_key())
     nonce = Utils.random_string(10)
 
     Utils.sha1([client.token(), to_string(timestamp), nonce, encrypt_content])

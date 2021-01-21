@@ -25,6 +25,11 @@ defmodule WeChat.Card do
     * `"BUS_TICKET"`      - 汽车票
   """
   @type card_type :: String.t()
+  @typedoc """
+  卡券Code码
+
+  一张卡券的唯一标识，核销卡券时使用此串码，支持商户自定义。
+  """
   @type card_code :: String.t()
   @typedoc """
   支持开发者拉出指定状态的卡券列表
@@ -45,13 +50,13 @@ defmodule WeChat.Card do
   | `"CODE_TYPE_NONE"`        | 无code类型       | 仅适用于线上核销，开发者须自定义跳转链接跳转至H5页面，允许用户核销掉卡券，自定义cell的名称可以命名为“立即使用” |
   """
   @type code_type :: String.t()
-  @type date :: Date.t() | String.t()
   @typedoc """
   卡券来源
     * `0` - 为公众平台创建的卡券数据
     * `1` - 是API创建的卡券数据
   """
   @type cond_source :: 0 | 1
+  @type date :: Date.t() | String.t()
 
   @doc """
   创建卡券 -

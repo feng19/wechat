@@ -6,7 +6,7 @@ defmodule WeChat.CardDistributing do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.Card
+  alias WeChat.{Card, User}
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html"
 
@@ -93,7 +93,7 @@ defmodule WeChat.CardDistributing do
   [Official API Docs Link](#{@doc_link}#12){:target="_blank"}
   """
   @spec set_test_whitelist(WeChat.client(), [
-          {:openid, [WeChat.openid()]} | {:username, [WeChat.username()]}
+          {:openid, [WeChat.openid()]} | {:username, [User.username()]}
         ]) :: WeChat.response()
   def set_test_whitelist(client, openid: openid_list) do
     client.post("/card/testwhitelist/set", json_map(openid: openid_list),
@@ -101,7 +101,6 @@ defmodule WeChat.CardDistributing do
     )
   end
 
-  @spec set_test_whitelist(WeChat.client(), [WeChat.username()]) :: WeChat.response()
   def set_test_whitelist(client, username: username_list) do
     client.post("/card/testwhitelist/set", json_map(username: username_list),
       query: [access_token: client.get_access_token()]
@@ -112,7 +111,7 @@ defmodule WeChat.CardDistributing do
   设置测试白名单 -
   [Official API Docs Link](#{@doc_link}#12){:target="_blank"}
   """
-  @spec set_test_whitelist(WeChat.client(), [WeChat.openid()], [WeChat.username()]) ::
+  @spec set_test_whitelist(WeChat.client(), [WeChat.openid()], [User.username()]) ::
           WeChat.response()
   def set_test_whitelist(client, openid_list, username_list) do
     client.post(

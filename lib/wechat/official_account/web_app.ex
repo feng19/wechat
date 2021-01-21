@@ -7,7 +7,7 @@ defmodule WeChat.WebApp do
     * [JS-SDK](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html){:target="_blank"}
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Requester, Utils, Card, Storage.Cache}
+  alias WeChat.{Requester, Utils, Card, User, Storage.Cache}
 
   @typedoc """
   授权范围
@@ -156,7 +156,7 @@ defmodule WeChat.WebApp do
     )
   end
 
-  @spec user_info(WeChat.openid(), access_token(), WeChat.lang()) :: WeChat.response()
+  @spec user_info(WeChat.openid(), access_token(), User.lang()) :: WeChat.response()
   def user_info(openid, access_token, lang) do
     Requester.get("/sns/userinfo",
       query: [
@@ -168,7 +168,7 @@ defmodule WeChat.WebApp do
   end
 
   @doc "See `user_info/2`"
-  @spec user_info(WeChat.requester(), WeChat.openid(), access_token(), WeChat.lang()) ::
+  @spec user_info(WeChat.requester(), WeChat.openid(), access_token(), User.lang()) ::
           WeChat.response()
   def user_info(requester, openid, access_token, lang) do
     requester.get("/sns/userinfo",

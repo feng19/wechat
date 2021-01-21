@@ -48,10 +48,12 @@ defmodule WeChat.MixProject do
         {"Basic",
          [
            WeChat,
-           WeChat.Requester
+           WeChat.Requester,
+           WeChat.RefreshTimer,
+           WeChat.RefreshHelper
          ]},
         {"Storage", [Storage.Adapter, Storage.File, Storage.Cache]},
-        {"Structure", [WeChat.Article]},
+        {"Structure", [WeChat.Material.Article]},
         {
           "用户管理 APIs",
           [

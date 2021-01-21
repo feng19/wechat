@@ -4,29 +4,33 @@ defmodule WeChat.ServerMessage.Encryptor do
 
   [API Docs Link](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Technical_Plan.html)
   """
+
+  @typedoc """
+  服务器配置里的 `EncodingAESKey` 值，在接收消息时用于解密消息
+  """
   @type encoding_aes_key :: String.t()
+  @typedoc """
+  对 `encoding_aes_key <> "="` 进行 `Base.decode64!`之后的值
+  """
+  @type aes_key :: String.t()
+  @type message :: String.t()
+  @type encrypted_message :: String.t()
 
   @aes_block_size 16
   @pad_block_size 32
 
-  @spec encrypt(msg :: String.t(), WeChat.appid(), encoding_aes_key()) ::
-          msg_encrypted :: String.t()
-  def encrypt(msg, appid, encoding_aes_key) do
-    aes_key = aes_key(encoding_aes_key)
-
-    msg
+  @spec encrypt(message, WeChat.appid(), aes_key) :: encrypted_message
+  def encrypt(message, appid, aes_key) do
+    message
     |> pack_appid(appid)
     |> encode_padding_with_pkcs7()
     |> encrypt_with_aes_cbc(aes_key)
     |> Base.encode64()
   end
 
-  @spec decrypt(msg_encrypted :: String.t(), encoding_aes_key()) ::
-          {WeChat.appid(), message :: String.t()}
-  def decrypt(msg_encrypted, encoding_aes_key) do
-    aes_key = aes_key(encoding_aes_key)
-
-    msg_encrypted
+  @spec decrypt(encrypted_message, aes_key) :: {WeChat.appid(), message}
+  def decrypt(encrypted_message, aes_key) do
+    encrypted_message
     |> Base.decode64!()
     |> decrypt_with_aes_cbc(aes_key)
     |> decode_padding_with_pkcs7()
@@ -77,7 +81,8 @@ defmodule WeChat.ServerMessage.Encryptor do
   end
 
   # get AES key from encoding_aes_key.
-  defp aes_key(encoding_aes_key) do
+  @doc false
+  def aes_key(encoding_aes_key) do
     Base.decode64!(encoding_aes_key <> "=")
   end
 end

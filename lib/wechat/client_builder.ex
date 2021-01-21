@@ -1,7 +1,5 @@
 defmodule WeChat.ClientBuilder do
-  @moduledoc """
-  client builder
-  """
+  @moduledoc false
   alias WeChat.{Component, MiniProgram}
 
   @base_option_fields [:role, :storage, :appid, :encoding_aes_key, :token, :requester]
@@ -107,10 +105,19 @@ defmodule WeChat.ClientBuilder do
       end
 
     get_funs =
-      Enum.map(default_opts, fn {key, value} ->
-        quote do
-          def unquote(key)(), do: unquote(value)
-        end
+      Enum.map(default_opts, fn
+        {:encoding_aes_key, value} ->
+          aes_key = WeChat.ServerMessage.Encryptor.aes_key(value)
+
+          quote do
+            def encoding_aes_key, do: unquote(value)
+            def aes_key, do: unquote(aes_key)
+          end
+
+        {key, value} ->
+          quote do
+            def unquote(key)(), do: unquote(value)
+          end
       end)
 
     [base | get_funs]

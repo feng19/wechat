@@ -3,13 +3,27 @@ defmodule WeChat.User do
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
 
+  @typedoc "微信号"
+  @type username :: String.t()
+  @typedoc """
+  国家地区语言
+    * `"zh_CN"` - 简体
+    * `"zh_TW"` - 繁体
+    * `"en"` - 英语
+  """
+  @type lang :: String.t()
+  @typedoc """
+  公众号运营者对粉丝的备注，公众号运营者可在微信公众平台用户管理界面对粉丝添加备注
+  """
+  @type remark :: String.t()
+
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management"
 
   @doc """
   设置用户备注名 -
   [Official API Docs Link](#{@doc_link}/Configuring_user_notes.html){:target="_blank"}
   """
-  @spec update_remark(WeChat.client(), WeChat.openid(), remark :: String.t()) :: WeChat.response()
+  @spec update_remark(WeChat.client(), WeChat.openid(), remark) :: WeChat.response()
   def update_remark(client, openid, remark) do
     client.post(
       "/cgi-bin/user/info/updateremark",
@@ -36,7 +50,7 @@ defmodule WeChat.User do
   获取用户基本信息(UnionID机制) -
   [Official API Docs Link](#{@doc_link}/Get_users_basic_information_UnionID.html#UinonId){:target="_blank"}
   """
-  @spec user_info(WeChat.client(), WeChat.openid(), WeChat.lang()) :: WeChat.response()
+  @spec user_info(WeChat.client(), WeChat.openid(), lang) :: WeChat.response()
   def user_info(client, openid, lang) do
     client.get("/cgi-bin/user/info",
       query: [
@@ -51,7 +65,9 @@ defmodule WeChat.User do
   批量获取用户基本信息 -
   [Official API Docs Link](#{@doc_link}/Get_users_basic_information_UnionID.html){:target="_blank"}
   """
-  @spec batch_get_user_info(WeChat.client(), [map]) :: WeChat.response()
+  @spec batch_get_user_info(WeChat.client(), [
+          %{required(:openid) => WeChat.openid(), optional(:lang) => lang}
+        ]) :: WeChat.response()
   def batch_get_user_info(client, user_list) do
     client.post(
       "/cgi-bin/user/info/batchget",
