@@ -19,6 +19,8 @@ defmodule WeChat.Template do
   @doc """
   设置所属行业 -
   [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
+
+  每月可修改行业1次，帐号仅可使用所属行业中相关的模板
   """
   @spec api_set_industry(WeChat.client(), industry_id, industry_id) :: WeChat.response()
   def api_set_industry(client, industry_id1, industry_id2) do

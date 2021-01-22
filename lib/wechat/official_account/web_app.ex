@@ -271,7 +271,8 @@ defmodule WeChat.WebApp do
   def sign_card(wx_card_ticket, card_id, openid), do: sign_card([wx_card_ticket, card_id, openid])
 
   @doc """
-  [卡券签名](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
+  卡券签名 -
+  [Official API Docs Link](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
   """
   @compile {:inline, sign_card: 1}
   @spec sign_card(list :: [String.t()]) :: map()

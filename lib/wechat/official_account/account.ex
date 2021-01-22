@@ -116,7 +116,7 @@ defmodule WeChat.Account do
 
   @doc """
   接口调用次数清零 -
-  [Official API Docs Link](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
+  [Official API Docs Link](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do

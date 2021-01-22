@@ -20,6 +20,19 @@ defmodule WeChat.CustomMessage do
   @doc """
   客服消息接口 - 发送文本消息 -
   [Official API Docs Link](#{@doc_link}#7){:target="_blank"}
+
+  发送文本消息时，支持插入跳小程序的文字链
+
+  ```html
+  文本内容<a href="http://www.qq.com" data-miniprogram-appid="appid" data-miniprogram-path="pages/index/index">点击跳小程序</a>
+  ```
+
+  说明：
+
+  - `data-miniprogram-appid` 项，填写小程序 `appid`，则表示该链接跳小程序；
+  - `data-miniprogram-path` 项，填写小程序路径，路径与 `app.json` 中保持一致，可带参数；
+  - 对于不支持 `data-miniprogram-appid` 项的客户端版本，如果有 `herf` 项，则仍然保持跳 `href` 中的网页链接；
+  - `data-miniprogram-appid` 对应的小程序必须与公众号有绑定关系。
   """
   @spec send_text(WeChat.client(), WeChat.openid(), content) :: WeChat.response()
   def send_text(client, openid, content) do
@@ -80,7 +93,7 @@ defmodule WeChat.CustomMessage do
   ## Example
 
   ```elixir
-  #{__MODULE__}.send_video(client, openid, {
+  #{inspect(__MODULE__)}.send_video(client, openid, {
     media_id:         "MEDIA_ID",
     thumb_media_id:   "MEDIA_ID",
     title:            "TITLE",
@@ -103,7 +116,7 @@ defmodule WeChat.CustomMessage do
   ## Example
 
   ```elixir
-  #{__MODULE__}.send_music(client, openid, {
+  #{inspect(__MODULE__)}.send_music(client, openid, {
     title:          "MUSIC_TITLE",
     description:    "MUSIC_DESCRIPTION",
     musicurl:       "MUSIC_URL",
@@ -127,7 +140,7 @@ defmodule WeChat.CustomMessage do
   ## Example
 
   ```elixir
-  #{__MODULE__}.send_news(client, openid, {
+  #{inspect(__MODULE__)}.send_news(client, openid, {
     title:        "Happy Day",
     description:  "Is Really A Happy Day",
     url:          "URL",
@@ -179,7 +192,7 @@ defmodule WeChat.CustomMessage do
   ## Example
 
   ```elixir
-  #{__MODULE__}.send_menu(client, openid, {
+  #{inspect(__MODULE__)}.send_menu(client, openid, {
     head_content: "您对本次服务是否满意呢?",
     list: [
       {
@@ -220,8 +233,9 @@ defmodule WeChat.CustomMessage do
   [Official API Docs Link](#{@doc_link}#7){:target="_blank"}
 
   ## Example
+
   ```elixir
-  #{__MODULE__}.send_mini_program_page(client, openid, {
+  #{inspect(__MODULE__)}.send_mini_program_page(client, openid, {
     title:    "title",
     appid:    "appid",
     pagepath: "pagepath",
@@ -251,7 +265,14 @@ defmodule WeChat.CustomMessage do
   客服输入状态 -
   [Official API Docs Link](#{@doc_link}#8){:target="_blank"}
 
-  开发者可通过调用“客服输入状态”接口，返回客服当前输入状态给用户.
+  开发者可通过调用“客服输入状态”接口，返回客服当前输入状态给用户。
+
+  此接口需要客服消息接口权限。
+
+  - 如果不满足发送客服消息的触发条件，则无法下发输入状态。
+  - 下发输入状态，需要客服之前30秒内跟用户有过消息交互。
+  - 在输入状态中（持续15s），不可重复下发输入态。
+  - 在输入状态中，如果向用户下发消息，会同时取消输入状态。
   """
   @spec typing(WeChat.client(), WeChat.openid(), is_typing :: boolean) :: WeChat.response()
   def typing(client, openid, is_typing \\ true) do
