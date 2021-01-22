@@ -60,29 +60,27 @@ defmodule WeChat.MiniProgram.Auth do
   """
   @spec code2session(WeChat.client(), code :: String.t()) :: WeChat.response()
   def code2session(client, code) do
-    case client.role() do
-      :mini_program ->
-        client.get("/sns/jscode2session",
-          query: [
-            appid: client.appid(),
-            secret: client.appsecret(),
-            js_code: code,
-            grant_type: "authorization_code"
-          ]
-        )
+    if client.by_component?() do
+      component_appid = client.component_appid()
 
-      :component ->
-        component_appid = client.component_appid()
-
-        client.get("/sns/component/jscode2session",
-          query: [
-            appid: client.appid(),
-            js_code: code,
-            grant_type: "authorization_code",
-            component_appid: component_appid,
-            component_access_token: Cache.get_cache(component_appid, :component_access_token)
-          ]
-        )
+      client.get("/sns/component/jscode2session",
+        query: [
+          appid: client.appid(),
+          js_code: code,
+          grant_type: "authorization_code",
+          component_appid: component_appid,
+          component_access_token: Cache.get_cache(component_appid, :component_access_token)
+        ]
+      )
+    else
+      client.get("/sns/jscode2session",
+        query: [
+          appid: client.appid(),
+          secret: client.appsecret(),
+          js_code: code,
+          grant_type: "authorization_code"
+        ]
+      )
     end
   end
 

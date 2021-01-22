@@ -229,7 +229,7 @@ defmodule WeChat.RefreshTimer do
     refresh_options = init_refresh_options(client, opts)
 
     Logger.info(
-      "Initialize WeChat Client: #{inspect(client)} by Role: #{client.role()}, Storage: #{
+      "Initialize WeChat Client: #{inspect(client)} by AppType: #{client.app_type()}, Storage: #{
         inspect(client.storage())
       }."
     )

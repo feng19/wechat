@@ -2,9 +2,18 @@ defmodule WeChat.ClientBuilder do
   @moduledoc false
   alias WeChat.{Component, MiniProgram}
 
-  @base_option_fields [:role, :storage, :appid, :encoding_aes_key, :token, :requester]
+  @base_option_fields [
+    :appid,
+    :app_type,
+    :by_component?,
+    :storage,
+    :requester,
+    :encoding_aes_key,
+    :token
+  ]
   @default_opts [
-    role: :official_account,
+    app_type: :official_account,
+    by_component?: false,
     storage: WeChat.Storage.File,
     requester: WeChat.Requester
   ]
@@ -30,65 +39,54 @@ defmodule WeChat.ClientBuilder do
   ]
 
   defmacro __using__(opts \\ []) do
-    opts = Keyword.merge(@default_opts, opts)
-    role = Keyword.get(opts, :role, :official_account)
+    opts = Macro.prewalk(opts, &Macro.expand(&1, __CALLER__))
+    default_opts = Keyword.merge(@default_opts, opts)
+    app_type = Keyword.fetch!(default_opts, :app_type)
 
     sub_modules =
-      case role do
+      case app_type do
         :official_account ->
           @official_account_modules
-
-        :component ->
-          case Keyword.get(opts, :app_type, :official_account) do
-            :official_account -> [Component | @official_account_modules]
-            :mini_program -> [Component | @mini_program_modules]
-          end
 
         :mini_program ->
           @mini_program_modules
 
         _ ->
-          raise ArgumentError, "please set role in [:official_account, :component, :mini_program]"
+          raise ArgumentError, "please set app_type in [:official_account, :mini_program]"
       end
 
-    {sub_module_ast_list, files} =
-      if Keyword.get(opts, :gen_sub_module?, true) do
-        gen_sub_modules(sub_modules, __CALLER__.module)
+    {sub_modules, default_opts} =
+      if Keyword.get(default_opts, :by_component?, false) do
+        unless Keyword.has_key?(default_opts, :component_appid) do
+          raise ArgumentError, "please set :component_appid when setting by_component?: true"
+        end
+
+        {
+          [Component | sub_modules],
+          Keyword.take(default_opts, [
+            :component_appid,
+            :component_appsecret | @base_option_fields
+          ])
+        }
       else
-        {[], []}
+        {
+          sub_modules,
+          Keyword.take(default_opts, [:appsecret | @base_option_fields])
+        }
       end
 
-    default_opts = Macro.prewalk(opts, &Macro.expand(&1, __CALLER__))
-
-    gen_get_function(role, default_opts) ++ files ++ sub_module_ast_list
+    if Keyword.get(opts, :gen_sub_module?, true) do
+      gen_get_functions(default_opts) ++ gen_sub_modules(sub_modules, __CALLER__.module)
+    else
+      gen_get_functions(default_opts)
+    end
   end
 
-  defp gen_get_function(:official_account, default_opts) do
-    default_opts
-    |> Keyword.take([:appsecret | @base_option_fields])
-    |> gen_get_function()
-  end
-
-  defp gen_get_function(:component, default_opts) do
-    default_opts
-    |> Keyword.take([:component_appid, :component_appsecret | @base_option_fields])
-    |> gen_get_function()
-  end
-
-  defp gen_get_function(:mini_program, default_opts) do
-    default_opts
-    |> Keyword.take([:appsecret | @base_option_fields])
-    |> gen_get_function()
-  end
-
-  defp gen_get_function(default_opts) do
+  defp gen_get_functions(default_opts) do
     appid =
       case Keyword.get(default_opts, :appid) do
-        appid when is_binary(appid) ->
-          appid
-
-        _ ->
-          raise ArgumentError, "please set appid"
+        appid when is_binary(appid) -> appid
+        _ -> raise ArgumentError, "please set appid"
       end
 
     {requester, default_opts} = Keyword.pop(default_opts, :requester)
@@ -131,14 +129,17 @@ defmodule WeChat.ClientBuilder do
       |> List.last()
       |> String.to_atom()
 
-    Enum.map_reduce(
-      sub_modules,
-      [],
-      fn module, acc ->
-        {file, ast} = gen_sub_module(module, parent_module, client_module)
-        {ast, [quote(do: @external_resource(unquote(file))) | acc]}
-      end
-    )
+    {sub_module_ast_list, files} =
+      Enum.map_reduce(
+        sub_modules,
+        [],
+        fn module, acc ->
+          {file, ast} = gen_sub_module(module, parent_module, client_module)
+          {ast, [quote(do: @external_resource(unquote(file))) | acc]}
+        end
+      )
+
+    files ++ sub_module_ast_list
   end
 
   defp gen_sub_module(module, parent_module, client_module) do

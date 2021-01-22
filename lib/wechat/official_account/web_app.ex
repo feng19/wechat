@@ -52,12 +52,10 @@ defmodule WeChat.WebApp do
         redirect_uri <>
         "&response_type=code&scope=" <> scope <> "&state=" <> state
 
-    case client.role() do
-      :official_account ->
-        base_url <> "#wechat_redirect"
-
-      :component ->
-        base_url <> "&component_appid=" <> client.component_appid() <> "#wechat_redirect"
+    if client.by_component?() do
+      base_url <> "&component_appid=" <> client.component_appid() <> "#wechat_redirect"
+    else
+      base_url <> "#wechat_redirect"
     end
   end
 
@@ -70,30 +68,28 @@ defmodule WeChat.WebApp do
   """
   @spec code2access_token(WeChat.client(), code()) :: WeChat.response()
   def code2access_token(client, code) do
-    case client.role() do
-      :official_account ->
-        client.get("/sns/oauth2/access_token",
-          query: [
-            appid: client.appid(),
-            secret: client.appsecret(),
-            code: code,
-            grant_type: "authorization_code"
-          ]
-        )
+    if client.by_component?() do
+      component_appid = client.component_appid()
 
-      :component ->
-        component_appid = client.component_appid()
-
-        client.get(
-          "/sns/oauth2/component/access_token",
-          query: [
-            appid: client.appid(),
-            code: code,
-            grant_type: "authorization_code",
-            component_appid: component_appid,
-            component_access_token: Cache.get_cache(component_appid, :component_access_token)
-          ]
-        )
+      client.get(
+        "/sns/oauth2/component/access_token",
+        query: [
+          appid: client.appid(),
+          code: code,
+          grant_type: "authorization_code",
+          component_appid: component_appid,
+          component_access_token: Cache.get_cache(component_appid, :component_access_token)
+        ]
+      )
+    else
+      client.get("/sns/oauth2/access_token",
+        query: [
+          appid: client.appid(),
+          secret: client.appsecret(),
+          code: code,
+          grant_type: "authorization_code"
+        ]
+      )
     end
   end
 
@@ -110,28 +106,26 @@ defmodule WeChat.WebApp do
   """
   @spec refresh_token(WeChat.client(), refresh_token()) :: WeChat.response()
   def refresh_token(client, refresh_token) do
-    case client.role() do
-      :official_account ->
-        client.get("/sns/oauth2/refresh_token",
-          query: [
-            appid: client.appid(),
-            grant_type: "refresh_token",
-            refresh_token: refresh_token
-          ]
-        )
+    if client.by_component?() do
+      component_appid = client.component_appid()
 
-      :component ->
-        component_appid = client.component_appid()
-
-        client.get("/sns/oauth2/component/refresh_token",
-          query: [
-            appid: client.appid(),
-            grant_type: "refresh_token",
-            refresh_token: refresh_token,
-            component_appid: component_appid,
-            component_access_token: Cache.get_cache(component_appid, :component_access_token)
-          ]
-        )
+      client.get("/sns/oauth2/component/refresh_token",
+        query: [
+          appid: client.appid(),
+          grant_type: "refresh_token",
+          refresh_token: refresh_token,
+          component_appid: component_appid,
+          component_access_token: Cache.get_cache(component_appid, :component_access_token)
+        ]
+      )
+    else
+      client.get("/sns/oauth2/refresh_token",
+        query: [
+          appid: client.appid(),
+          grant_type: "refresh_token",
+          refresh_token: refresh_token
+        ]
+      )
     end
   end
 

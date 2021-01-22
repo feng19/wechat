@@ -21,7 +21,7 @@ defmodule WeChat do
   defmodule YourApp.WeChatAppCodeName do
   @moduledoc "CodeName"
   use WeChat,
-    role: :mini_program,
+    app_type: :mini_program,
     appid: "wx-appid",
     appsecret: "appsecret"
   end
@@ -33,7 +33,7 @@ defmodule WeChat do
   defmodule YourApp.WeChatAppCodeName do
   @moduledoc "CodeName"
   use WeChat,
-    role: :component,
+    by_component?: true,
     app_type: :official_account | :mini_program, # 默认为 :official_account
     appid: "wx-appid",
     component_appid: "wx-third-appid", # 第三方 appid
@@ -77,8 +77,8 @@ defmodule WeChat do
   """
   @type unionid :: String.t()
 
-  @typedoc "`client` 的角色"
-  @type role :: :official_account | :component | :mini_program
+  @typedoc "是否第三方平台开发"
+  @type by_component? :: boolean
   @typedoc "`client` 的应用类型"
   @type app_type :: :official_account | :mini_program
   @typedoc "公众号/小程序 应用id"
@@ -99,26 +99,27 @@ defmodule WeChat do
 
   ## 参数说明
 
-  - `role`: `t:role/0`
+  - `appid`: `t:appid/0` - 必填
   - `app_type`: `t:app_type/0`
+  - `by_component?`: `t:by_component?/0`
   - `storage`: `t:WeChat.Storage.Adapter.t()`
-  - `appid`: `t:appid/0`
-  - `appsecret`: `t:appsecret/0` - 仅在 `role` 设定为 `:official_account`/`:mini_program` 时才有效
-  - `component_appid`: `t:component_appid/0` - 仅在 `role` 设定为 `:component` 时才有效
-  - `component_appsecret`: `t:component_appsecret/0` - 仅在 `role` 设定为 `:component` 时才有效
+  - `appsecret`: `t:appsecret/0` - 仅在 `by_component?` 设定为 `false` 时才有效
+  - `component_appid`: `t:component_appid/0` - 仅在 `by_component?` 设定为 `true` 时才有效
+  - `component_appsecret`: `t:component_appsecret/0` - 仅在 `by_component?` 设定为 `true` 时才有效
   - `encoding_aes_key`: `t:WeChat.ServerMessage.Encryptor.encoding_aes_key/0` - 在编译时会自动将 `encoding_aes_key` 转换为 `aes_key`
   - `token`: `t:token/0`
   - `requester`: 请求客户端 - `t:module/0`
 
   ## 默认参数:
 
-  - `role`: `:official_account`
+  - `by_component?`: `false`
+  - `app_type`: `:official_account`
   - `storage`: `WeChat.Storage.File`
   - `requester`: `WeChat.Requester`
   - 其余参数皆为可选
   """
   @type options :: [
-          role: role,
+          by_component?: by_component?,
           app_type: app_type,
           storage: WeChat.Storage.Adapter.t(),
           appid: appid,

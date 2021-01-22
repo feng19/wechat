@@ -5,7 +5,8 @@ defmodule WeChatTest do
   doctest WeChat
 
   test "Auto generate functions" do
-    assert WxApp.role() == :official_account
+    assert WxApp.app_type() == :official_account
+    assert WxApp.by_component?() == false
     assert WxApp.storage() == WeChat.Storage.File
     assert WxApp.appid() == "wx2c2769f8efd9abc2"
     assert WxApp.appsecret() == "appsecret"
@@ -37,8 +38,9 @@ defmodule WeChatTest do
 
   test "build component client" do
     opts = [
-      role: :component,
       appid: "wx2c2769f8efd9abc2",
+      by_component?: true,
+      component_appid: "wx3c2769f8efd9abc3",
       appsecret: "appsecret",
       encoding_aes_key: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG",
       token: "spamtest"
@@ -53,7 +55,7 @@ defmodule WeChatTest do
 
   test "build mini_program client" do
     opts = [
-      role: :mini_program,
+      app_type: :mini_program,
       appid: "wx2c2769f8efd9abc2",
       appsecret: "appsecret",
       encoding_aes_key: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG",

@@ -1,6 +1,6 @@
 # WeChat
 
-**微信SDK for Elixir(WIP)**
+**WeChat SDK for Elixir(WIP)**
 
 ## Installation
 
@@ -41,7 +41,7 @@ end
 defmodule YourApp.WeChatAppCodeName do
   @moduledoc "CodeName"
   use WeChat,
-    role: :component,
+    by_component?: true,
     appid: "wx-appid",
     component_appid: "wx-third-appid", # 第三方 appid
 end
@@ -60,7 +60,7 @@ WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 ```
 ### 支持接口列表
 
-[官方文档](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
+[微信官方文档](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
 
 * 消息管理
 * 素材管理

@@ -17,24 +17,26 @@ defmodule WeChat.RefreshHelper do
   alias WeChat.{Account, WebApp, Component, MiniProgram}
 
   @doc """
-  根据不同的 `client` 的 `role` 输出不同的 `refresh_options`
+  根据不同的 `client` 的 `app_type` & `by_component?` 输出不同的 `refresh_options`
 
-  role:
-  - official_account: `official_account_refresh_options/0`
-  - component: `component_refresh_options/1`
-  - mini_program: `mini_program_refresh_options/0`
+  rules:
+  - `by_component?` == `true`: `component_refresh_options/1`
+  - `official_account`: `official_account_refresh_options/0`
+  - `mini_program`: `mini_program_refresh_options/0`
   """
   @spec get_refresh_options_by_client(WeChat.client()) :: refresh_options
   def get_refresh_options_by_client(client) do
-    case client.role() do
-      :official_account ->
-        official_account_refresh_options()
+    if client.by_component? do
+      component_refresh_options(client)
+    else
+      unless function_exported?(client, :appsecret, 0) do
+        raise RuntimeError, "please set :appsecret when defining #{inspect(client)}."
+      end
 
-      :component ->
-        component_refresh_options(client)
-
-      :mini_program ->
-        mini_program_refresh_options()
+      case client.app_type do
+        :official_account -> official_account_refresh_options()
+        :mini_program -> mini_program_refresh_options()
+      end
     end
   end
 
