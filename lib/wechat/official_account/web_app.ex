@@ -21,8 +21,19 @@ defmodule WeChat.WebApp do
   @type access_token :: String.t()
   @type refresh_token :: String.t()
   @type ticket :: String.t()
-  @type wx_card_ticket :: ticket()
+  @type wx_card_ticket :: ticket
+  @type js_api_ticket :: ticket
   @type url :: String.t()
+  @type signature :: String.t()
+  @type timestamp :: non_neg_integer
+  @type nonce_str :: String.t()
+  @type js_sdk_config :: %{
+          appId: WeChat.appid(),
+          signature: signature,
+          timestamp: timestamp,
+          nonceStr: nonce_str
+        }
+  @type card_config :: %{cardId: Card.card_id(), cardExt: String.t()}
 
   @typedoc """
   JS API的临时票据类型
@@ -35,13 +46,22 @@ defmodule WeChat.WebApp do
   @component_doc_link "#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html"
 
   @doc """
-  请求`code`
+  网页授权 - 请求`code`
 
   Official API Docs Link:
   * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#0){:target="_blank"}
   * [Component](#{@component_doc_link}){:target="_blank"}
+
+  关于网页授权回调域名的说明
+
+  - 在微信公众号请求用户网页授权之前，开发者需要先到公众平台官网中的 “`开发` - `接口权限` - `网页服务` - `网页帐号` - `网页授权获取用户基本信息`” 的配置选项中，
+  修改授权回调域名。请注意，这里填写的是域名（是一个字符串），而不是URL，因此请勿加 `http://` 等协议头；
+  - 授权回调域名配置规范为全域名，比如需要网页授权的域名为：`www.qq.com`，配置以后此域名下面的页面 `http://www.qq.com/music.html`、
+  `http://www.qq.com/login.html` 都可以进行 `OAuth2.0` 鉴权。但 `http://pay.qq.com`、`http://music.qq.com` 、 `http://qq.com`
+  无法进行 `OAuth2.0` 鉴权
+  - 如果公众号登录授权给了第三方开发者来进行管理，则不必做任何设置，由第三方代替公众号实现网页授权即可
   """
-  @spec oauth2_authorize_url(WeChat.client(), redirect_uri(), state(), scope()) :: url()
+  @spec oauth2_authorize_url(WeChat.client(), redirect_uri, state, scope) :: url
   def oauth2_authorize_url(client, redirect_uri, scope \\ "snsapi_base", state \\ "") do
     redirect_uri = URI.encode_www_form(redirect_uri)
 
@@ -60,13 +80,13 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  通过`code`换取网页授权`access_token`
+  网页授权 - 通过`code`换取`access_token`
 
   Official API Docs Link:
     * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#1){:target="_blank"}
     * [Component](#{@component_doc_link}){:target="_blank"}
   """
-  @spec code2access_token(WeChat.client(), code()) :: WeChat.response()
+  @spec code2access_token(WeChat.client(), code) :: WeChat.response()
   def code2access_token(client, code) do
     if client.by_component?() do
       component_appid = client.component_appid()
@@ -94,7 +114,7 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  刷新`access_token`
+  网页授权 - 刷新`access_token`
 
   由于`access_token`拥有较短的有效期，当`access_token`超时后，可以使用`refresh_token`进行刷新，
 
@@ -104,7 +124,7 @@ defmodule WeChat.WebApp do
     * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#2){:target="_blank"}
     * [Component](#{@component_doc_link}){:target="_blank"}
   """
-  @spec refresh_token(WeChat.client(), refresh_token()) :: WeChat.response()
+  @spec refresh_token(WeChat.client(), refresh_token) :: WeChat.response()
   def refresh_token(client, refresh_token) do
     if client.by_component?() do
       component_appid = client.component_appid()
@@ -130,12 +150,12 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  拉取用户信息(需`scope`为`snsapi_userinfo`) -
+  网页授权 - 拉取用户信息(需`scope`为`snsapi_userinfo`) -
   [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#3){:target="_blank"}
 
   如果网页授权作用域为`snsapi_userinfo`,则此时开发者可以通过access_token和openid拉取用户信息了.
   """
-  @spec user_info(WeChat.openid(), access_token()) :: WeChat.response()
+  @spec user_info(WeChat.openid(), access_token) :: WeChat.response()
   def user_info(openid, access_token) do
     Requester.get("/sns/userinfo",
       query: [access_token: access_token, openid: openid]
@@ -143,14 +163,14 @@ defmodule WeChat.WebApp do
   end
 
   @doc "See `user_info/2`"
-  @spec user_info(WeChat.requester(), WeChat.openid(), access_token()) :: WeChat.response()
+  @spec user_info(WeChat.requester(), WeChat.openid(), access_token) :: WeChat.response()
   def user_info(requester, openid, access_token) when is_atom(requester) do
     requester.get("/sns/userinfo",
       query: [access_token: access_token, openid: openid]
     )
   end
 
-  @spec user_info(WeChat.openid(), access_token(), User.lang()) :: WeChat.response()
+  @spec user_info(WeChat.openid(), access_token, User.lang()) :: WeChat.response()
   def user_info(openid, access_token, lang) do
     Requester.get("/sns/userinfo",
       query: [
@@ -162,7 +182,7 @@ defmodule WeChat.WebApp do
   end
 
   @doc "See `user_info/2`"
-  @spec user_info(WeChat.requester(), WeChat.openid(), access_token(), User.lang()) ::
+  @spec user_info(WeChat.requester(), WeChat.openid(), access_token, User.lang()) ::
           WeChat.response()
   def user_info(requester, openid, access_token, lang) do
     requester.get("/sns/userinfo",
@@ -175,10 +195,10 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  检验授权凭证(`access_token`)是否有效 -
+  网页授权 - 检验授权凭证(`access_token`)是否有效 -
   [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#4){:target="_blank"}
   """
-  @spec auth(WeChat.openid(), access_token()) :: WeChat.response()
+  @spec auth(WeChat.openid(), access_token) :: WeChat.response()
   def auth(requester \\ Requester, openid, access_token) do
     requester.get("/sns/auth",
       query: [access_token: access_token, openid: openid]
@@ -186,21 +206,25 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  JS-SDK配置 -
+  生成JS-SDK配置 -
   [Official API Docs Link](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
   """
-  @spec js_sdk_config(WeChat.client(), url()) :: WeChat.response()
+  @spec js_sdk_config(WeChat.client(), url) :: js_sdk_config
   def js_sdk_config(client, url) do
     appid = client.appid()
 
     appid
     |> Cache.get_cache(:js_api_ticket)
-    |> sign_jssdk(url)
+    |> sign_jssdk(url, appid)
     |> Map.put(:appId, appid)
   end
 
-  @spec sign_jssdk(jsapi_ticket :: ticket(), url()) :: map()
-  def sign_jssdk(jsapi_ticket, url) do
+  @doc """
+  生成JS-SDK配置(by ticket) -
+  [Official API Docs Link](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
+  """
+  @spec sign_jssdk(js_api_ticket, url, WeChat.appid()) :: js_sdk_config
+  def sign_jssdk(jsapi_ticket, url, appid) do
     url = String.replace(url, ~r/\#.*/, "")
     nonce_str = Utils.random_string(16)
     timestamp = Utils.now_unix()
@@ -210,17 +234,17 @@ defmodule WeChat.WebApp do
         "jsapi_ticket=#{jsapi_ticket}&noncestr=#{nonce_str}&timestamp=#{timestamp}&url=#{url}"
       )
 
-    %{signature: signature, timestamp: timestamp, nonceStr: nonce_str}
+    %{appId: appid, signature: signature, timestamp: timestamp, nonceStr: nonce_str}
   end
 
   @doc """
-  微信卡券配置 - 添加卡券
+  生成微信卡券配置 - 添加卡券
 
   ## API Docs
     * [微信卡券](#{@doc_link}/JS-SDK.html#53){:target="_blank"}
     * [卡券扩展字段及签名生成算法](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
   """
-  @spec add_card_config(WeChat.client(), Card.card_id(), outer_str :: String.t()) :: map()
+  @spec add_card_config(WeChat.client(), Card.card_id(), outer_str :: String.t()) :: card_config
   def add_card_config(client, card_id, outer_str) do
     appid = client.appid()
 
@@ -235,14 +259,14 @@ defmodule WeChat.WebApp do
   end
 
   @doc """
-  微信卡券配置 - 添加卡券(绑定`openid`)
+  生成微信卡券配置 - 添加卡券(绑定`openid`)
 
   ## API Docs
     * [微信卡券](#{@doc_link}/JS-SDK.html#53){:target="_blank"}
     * [卡券扩展字段及签名生成算法](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
   """
   @spec add_card_config(WeChat.client(), Card.card_id(), outer_str :: String.t(), WeChat.openid()) ::
-          map()
+          map
   def add_card_config(client, card_id, outer_str, openid) do
     appid = client.appid()
 
@@ -257,11 +281,11 @@ defmodule WeChat.WebApp do
   end
 
   @doc "See `sign_card/1`"
-  @spec sign_card(wx_card_ticket(), Card.card_id()) :: map()
+  @spec sign_card(wx_card_ticket, Card.card_id()) :: map
   def sign_card(wx_card_ticket, card_id), do: sign_card([wx_card_ticket, card_id])
 
   @doc "See `sign_card/1`"
-  @spec sign_card(wx_card_ticket(), Card.card_id(), WeChat.openid()) :: map()
+  @spec sign_card(wx_card_ticket, Card.card_id(), WeChat.openid()) :: map
   def sign_card(wx_card_ticket, card_id, openid), do: sign_card([wx_card_ticket, card_id, openid])
 
   @doc """
@@ -269,7 +293,7 @@ defmodule WeChat.WebApp do
   [Official API Docs Link](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
   """
   @compile {:inline, sign_card: 1}
-  @spec sign_card(list :: [String.t()]) :: map()
+  @spec sign_card(list :: [String.t()]) :: map
   def sign_card(list) do
     nonce_str = Utils.random_string(16)
     timestamp = Utils.now_unix()
@@ -283,7 +307,7 @@ defmodule WeChat.WebApp do
   获取`api_ticket` -
   [Official API Docs Link](#{@doc_link}/JS-SDK.html#62){:target="_blank"}
   """
-  @spec get_ticket(WeChat.client(), js_api_ticket_type()) :: WeChat.response()
+  @spec get_ticket(WeChat.client(), js_api_ticket_type) :: WeChat.response()
   def get_ticket(client, type) do
     client.get("/cgi-bin/ticket/getticket",
       query: [type: type, access_token: client.get_access_token()]

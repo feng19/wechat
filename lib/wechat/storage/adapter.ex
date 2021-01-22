@@ -4,9 +4,9 @@ defmodule WeChat.Storage.Adapter do
   @typedoc "存储器"
   @type t :: module
   @type store_id :: String.t()
-  @type store_key :: atom() | String.t()
-  @type value :: map()
+  @type store_key :: atom | String.t()
+  @type value :: map
 
-  @callback store(store_id(), store_key(), value()) :: :ok
-  @callback restore(store_id(), store_key()) :: {:ok, value()}
+  @callback store(store_id, store_key, value) :: :ok
+  @callback restore(store_id, store_key) :: {:ok, value}
 end

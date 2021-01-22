@@ -87,9 +87,9 @@ defmodule WeChat.MixProject do
            # 微信卡券 - 投放卡券
            WeChat.CardDistributing
          ]},
-        {"Server Message",
+        {"事件推送",
          [
-           # 微信推送消息处理
+           WeChat.Plug.EventHandler,
            ServerMessage.EventHandler,
            ServerMessage.Encryptor,
            ServerMessage.XmlMessage,

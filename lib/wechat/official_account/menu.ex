@@ -105,7 +105,9 @@ defmodule WeChat.Menu do
   """
   @spec del_conditional_menu(WeChat.client(), menu_id) :: WeChat.response()
   def del_conditional_menu(client, menu_id) do
-    client.post("/cgi-bin/menu/delconditional", json_map(menuid: menu_id), query: [access_token: client.get_access_token()])
+    client.post("/cgi-bin/menu/delconditional", json_map(menuid: menu_id),
+      query: [access_token: client.get_access_token()]
+    )
   end
 
   @doc """
@@ -114,6 +116,8 @@ defmodule WeChat.Menu do
   """
   @spec try_match_menu(WeChat.client(), user_id) :: WeChat.response()
   def try_match_menu(client, user_id) do
-    client.post("/cgi-bin/menu/trymatch", json_map(user_id: user_id), query: [access_token: client.get_access_token()])
+    client.post("/cgi-bin/menu/trymatch", json_map(user_id: user_id),
+      query: [access_token: client.get_access_token()]
+    )
   end
 end
