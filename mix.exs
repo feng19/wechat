@@ -95,25 +95,22 @@ defmodule WeChat.MixProject do
            ServerMessage.XmlMessage,
            ServerMessage.XmlParser
          ]},
-        {
-          "Other APIs",
-          [
-            # 素材管理
-            WeChat.Material,
-            # 图文消息留言管理
-            WeChat.Comment,
-            # 账号管理
-            WeChat.Account,
-            # 网页开发(WIP)
-            WeChat.WebApp,
-            # 第三方平台
-            WeChat.Component
-          ]
-        },
-        {
-          "小程序 APIs",
-          [MiniProgram.Auth]
-        }
+        {"Other APIs",
+         [
+           # 自定义菜单
+           WeChat.Menu,
+           # 素材管理
+           WeChat.Material,
+           # 图文消息留言管理
+           WeChat.Comment,
+           # 账号管理
+           WeChat.Account,
+           # 网页开发(WIP)
+           WeChat.WebApp,
+           # 第三方平台
+           WeChat.Component
+         ]},
+        {"小程序 APIs", [MiniProgram.Auth]}
       ]
     ]
   end

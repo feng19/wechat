@@ -9,6 +9,7 @@ defmodule WeChat.ClientBuilder do
     requester: WeChat.Requester
   ]
   @official_account_modules [
+    WeChat.Menu,
     WeChat.Material,
     WeChat.Card,
     WeChat.CardManaging,
