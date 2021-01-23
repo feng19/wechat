@@ -144,7 +144,7 @@ defmodule WeChat.ServerMessage.EventHandler do
          timestamp when timestamp != nil <- params["timestamp"],
          {timestamp, ""} <- Integer.parse(timestamp),
          now_timestamp <- Utils.now_unix(),
-         true <- now_timestamp > timestamp and now_timestamp - timestamp < 5 do
+         true <- now_timestamp >= timestamp and now_timestamp - timestamp <= 5 do
       Plug.Crypto.secure_compare(
         signature,
         Utils.sha1([client.token(), nonce, to_string(timestamp)])
