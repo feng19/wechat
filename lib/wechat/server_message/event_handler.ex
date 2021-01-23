@@ -142,6 +142,7 @@ defmodule WeChat.ServerMessage.EventHandler do
     with signature when signature != nil <- params["signature"],
          nonce when nonce != nil <- params["nonce"],
          timestamp when timestamp != nil <- params["timestamp"],
+         {timestamp, ""} <- Integer.parse(timestamp),
          now_timestamp <- Utils.now_unix(),
          true <- now_timestamp > timestamp and now_timestamp - timestamp < 5 do
       Plug.Crypto.secure_compare(
