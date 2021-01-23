@@ -52,7 +52,7 @@ defmodule WeChat.ServerMessage.EventHandler do
     if check_signature?(query_params, client) do
       {200, query_params["echostr"]}
     else
-      {400, "invalid request"}
+      {400, "Bad Request"}
     end
   end
 

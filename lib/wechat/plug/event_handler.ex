@@ -7,7 +7,10 @@ defmodule WeChat.Plug.EventHandler do
   - 单一 client：
 
     ```elixir
-    plug WeChat.Plug.EventHandler, client: WxOfficialAccount, handler: &Module:handle_event/2
+    scope "/wx/event" do
+      plug :accepts, ["html", "json"]
+      forward "/", WeChat.Plug.EventHandler, client: WxOfficialAccount, handler: &Module.handle_event/2
+    end
     ```
 
   - 兼容多个 client：
@@ -15,7 +18,10 @@ defmodule WeChat.Plug.EventHandler do
     请将入口路径设置为如下格式: `/xxx/:appid/xxx`
 
     ```elixir
-    plug WeChat.Plug.EventHandler, handler: &Module:handle_event/2
+    scope "/wx/:appid/event" do
+      plug :accepts, ["html", "json"]
+      forward "/", WeChat.Plug.EventHandler, handler: &Module.handle_event/2
+    end
     ```
 
   ## Options
@@ -37,16 +43,19 @@ defmodule WeChat.Plug.EventHandler do
     opts
   end
 
-  def call(%{method: "GET", query_params: params} = conn, %{client: client}) do
-    {status, resp} = ServerMessage.EventHandler.handle_get(params, client)
+  def call(%{method: "GET", query_params: query_params} = conn, %{client: client}) do
+    {status, resp} = ServerMessage.EventHandler.handle_get(query_params, client)
     send_resp(conn, status, resp)
   end
 
-  def call(%{method: "GET", query_params: params} = conn, _opts) do
-    with appid <- params["appid"],
+  def call(%{method: "GET", path_params: path_params, query_params: query_params} = conn, _opts) do
+    with appid <- path_params["appid"],
          client when client != nil <- WeChat.get_client_by_appid(appid) do
-      {status, resp} = ServerMessage.EventHandler.handle_get(params, client)
+      {status, resp} = ServerMessage.EventHandler.handle_get(query_params, client)
       send_resp(conn, status, resp)
+    else
+      _ ->
+        send_resp(conn, 400, "Bad Request")
     end
   end
 
@@ -55,11 +64,14 @@ defmodule WeChat.Plug.EventHandler do
     send_resp(conn, status, resp)
   end
 
-  def call(%{method: "POST", query_params: params} = conn, %{handler: handler}) do
-    with appid <- params["appid"],
+  def call(%{method: "POST", path_params: path_params} = conn, %{handler: handler}) do
+    with appid <- path_params["appid"],
          client when client != nil <- WeChat.get_client_by_appid(appid) do
       {status, resp} = ServerMessage.EventHandler.handle_post(conn, client, handler)
       send_resp(conn, status, resp)
+    else
+      _ ->
+        send_resp(conn, 400, "Bad Request")
     end
   end
 
