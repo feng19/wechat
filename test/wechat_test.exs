@@ -7,6 +7,8 @@ defmodule WeChatTest do
   test "Auto generate functions" do
     assert WxApp.app_type() == :official_account
     assert WxApp.by_component?() == false
+    assert WxApp.server_role() == :client
+    assert WxApp.code_name() == "wxapp"
     assert WxApp.storage() == WeChat.Storage.File
     assert WxApp.appid() == "wx2c2769f8efd9abc2"
     assert WxApp.appsecret() == "appsecret"

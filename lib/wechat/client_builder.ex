@@ -7,6 +7,7 @@ defmodule WeChat.ClientBuilder do
     :app_type,
     :by_component?,
     :server_role,
+    :code_name,
     :storage,
     :requester,
     :encoding_aes_key,
@@ -77,25 +78,33 @@ defmodule WeChat.ClientBuilder do
         }
       end
 
+    client = __CALLER__.module
+
     if Keyword.get(opts, :gen_sub_module?, true) do
-      gen_get_functions(default_opts) ++ gen_sub_modules(sub_modules, __CALLER__.module)
+      gen_get_functions(default_opts, client) ++ gen_sub_modules(sub_modules, client)
     else
-      gen_get_functions(default_opts)
+      gen_get_functions(default_opts, client)
     end
   end
 
-  defp gen_get_functions(default_opts) do
+  defp gen_get_functions(default_opts, client) do
     appid =
       case Keyword.get(default_opts, :appid) do
         appid when is_binary(appid) -> appid
         _ -> raise ArgumentError, "please set appid"
       end
 
+    code_name =
+      Keyword.get_lazy(default_opts, :code_name, fn ->
+        client |> to_string() |> String.split(".") |> List.last() |> String.downcase()
+      end)
+
     {requester, default_opts} = Keyword.pop(default_opts, :requester)
 
     base =
       quote do
         def default_opts, do: unquote(default_opts)
+        def code_name, do: unquote(code_name)
         def get_access_token, do: WeChat.Storage.Cache.get_cache(unquote(appid), :access_token)
         defdelegate get(url), to: unquote(requester)
         defdelegate get(url, opts), to: unquote(requester)

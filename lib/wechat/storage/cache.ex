@@ -13,10 +13,17 @@ defmodule WeChat.Storage.Cache do
   end
 
   @spec set_client(WeChat.client()) :: true
-  def set_client(client), do: put_cache(client.appid(), :client, client)
+  def set_client(client) do
+    put_cache(client.appid(), :client, client)
+    put_cache(client.code_name(), :client, client)
+  end
 
   @spec search_client(WeChat.appid()) :: nil | WeChat.client()
   def search_client(appid), do: get_cache(appid, :client)
+
+  @spec search_client(WeChat.code_name()) :: nil | WeChat.client()
+  def search_client_by_name(code_name) when is_binary(code_name),
+    do: code_name |> String.downcase() |> get_cache(:client)
 
   @spec put_cache(cache_id(), cache_sub_key(), cache_value()) :: true
   def put_cache(id, sub_key, value) do

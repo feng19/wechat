@@ -96,6 +96,8 @@ defmodule WeChat do
   @type app_type :: :official_account | :mini_program
   @typedoc "公众号/小程序 应用id"
   @type appid :: String.t()
+  @typedoc "公众号/小程序 应用代码"
+  @type code_name :: String.t()
   @typedoc "应用秘钥"
   @type appsecret :: String.t()
   @typedoc "第三方平台应用id"
