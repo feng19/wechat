@@ -77,9 +77,22 @@ defmodule WeChat do
   """
   @type unionid :: String.t()
 
+  @typedoc """
+  服务器角色
+
+  `:client`: 默认，刷新`token`
+  `:hub`: 中控服务器，刷新`token`
+  `:hub_client`: 逻辑服务器，获取`token`
+  """
+  @type server_role :: :client | :hub | :hub_client
   @typedoc "是否第三方平台开发"
   @type by_component? :: boolean
-  @typedoc "`client` 的应用类型"
+  @typedoc """
+  `client` 的应用类型
+
+  - `:official_account`: 公众号
+  - `:mini_program`: 小程序
+  """
   @type app_type :: :official_account | :mini_program
   @typedoc "公众号/小程序 应用id"
   @type appid :: String.t()
@@ -102,6 +115,7 @@ defmodule WeChat do
   - `appid`: `t:appid/0` - 必填
   - `app_type`: `t:app_type/0`
   - `by_component?`: `t:by_component?/0`
+  - `server_role`: `t:server_role/0`
   - `storage`: `t:WeChat.Storage.Adapter.t()`
   - `appsecret`: `t:appsecret/0` - 仅在 `by_component?` 设定为 `false` 时才有效
   - `component_appid`: `t:component_appid/0` - 仅在 `by_component?` 设定为 `true` 时才有效
@@ -112,6 +126,7 @@ defmodule WeChat do
 
   ## 默认参数:
 
+  - `server_role`: `:client`
   - `by_component?`: `false`
   - `app_type`: `:official_account`
   - `storage`: `WeChat.Storage.File`
@@ -119,6 +134,7 @@ defmodule WeChat do
   - 其余参数皆为可选
   """
   @type options :: [
+          server_role: server_role,
           by_component?: by_component?,
           app_type: app_type,
           storage: WeChat.Storage.Adapter.t(),

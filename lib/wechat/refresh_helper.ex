@@ -11,10 +11,11 @@ defmodule WeChat.RefreshHelper do
   @type refresh_fun_result ::
           {:ok, token, expires_in} | {:ok, token_list, expires_in} | {:error, any}
   @type refresh_fun :: (WeChat.client() -> refresh_fun_result)
-  @type refresh_option :: {store_id_type, key_name, refresh_fun}
+  @type refresh_option ::
+          {store_id_type | WeChat.Storage.Adapter.store_id(), key_name, refresh_fun}
   @type refresh_options :: [refresh_option]
 
-  alias WeChat.{Account, WebApp, Component, MiniProgram}
+  alias WeChat.{Account, WebApp, Component, MiniProgram, Utils}
 
   @doc """
   根据不同的 `client` 的 `app_type` & `by_component?` 输出不同的 `refresh_options`
@@ -26,16 +27,23 @@ defmodule WeChat.RefreshHelper do
   """
   @spec get_refresh_options_by_client(WeChat.client()) :: refresh_options
   def get_refresh_options_by_client(client) do
-    if client.by_component? do
+    if client.by_component?() do
       component_refresh_options(client)
     else
       unless function_exported?(client, :appsecret, 0) do
-        raise RuntimeError, "please set :appsecret when defining #{inspect(client)}."
+        raise RuntimeError, "Please set :appsecret when defining #{inspect(client)}."
       end
 
-      case client.app_type do
-        :official_account -> official_account_refresh_options()
-        :mini_program -> mini_program_refresh_options()
+      if match?(:hub_client, client.server_role()) and match?(nil, client.storage()) do
+        raise RuntimeError,
+              "Not accept storage: nil when server_role: :hub_client, please set a module for :storage when defining #{
+                inspect(client)
+              }."
+      end
+
+      case client.app_type() do
+        :official_account -> official_account_refresh_options(client)
+        :mini_program -> mini_program_refresh_options(client)
       end
     end
   end
@@ -48,13 +56,16 @@ defmodule WeChat.RefreshHelper do
   - `js_api_ticket`
   - `wx_card_ticket`
   """
-  @spec official_account_refresh_options() :: refresh_options
-  def official_account_refresh_options,
-    do: [
-      {:appid, :access_token, &__MODULE__.refresh_access_token/1},
-      {:appid, :js_api_ticket, &__MODULE__.refresh_ticket("jsapi", &1)},
-      {:appid, :wx_card_ticket, &__MODULE__.refresh_ticket("wx_card", &1)}
+  @spec official_account_refresh_options(WeChat.client()) :: refresh_options
+  def official_account_refresh_options(client) do
+    appid = client.appid()
+
+    [
+      {appid, :access_token, &__MODULE__.refresh_access_token/1},
+      {appid, :js_api_ticket, &__MODULE__.refresh_ticket("jsapi", &1)},
+      {appid, :wx_card_ticket, &__MODULE__.refresh_ticket("wx_card", &1)}
     ]
+  end
 
   @doc """
   输出[第三方平台]的 `refresh_options`
@@ -65,16 +76,26 @@ defmodule WeChat.RefreshHelper do
   """
   @spec component_refresh_options(WeChat.client()) :: refresh_options
   def component_refresh_options(client) do
-    authorizer_refresh_options =
-      case client.app_type do
-        :official_account -> official_account_refresh_options()
-        :mini_program -> mini_program_refresh_options()
-      end
+    component_appid = client.component_appid()
+    appid = client.appid()
 
-    [
-      {:component_appid, :component_access_token, &__MODULE__.refresh_component_access_token/1}
-      | authorizer_refresh_options
-    ]
+    case client.app_type() do
+      :official_account ->
+        [
+          {component_appid, :component_access_token,
+           &__MODULE__.refresh_component_access_token/1},
+          {appid, :access_token, &__MODULE__.refresh_authorizer_access_token/1},
+          {appid, :js_api_ticket, &__MODULE__.refresh_ticket("jsapi", &1)},
+          {appid, :wx_card_ticket, &__MODULE__.refresh_ticket("wx_card", &1)}
+        ]
+
+      :mini_program ->
+        [
+          {component_appid, :component_access_token,
+           &__MODULE__.refresh_component_access_token/1},
+          {appid, :access_token, &__MODULE__.refresh_authorizer_access_token/1}
+        ]
+    end
   end
 
   @doc """
@@ -83,23 +104,29 @@ defmodule WeChat.RefreshHelper do
   刷新如下`token`：
   - `access_token`
   """
-  @spec mini_program_refresh_options() :: refresh_options
-  def mini_program_refresh_options,
+  @spec mini_program_refresh_options(WeChat.client()) :: refresh_options
+  def mini_program_refresh_options(client),
     do: [
-      {:appid, :access_token, &__MODULE__.refresh_mini_program_access_token/1}
+      {client.appid(), :access_token, &__MODULE__.refresh_mini_program_access_token/1}
     ]
 
   @spec refresh_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_access_token(client) do
-    with {:ok, %{status: 200, body: data}} <- Account.get_access_token(client),
+    with :not_hub_client <- get_hub_client_token(client, :access_token),
+         {:ok, %{status: 200, body: data}} <- Account.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
     end
   end
 
+  defp get_store_key_by_ticket_type("jsapi"), do: :js_api_ticket
+  defp get_store_key_by_ticket_type("wx_card"), do: :wx_card_ticket
+
   @spec refresh_ticket(WeChat.WebApp.js_api_ticket_type(), WeChat.client()) :: refresh_fun_result
   def refresh_ticket(ticket_type, client) do
-    with {:ok, %{status: 200, body: data}} <- WebApp.get_ticket(client, ticket_type),
+    with store_key <- get_store_key_by_ticket_type(ticket_type),
+         :not_hub_client <- get_hub_client_token(client, store_key),
+         {:ok, %{status: 200, body: data}} <- WebApp.get_ticket(client, ticket_type),
          %{"ticket" => ticket, "expires_in" => expires_in} <- data do
       {:ok, ticket, expires_in}
     end
@@ -107,7 +134,9 @@ defmodule WeChat.RefreshHelper do
 
   @spec refresh_component_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_component_access_token(client) do
-    with {:ok, %{status: 200, body: data}} <- Component.get_component_token(client),
+    with :not_hub_client <-
+           get_hub_client_token(client, client.component_appid(), :component_access_token),
+         {:ok, %{status: 200, body: data}} <- Component.get_component_token(client),
          %{"component_access_token" => component_access_token, "expires_in" => expires_in} <- data do
       {:ok, component_access_token, expires_in}
     end
@@ -115,7 +144,8 @@ defmodule WeChat.RefreshHelper do
 
   @spec refresh_authorizer_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_authorizer_access_token(client) do
-    with {:ok, %{status: 200, body: data}} <- Component.authorizer_token(client),
+    with :not_hub_client <- get_hub_client_token(client, :access_token),
+         {:ok, %{status: 200, body: data}} <- Component.authorizer_token(client),
          %{
            "authorizer_access_token" => authorizer_access_token,
            "authorizer_refresh_token" => authorizer_refresh_token,
@@ -133,9 +163,25 @@ defmodule WeChat.RefreshHelper do
 
   @spec refresh_mini_program_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_mini_program_access_token(client) do
-    with {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
+    with :not_hub_client <- get_hub_client_token(client, :access_token),
+         {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
+    end
+  end
+
+  defp get_hub_client_token(client, store_id \\ nil, store_key) do
+    store_id = store_id || client.appid()
+
+    if match?(:hub_client, client.server_role()) do
+      with storage when storage != nil <- client.storage(),
+           {:ok, %{"value" => access_token, "expired_time" => expired_time}} <-
+             storage.restore(store_id, store_key) do
+        expires_in = expired_time - Utils.now_unix()
+        {:ok, access_token, expires_in}
+      end
+    else
+      :not_hub_client
     end
   end
 end

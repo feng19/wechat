@@ -44,14 +44,20 @@ defmodule WeChat.RefreshTimer do
   # 刷新失败重试时间间隔 1 分钟
   @refresh_retry_interval 60
 
-  @typedoc "在 `token` 过去前多少秒刷新，单位：秒"
+  @typedoc """
+  在 `token` 过去前多少秒刷新，单位：秒
+
+  如果`server_role` = `hub`, `hub server` 的值请大于 `hub client`
+  """
   @type refresh_before_expired :: non_neg_integer
   @typedoc "刷新 `token` 失败的重试间隔，单位：秒"
   @type refresh_retry_interval :: non_neg_integer
   @typedoc """
 
   option
-  - `:refresh_before_expired`: 在 `token` 过去前多少秒刷新，单位：秒，可选，默认值：`#{@refresh_before_expired}` 秒
+  - `:refresh_before_expired`: 在 `token` 过去前多少秒刷新，单位：秒，可选，
+  `server_role=hub` 时, 默认值：`2 * #{@refresh_before_expired}` 秒；
+  其余角色默认值：`#{@refresh_before_expired}` 秒
   - `:refresh_retry_interval`: 刷新 `token` 失败的重试间隔，单位：秒，可选，默认值：`#{@refresh_retry_interval * 1000}` 秒
   - `:refresh_options`: 刷新 `token` 配置，可选，默认值：`WeChat.RefreshHelper.get_refresh_options_by_client/1` 的输出结果
   """
@@ -168,7 +174,9 @@ defmodule WeChat.RefreshTimer do
   defp cache_and_store(store_id, store_key, value, expired_time, client) do
     Cache.put_cache(store_id, store_key, value)
 
-    if storage = client.storage() do
+    with storage when storage != nil <- client.storage(),
+         # 因为 hub_client 是从 storage 中读取 token 的，因此不需要再做写入操作
+         true <- client.server_role() != :hub_client do
       result =
         storage.store(store_id, store_key, %{"value" => value, "expired_time" => expired_time})
 
@@ -217,9 +225,17 @@ defmodule WeChat.RefreshTimer do
   end
 
   defp do_add(client, opts) do
+    default_refresh_before_expired =
+      if match?(:hub, client.server_role()) do
+        @refresh_before_expired
+      else
+        2 * @refresh_before_expired
+      end
+
     opts =
       Map.merge(opts, %{
-        refresh_before_expired: Map.get(opts, :refresh_before_expired, @refresh_before_expired),
+        refresh_before_expired:
+          Map.get(opts, :refresh_before_expired, default_refresh_before_expired),
         refresh_retry_interval:
           Map.get(opts, :refresh_retry_interval, @refresh_retry_interval) * 1000
       })
@@ -273,6 +289,7 @@ defmodule WeChat.RefreshTimer do
   @compile {:inline, get_store_id_by_id_type: 2}
   defp get_store_id_by_id_type(:appid, client), do: client.appid()
   defp get_store_id_by_id_type(:component_appid, client), do: client.component_appid()
+  defp get_store_id_by_id_type(store_id, _client) when is_binary(store_id), do: store_id
 
   defp refresh_token(store_id, store_key, fun, client, opts) do
     case fun.(client) do

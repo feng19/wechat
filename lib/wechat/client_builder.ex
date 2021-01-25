@@ -6,6 +6,7 @@ defmodule WeChat.ClientBuilder do
     :appid,
     :app_type,
     :by_component?,
+    :server_role,
     :storage,
     :requester,
     :encoding_aes_key,
@@ -13,6 +14,7 @@ defmodule WeChat.ClientBuilder do
   ]
   @default_opts [
     app_type: :official_account,
+    server_role: :client,
     by_component?: false,
     storage: WeChat.Storage.File,
     requester: WeChat.Requester
