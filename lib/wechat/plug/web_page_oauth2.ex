@@ -26,6 +26,21 @@ defmodule WeChat.Plug.WebPageOAuth2 do
     end
     ```
 
+  - 服务器角色为 `hub`：
+
+    ```elixir
+    get "/wx/oauth2/:code_name/callback/:app/*path", WeChat.Plug.WebPageOAuth2, :hub_oauth2_callback
+    ```
+
+  - 服务器角色为 `hub_client`：
+
+    ```elixir
+    scope "/wx/oauth2/:code_name", WeChat.Plug do
+      get "/callback/*path", WebPageOAuth2, :oauth2_callback
+      get "/*path", WebPageOAuth2, :hub_client_oauth2
+    end
+    ```
+
   用户在微信进入下面这个链接：
 
       /wx/oauth2/:code_name/*path?xx=xx
@@ -76,55 +91,70 @@ defmodule WeChat.Plug.WebPageOAuth2 do
     apply(__MODULE__, action, [conn, conn.query_params, client])
   end
 
+  def hub_client_oauth2(conn, query_params, client) do
+    if hub_oauth2_url = Cache.get_hub_oauth2_url(client) do
+      {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
+      {state, query_params} = Map.pop(query_params, "state", "")
+      request_url = Path.join([hub_oauth2_url | conn.path_params["path"]])
+
+      redirect_uri =
+        case URI.encode_query(query_params) do
+          "" -> request_url
+          qs -> request_url <> "?" <> qs
+        end
+
+      oauth2_authorize_url = WebPage.oauth2_authorize_url(client, redirect_uri, scope, state)
+      redirect(conn, oauth2_authorize_url)
+    else
+      not_found(conn)
+    end
+  end
+
   def oauth2(conn, query_params, client) do
     {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
     {state, query_params} = Map.pop(query_params, "state", "")
-    query_string = URI.encode_query(query_params)
-
-    {prefix_path, path} =
-      case conn.path_params["path"] do
-        [] ->
-          {conn.request_path |> String.trim_trailing("/"), ""}
-
-        path ->
-          path = Path.join(path, "/")
-
-          prefix_path =
-            conn.request_path |> String.trim_trailing("/") |> String.trim_trailing(path)
-
-          {prefix_path, path}
-      end
-
-    # callback_uri => "/wx/oauth2/AppCodeName/callback/*path?xx=xx"
-    callback_uri =
-      IO.iodata_to_binary([
-        to_string(conn.scheme),
-        "://",
-        conn.host,
-        request_url_port(conn.scheme, conn.port),
-        "/",
-        prefix_path,
-        "/callback/",
-        path,
-        request_url_qs(query_string)
-      ])
-
-    oauth2_authorize_url = WebPage.oauth2_authorize_url(client, callback_uri, scope, state)
+    redirect_uri = get_callback_url(%{conn | query_params: query_params})
+    oauth2_authorize_url = WebPage.oauth2_authorize_url(client, redirect_uri, scope, state)
     redirect(conn, oauth2_authorize_url)
+  end
+
+  def hub_oauth2_callback(conn, %{"code" => _} = query_params, client) do
+    path_params = conn.path_params
+    app = path_params["app"]
+
+    if oauth2_app_url = Cache.get_oauth2_app_url(client, app) do
+      request_url = Path.join([oauth2_app_url | path_params["path"]])
+
+      redirect_uri =
+        case URI.encode_query(query_params) do
+          "" -> request_url
+          qs -> request_url <> "?" <> qs
+        end
+
+      redirect(conn, redirect_uri)
+    else
+      not_found(conn)
+    end
+  end
+
+  def hub_oauth2_callback(conn, _query_params, _client) do
+    not_found(conn)
   end
 
   def oauth2_callback(conn, %{"code" => code} = query_params, client) do
     with {:ok, %{status: 200, body: info}} <- WebPage.code2access_token(client, code),
          access_token when access_token != nil <- info["access_token"],
          openid when openid != nil <- info["openid"] do
-      query_string = query_params |> Map.delete("code") |> URI.encode_query()
+      query_string =
+        query_params
+        |> Map.delete("code")
+        |> URI.encode_query()
+        |> case do
+          "" -> ""
+          qs -> "?" <> qs
+        end
 
-      path =
-        IO.iodata_to_binary([
-          "/",
-          Enum.join(conn.path_params["path"], "/"),
-          request_url_qs(query_string)
-        ])
+      path = IO.iodata_to_binary(["/", Path.join(conn.path_params["path"]), query_string])
 
       conn
       |> fetch_session()
@@ -164,10 +194,29 @@ defmodule WeChat.Plug.WebPageOAuth2 do
     |> send_resp(302, body)
   end
 
-  defp request_url_port(:http, 80), do: ""
-  defp request_url_port(:https, 443), do: ""
-  defp request_url_port(_, port), do: [?:, Integer.to_string(port)]
+  # callback_uri => "/wx/oauth2/:code_name/callback/*path?xx=xx"
+  defp get_callback_url(conn) do
+    request_url = request_url(%{conn | query_string: ""})
 
-  defp request_url_qs(""), do: ""
-  defp request_url_qs(qs), do: [??, qs]
+    {prefix_path, path} =
+      case conn.path_params["path"] do
+        [] ->
+          {String.trim_trailing(request_url, "/"), ""}
+
+        path ->
+          path = Path.join(path, "/")
+
+          prefix_path = request_url |> String.trim_trailing("/") |> String.trim_trailing(path)
+
+          {prefix_path, path}
+      end
+
+    query_string =
+      case URI.encode_query(conn.query_params) do
+        "" -> ""
+        qs -> "?" <> qs
+      end
+
+    IO.iodata_to_binary([prefix_path, "/callback/", path, query_string])
+  end
 end
