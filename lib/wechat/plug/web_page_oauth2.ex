@@ -111,6 +111,7 @@ defmodule WeChat.Plug.WebPageOAuth2 do
       path = IO.iodata_to_binary(["/", Enum.join(path, "/"), request_url_qs(query_string)])
 
       conn
+      |> fetch_session()
       |> put_session(:openid, openid)
       |> put_session(:appid, client.appid())
       |> redirect(path)
