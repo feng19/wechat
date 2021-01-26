@@ -154,7 +154,7 @@ defmodule WeChat.Plug.WebPageOAuth2 do
           qs -> "?" <> qs
         end
 
-      path = IO.iodata_to_binary(["/", Path.join(conn.path_params["path"]), query_string])
+      path = Path.join(["/" | conn.path_params["path"]]) <> query_string
 
       conn
       |> fetch_session()
