@@ -15,7 +15,7 @@ defmodule WeChat.RefreshHelper do
           {store_id_type | WeChat.Storage.Adapter.store_id(), key_name, refresh_fun}
   @type refresh_options :: [refresh_option]
 
-  alias WeChat.{Account, WebApp, Component, MiniProgram, Utils}
+  alias WeChat.{Account, WebPage, Component, MiniProgram, Utils}
 
   @doc """
   根据不同的 `client` 的 `app_type` & `by_component?` 输出不同的 `refresh_options`
@@ -122,11 +122,11 @@ defmodule WeChat.RefreshHelper do
   defp get_store_key_by_ticket_type("jsapi"), do: :js_api_ticket
   defp get_store_key_by_ticket_type("wx_card"), do: :wx_card_ticket
 
-  @spec refresh_ticket(WeChat.WebApp.js_api_ticket_type(), WeChat.client()) :: refresh_fun_result
+  @spec refresh_ticket(WeChat.WebPage.js_api_ticket_type(), WeChat.client()) :: refresh_fun_result
   def refresh_ticket(ticket_type, client) do
     with store_key <- get_store_key_by_ticket_type(ticket_type),
          :not_hub_client <- get_hub_client_token(client, store_key),
-         {:ok, %{status: 200, body: data}} <- WebApp.get_ticket(client, ticket_type),
+         {:ok, %{status: 200, body: data}} <- WebPage.get_ticket(client, ticket_type),
          %{"ticket" => ticket, "expires_in" => expires_in} <- data do
       {:ok, ticket, expires_in}
     end

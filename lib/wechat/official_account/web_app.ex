@@ -1,4 +1,4 @@
-defmodule WeChat.WebApp do
+defmodule WeChat.WebPage do
   @moduledoc """
   网页开发
 
@@ -15,7 +15,9 @@ defmodule WeChat.WebApp do
     * `"snsapi_userinfo"` - 用户的基本信息(无须关注)
   """
   @type scope :: String.t()
+  @typedoc "重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值，最多128字节"
   @type state :: String.t()
+  @typedoc "授权后重定向的回调链接地址， 请使用 urlEncode 对链接进行处理"
   @type redirect_uri :: String.t()
   @type code :: String.t()
   @type access_token :: String.t()
@@ -61,7 +63,7 @@ defmodule WeChat.WebApp do
   无法进行 `OAuth2.0` 鉴权
   - 如果公众号登录授权给了第三方开发者来进行管理，则不必做任何设置，由第三方代替公众号实现网页授权即可
   """
-  @spec oauth2_authorize_url(WeChat.client(), redirect_uri, state, scope) :: url
+  @spec oauth2_authorize_url(WeChat.client(), redirect_uri, scope, state) :: url
   def oauth2_authorize_url(client, redirect_uri, scope \\ "snsapi_base", state \\ "") do
     redirect_uri = URI.encode_www_form(redirect_uri)
 

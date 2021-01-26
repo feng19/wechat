@@ -35,7 +35,7 @@ defmodule WeChat.ClientBuilder do
     WeChat.UserBlacklist,
     WeChat.Account,
     WeChat.Comment,
-    WeChat.WebApp
+    WeChat.WebPage
   ]
   @mini_program_modules [
     MiniProgram.Auth

@@ -7,10 +7,7 @@ defmodule WeChat.Plug.EventHandler do
   - 单一 client：
 
     ```elixir
-    scope "/wx/event" do
-      plug :accepts, ["html", "json"]
-      forward "/", WeChat.Plug.EventHandler, client: WxOfficialAccount, handler: &Module.handle_event/2
-    end
+    forward "/wx/event", WeChat.Plug.EventHandler, client: WxOfficialAccount, handler: &Module.handle_event/2
     ```
 
   - 兼容多个 client：
@@ -18,8 +15,7 @@ defmodule WeChat.Plug.EventHandler do
     请将入口路径设置为如下格式: `/xxx/:appid/xxx`
 
     ```elixir
-    scope "/wx/:appid/event" do
-      plug :accepts, ["html", "json"]
+    scope "/wx/event/:appid" do
       forward "/", WeChat.Plug.EventHandler, handler: &Module.handle_event/2
     end
     ```

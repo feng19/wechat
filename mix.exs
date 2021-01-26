@@ -106,7 +106,7 @@ defmodule WeChat.MixProject do
            # 账号管理
            WeChat.Account,
            # 网页开发(WIP)
-           WeChat.WebApp,
+           WeChat.WebPage,
            # 第三方平台
            WeChat.Component
          ]},
