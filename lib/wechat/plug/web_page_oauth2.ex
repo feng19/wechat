@@ -29,7 +29,7 @@ defmodule WeChat.Plug.WebPageOAuth2 do
   - 服务器角色为 `hub`：
 
     ```elixir
-    get "/wx/oauth2/:code_name/callback/:app/*path", WeChat.Plug.WebPageOAuth2, :hub_oauth2_callback
+    get "/wx/oauth2/:code_name/:app/callback/*path", WeChat.Plug.WebPageOAuth2, :hub_oauth2_callback
     ```
 
   - 服务器角色为 `hub_client`：
