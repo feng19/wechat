@@ -94,8 +94,8 @@ defmodule WeChat.ClientBuilder do
         _ -> raise ArgumentError, "please set appid"
       end
 
-    code_name =
-      Keyword.get_lazy(default_opts, :code_name, fn ->
+    {code_name, default_opts} =
+      Keyword.pop_lazy(default_opts, :code_name, fn ->
         client |> to_string() |> String.split(".") |> List.last() |> String.downcase()
       end)
 

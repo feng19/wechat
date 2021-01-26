@@ -95,6 +95,11 @@ defmodule WeChat.MixProject do
            ServerMessage.XmlMessage,
            ServerMessage.XmlParser
          ]},
+        {"网页开发",
+         [
+           WeChat.WebPage,
+           WeChat.Plug.WebPageOAuth2
+         ]},
         {"Other APIs",
          [
            # 自定义菜单
@@ -105,8 +110,6 @@ defmodule WeChat.MixProject do
            WeChat.Comment,
            # 账号管理
            WeChat.Account,
-           # 网页开发(WIP)
-           WeChat.WebPage,
            # 第三方平台
            WeChat.Component
          ]},
