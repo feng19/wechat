@@ -4,13 +4,15 @@ defmodule WeChat.Plug.EventHandler do
 
   ## Usage
 
-  - 单一 client：
+  将下面的代码加到 `router` 里面：
+
+  - 单一应用的情况：
 
     ```elixir
     forward "/wx/event", WeChat.Plug.EventHandler, client: WxOfficialAccount, handler: &Module.handle_event/2
     ```
 
-  - 兼容多个 client：
+  - 多个应用的情况：
 
     请将入口路径设置为如下格式: `/xxx/:appid/xxx`
 

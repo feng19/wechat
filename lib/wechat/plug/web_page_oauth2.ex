@@ -6,11 +6,25 @@ defmodule WeChat.Plug.WebPageOAuth2 do
 
   ## Usage
 
-  将下面的一句代码加到 `router` 里面：
+  将下面的代码加到 `router` 里面：
 
-  ```elixir
-  forward "/wx/oauth2", WeChat.Plug.WebPageOAuth2, path_prefix: "/wx/oauth2"
-  ```
+  - 单一应用的情况：
+
+    ```elixir
+    scope "/wx/oauth2", WeChat.Plug do
+      get "/callback/*path", WebPageOAuth2, [client: Client, action: :oauth2_callback]
+      get "/*path", WebPageOAuth2, [client: Client, action: :oauth2]
+    end
+    ```
+
+  - 多个应用的情况：
+
+    ```elixir
+    scope "/wx/oauth2/:code_name", WeChat.Plug do
+      get "/callback/*path", WebPageOAuth2, :oauth2_callback
+      get "/*path", WebPageOAuth2, :oauth2
+    end
+    ```
 
   用户在微信进入下面这个链接：
 
@@ -30,85 +44,72 @@ defmodule WeChat.Plug.WebPageOAuth2 do
       /*path?xx=xx
 
   """
-  use Plug.Router
-  alias WeChat.{WebPage, Storage.Cache}
+  import Plug.Conn
   require Logger
+  alias WeChat.{WebPage, Storage.Cache}
 
-  plug :match
-  plug :dispatch
+  def init(action) when is_atom(action), do: action
 
   def init(options) do
     options = Map.new(options)
 
-    unless Map.has_key?(options, :path_prefix) do
-      raise ArgumentError, "must have :path_prefix setting for using #{inspect(__MODULE__)}"
+    unless Map.has_key?(options, :action) and is_atom(options.action) do
+      raise ArgumentError, "please set a available for :action when using #{inspect(__MODULE__)}"
     end
 
-    path_prefix = "/" <> String.trim(options.path_prefix, "/") <> "/"
-
-    Map.merge(
-      %{oauth2_callback: &__MODULE__.oauth2_callback/2},
-      %{options | path_prefix: path_prefix}
-    )
+    if Map.has_key?(options, :client) do
+      options
+    else
+      options.action
+    end
   end
 
-  get "/:code_name/callback/*path" do
-    oauth2_callback = opts.oauth2_callback
-    oauth2_callback.(conn, opts)
-  end
-
-  get "/:code_name/*path" do
-    oauth2(conn, opts)
-  end
-
-  match _ do
-    not_found(conn)
-  end
-
-  def oauth2(
-        %{path_params: %{"code_name" => code_name, "path" => path}, query_params: query_params} =
-          conn,
-        options
-      ) do
+  def call(%{path_params: %{"code_name" => code_name}} = conn, action) when is_atom(action) do
     if client = Cache.search_client_by_name(code_name) do
-      {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
-      {state, query_params} = Map.pop(query_params, "state", "")
-      query_string = URI.encode_query(query_params)
-      # callback_uri => "/wx/oauth2/AppCodeName/callback/*path?xx=xx"
-      callback_uri =
-        IO.iodata_to_binary([
-          to_string(conn.scheme),
-          "://",
-          conn.host,
-          request_url_port(conn.scheme, conn.port),
-          options.path_prefix,
-          code_name,
-          "/callback/",
-          Enum.join(path, "/"),
-          request_url_qs(query_string)
-        ])
-
-      oauth2_authorize_url = WebPage.oauth2_authorize_url(client, callback_uri, scope, state)
-      redirect(conn, oauth2_authorize_url)
+      apply(__MODULE__, action, [conn, conn.query_params, client])
     else
       not_found(conn)
     end
   end
 
-  # oauth2 callback
-  def oauth2_callback(
-        %{
-          query_params: %{"code" => code} = query_params,
-          path_params: %{"code_name" => code_name, "path" => path}
-        } = conn,
-        _options
-      ) do
-    with client when client != nil <- Cache.search_client_by_name(code_name),
-         {:ok, %{status: 200, body: info}} <- WebPage.code2access_token(client, code),
+  def call(conn, %{action: action, client: client}) do
+    apply(__MODULE__, action, [conn, conn.query_params, client])
+  end
+
+  def oauth2(conn, query_params, client) do
+    {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
+    {state, query_params} = Map.pop(query_params, "state", "")
+    query_string = URI.encode_query(query_params)
+    # callback_uri => "/wx/oauth2/AppCodeName/callback/*path?xx=xx"
+    callback_uri =
+      IO.iodata_to_binary([
+        to_string(conn.scheme),
+        "://",
+        conn.host,
+        request_url_port(conn.scheme, conn.port),
+        "/",
+        Path.join(conn.path_info),
+        "/callback/",
+        Path.join(conn.path_params["path"], "/"),
+        request_url_qs(query_string)
+      ])
+
+    oauth2_authorize_url = WebPage.oauth2_authorize_url(client, callback_uri, scope, state)
+    redirect(conn, oauth2_authorize_url)
+  end
+
+  def oauth2_callback(conn, %{"code" => code} = query_params, client) do
+    with {:ok, %{status: 200, body: info}} <- WebPage.code2access_token(client, code),
          access_token when access_token != nil <- info["access_token"],
          openid when openid != nil <- info["openid"] do
       query_string = query_params |> Map.delete("code") |> URI.encode_query()
-      path = IO.iodata_to_binary(["/", Enum.join(path, "/"), request_url_qs(query_string)])
+
+      path =
+        IO.iodata_to_binary([
+          "/",
+          Enum.join(conn.path_params["path"], "/"),
+          request_url_qs(query_string)
+        ])
 
       conn
       |> fetch_session()
