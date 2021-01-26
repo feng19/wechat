@@ -65,20 +65,24 @@ defmodule WeChat.WebPage do
   """
   @spec oauth2_authorize_url(WeChat.client(), redirect_uri, scope, state) :: url
   def oauth2_authorize_url(client, redirect_uri, scope \\ "snsapi_base", state \\ "") do
-    redirect_uri = URI.encode_www_form(redirect_uri)
-
-    base_url =
-      "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" <>
-        client.appid() <>
-        "&redirect_uri=" <>
-        redirect_uri <>
-        "&response_type=code&scope=" <> scope <> "&state=" <> state
-
-    if client.by_component?() do
-      base_url <> "&component_appid=" <> client.component_appid() <> "#wechat_redirect"
-    else
-      base_url <> "#wechat_redirect"
-    end
+    [
+      "https://open.weixin.qq.com/connect/oauth2/authorize?",
+      ["appid=", client.appid()],
+      ["&redirect_uri=", URI.encode_www_form(redirect_uri)],
+      "&response_type=code",
+      ["&scope=", scope],
+      if match?("", state) do
+        []
+      else
+        ["&state=", state]
+      end,
+      if client.by_component?() do
+        ["&component_appid=", client.component_appid(), "#wechat_redirect"]
+      else
+        "#wechat_redirect"
+      end
+    ]
+    |> IO.iodata_to_binary()
   end
 
   @doc """
