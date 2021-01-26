@@ -80,8 +80,21 @@ defmodule WeChat.Plug.WebPageOAuth2 do
     {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
     {state, query_params} = Map.pop(query_params, "state", "")
     query_string = URI.encode_query(query_params)
-    path = Path.join(conn.path_params["path"], "/")
-    prefix_path = conn.request_path |> String.trim_trailing("/") |> String.trim_trailing(path)
+
+    {prefix_path, path} =
+      case conn.path_params["path"] do
+        [] ->
+          {conn.request_path |> String.trim_trailing("/"), ""}
+
+        path ->
+          path = Path.join(path, "/")
+
+          prefix_path =
+            conn.request_path |> String.trim_trailing("/") |> String.trim_trailing(path)
+
+          {prefix_path, path}
+      end
+
     # callback_uri => "/wx/oauth2/AppCodeName/callback/*path?xx=xx"
     callback_uri =
       IO.iodata_to_binary([
