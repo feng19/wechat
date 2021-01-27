@@ -4,25 +4,27 @@ defmodule WeChat.Plug.CheckOauth2 do
 
   ## Usage
 
-  - 服务器角色为 `client`：
+  ### 服务器角色为 `client`：
 
-    ```elixir
-    plug WeChat.Plug.CheckOauth2, client: Client, path_prefix: "/wx/oauth2", scope: "snsapi_base", state: ""
-    ```
+      plug WeChat.Plug.CheckOauth2, client: Client, path_prefix: "/wx/oauth2", scope: "snsapi_base", state: ""
 
-    可选参数：
+  可选参数：
 
-    - path_prefix: 默认值为 "/wx/oauth2"
-    - scope: "snsapi_base" | "snsapi_userinfo"， 默认值为 "snsapi_base"
-    - state: 默认值为 ""
+  - `:path_prefix`: 默认值为 `"/wx/oauth2"`
+  - `:scope`: `"snsapi_base"` | `"snsapi_userinfo"`， 默认值为 `"snsapi_base"`
+  - `:state`: 默认值为 `""`
 
-    `/wx/oauth2/:code_name/callback/*path?xx=xx`
+  检测到未授权将会跳转到下面这个链接：
 
-  - 服务器角色为 `hub_client`：
+      /wx/oauth2/:code_name/callback/*path?xx=xx
 
-    ```elixir
-    plug WeChat.Plug.CheckOauth2, client: Client
-    ```
+  ### 服务器角色为 `hub_client`：
+
+      plug WeChat.Plug.CheckOauth2, client: Client
+
+  检测到未授权将会跳转到下面这个链接：
+
+      HubOauth2Url <> "*path?xx=xx"
 
   """
   import Plug.Conn
