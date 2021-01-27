@@ -45,10 +45,8 @@ defmodule WeChat.MixProject do
     [
       main: "readme",
       formatter_opts: [gfm: true],
-      extras: ["README.md"],
-      groups_for_modules: groups_for_modules(),
-      source_ref: "v#{@version}",
-      source_url: "https://github.com/feng19/wechat"
+      extras: ["README.md", "LICENSE"],
+      groups_for_modules: groups_for_modules()
     ]
   end
 
@@ -137,7 +135,7 @@ defmodule WeChat.MixProject do
   defp package do
     [
       name: "wechat_sdk",
-      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
       maintainers: ["feng19"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/feng19/wechat"}

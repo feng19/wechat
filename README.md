@@ -79,4 +79,4 @@ WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 
 ## License
 
-plug_crypto source code is released under Apache 2 License. Check the [LICENSE](./LICENSE) file for more information.
+wechat source code is released under Apache 2 License. Check the [LICENSE](./LICENSE) file for more information.
