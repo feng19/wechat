@@ -7,13 +7,14 @@ defmodule WeChat.Plug.CheckOauth2 do
   - 服务器角色为 `client`：
 
     ```elixir
-    plug WeChat.Plug.CheckOauth2, client: Client, path_prefix: "/wx/oauth2", scope: "snsapi_base", state: "xxx"
+    plug WeChat.Plug.CheckOauth2, client: Client, path_prefix: "/wx/oauth2", scope: "snsapi_base", state: ""
     ```
 
     可选参数：
 
-    - scope: "snsapi_base" | "snsapi_userinfo"， 默认为 "snsapi_base"
-    - state: 默认为 ""
+    - path_prefix: 默认值为 "/wx/oauth2"
+    - scope: "snsapi_base" | "snsapi_userinfo"， 默认值为 "snsapi_base"
+    - state: 默认值为 ""
 
     `/wx/oauth2/:code_name/callback/*path?xx=xx`
 
@@ -47,17 +48,10 @@ defmodule WeChat.Plug.CheckOauth2 do
         ]
 
       :client ->
-        unless Map.has_key?(options, :path_prefix) and is_binary(options.path_prefix) do
-          raise ArgumentError,
-                "please set a available value for the :path_prefix when using #{
-                  inspect(__MODULE__)
-                }"
-        end
-
+        path_prefix = Map.get(options, :path_prefix, "/wx/oauth2")
+        path_prefix = Path.join([path_prefix, client.code_name(), "callback"])
         scope = Map.get(options, :scope, "snsapi_base")
         state = Map.get(options, :state, "")
-
-        path_prefix = Path.join([options.path_prefix, client.code_name(), "callback"])
 
         redirect_fun = fn conn ->
           [pre, tail] =
