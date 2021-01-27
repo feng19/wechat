@@ -52,10 +52,10 @@ defmodule WeChat.MiniProgram.Code do
 
   @doc """
   生成的小程序二维码 -
-  [官方文档](#{@doc_link}/wxacode.createQRCode.html)
+  [官方文档](#{@doc_link}/wxacode.createQRCode.html){:target="_blank"}
 
   获取小程序二维码，适用于需要的码数量较少的业务场景。通过该接口生成的小程序二维码，永久有效，有数量限制，
-  详见(获取二维码)[https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/qr-code.html]。
+  详见[获取二维码](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/qr-code.html){:target="_blank"}。
   """
   @spec create_qrcode(WeChat.client(), path, width) :: WeChat.response()
   def create_qrcode(client, path, width \\ 430) when is_binary(path) do
@@ -68,10 +68,10 @@ defmodule WeChat.MiniProgram.Code do
 
   @doc """
   生成的小程序码 -
-  [官方文档](#{@doc_link}/wxacode.get.html)
+  [官方文档](#{@doc_link}/wxacode.get.html){:target="_blank"}
 
   获取小程序码，适用于需要的码数量较少的业务场景。通过该接口生成的小程序码，永久有效，有数量限制，
-  详见(获取二维码)[https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/qr-code.html]。
+  详见[获取二维码](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/qr-code.html){:target="_blank"}。
   """
   @spec create_code(WeChat.client(), path, width, code_options) :: WeChat.response()
   def create_code(client, path, width \\ 430, options \\ %{}) when is_binary(path) do
@@ -84,10 +84,10 @@ defmodule WeChat.MiniProgram.Code do
 
   @doc """
   生成的小程序码 -
-  [官方文档](#{@doc_link}/wxacode.get.html)
+  [官方文档](#{@doc_link}/wxacode.get.html){:target="_blank"}
 
   获取小程序码，适用于需要的码数量极多的业务场景。通过该接口生成的小程序码，永久有效，数量暂无限制，
-  详见(获取二维码)[https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/qr-code.html]。
+  详见[获取二维码](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/qr-code.html){:target="_blank"}。
   """
   @spec create_code_unlimited(WeChat.client(), scene, code_options) :: WeChat.response()
   def create_code_unlimited(client, scene, options \\ %{}) when is_binary(scene) do
