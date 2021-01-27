@@ -76,7 +76,7 @@ defmodule WeChat.MiniProgram.Code do
   @spec create_code(WeChat.client(), path, width, code_options) :: WeChat.response()
   def create_code(client, path, width \\ 430, options \\ %{}) when is_binary(path) do
     client.post(
-      "/cgi-bin/wxaapp/createwxaqrcode",
+      "/wxa/getwxacode",
       Map.merge(options, %{path: path, width: width}),
       query: [access_token: client.get_access_token()]
     )
@@ -92,7 +92,7 @@ defmodule WeChat.MiniProgram.Code do
   @spec create_code_unlimited(WeChat.client(), scene, code_options) :: WeChat.response()
   def create_code_unlimited(client, scene, options \\ %{}) when is_binary(scene) do
     client.post(
-      "/cgi-bin/wxaapp/createwxaqrcode",
+      "/wxa/getwxacodeunlimit",
       Map.put(options, :scene, scene),
       query: [access_token: client.get_access_token()]
     )
