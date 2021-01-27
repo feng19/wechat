@@ -97,4 +97,16 @@ defmodule WeChat.MiniProgram.Code do
       query: [access_token: client.get_access_token()]
     )
   end
+
+  @spec download(file_path :: Path.t(), create_fun :: (() -> WeChat.response())) ::
+          WeChat.response() | :ok | {:error, File.posix()}
+  def download(file_path, create_fun) do
+    file_path
+    |> Path.dirname()
+    |> File.mkdir_p!()
+
+    with {:ok, %{body: body}} when is_binary(body) <- create_fun.() do
+      File.write(file_path, body)
+    end
+  end
 end

@@ -1,6 +1,6 @@
 # WeChat
 
-**WeChat SDK for Elixir(WIP)**
+**目前支持最完善的 WeChat SDK for Elixir**
 
 ## Installation
 
