@@ -1,23 +1,22 @@
 # WeChat
 
-**目前支持最完善的 WeChat SDK for Elixir**
+**WeChat SDK for Elixir**
+
+目前 `Elixir` 中支持最完善的微信SDK。
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `wechat_sdk` to your list of dependencies in `mix.exs`:
+You can use wechat in your projects by adding it to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
   [
-    {:wechat, "~> 0.1.0"}
+    {:wechat, "~> 0.1.0", hex: :wechat_sdk}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/wechat_sdk](https://hexdocs.pm/wechat_sdk).
+[在线文档](http://hexdocs.pm/wechat_sdk/).
 
 ## Usage
 
@@ -65,12 +64,19 @@ WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 * 消息管理
 * 素材管理
 * 图文消息留言管理
+* 自定义菜单
 * 用户管理
 * 账号管理
 * 微信卡券(WIP)
 * 第三方平台
 * 小程序(WIP)
 
-更多接口目前还在开发中……
+更多接口正在开发中……
 
-如果有接口未覆盖到，欢迎提交`PR`
+## Contributing
+
+如果有接口未覆盖到，欢迎提交 `PR`，感谢。
+
+## License
+
+plug_crypto source code is released under Apache 2 License. Check the [LICENSE](./LICENSE) file for more information.
