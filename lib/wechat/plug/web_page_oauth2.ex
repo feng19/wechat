@@ -184,7 +184,8 @@ defmodule WeChat.Plug.WebPageOAuth2 do
     |> send_resp(404, "not_found")
   end
 
-  defp redirect(conn, url) do
+  @doc false
+  def redirect(conn, url) do
     html = Plug.HTML.html_escape(url)
     body = "<html><body>You are being <a href=\"#{html}\">redirected</a>.</body></html>"
 

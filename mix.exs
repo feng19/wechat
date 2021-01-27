@@ -98,7 +98,8 @@ defmodule WeChat.MixProject do
         {"网页开发",
          [
            WeChat.WebPage,
-           WeChat.Plug.WebPageOAuth2
+           WeChat.Plug.WebPageOAuth2,
+           WeChat.Plug.CheckOauth2
          ]},
         {"Other APIs",
          [
