@@ -41,7 +41,8 @@ defmodule WeChat.ClientBuilder do
     MiniProgram.Auth,
     MiniProgram.Code,
     MiniProgram.UrlScheme,
-    MiniProgram.SubscribeMessage
+    MiniProgram.SubscribeMessage,
+    MiniProgram.NearbyPOI
   ]
 
   defmacro __using__(opts \\ []) do

@@ -119,7 +119,8 @@ defmodule WeChat.MixProject do
            MiniProgram.Auth,
            MiniProgram.Code,
            MiniProgram.UrlScheme,
-           MiniProgram.SubscribeMessage
+           MiniProgram.SubscribeMessage,
+           MiniProgram.NearbyPOI
          ]}
       ]
     ]
