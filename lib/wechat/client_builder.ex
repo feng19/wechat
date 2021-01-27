@@ -39,7 +39,8 @@ defmodule WeChat.ClientBuilder do
   ]
   @mini_program_modules [
     MiniProgram.Auth,
-    MiniProgram.Code
+    MiniProgram.Code,
+    MiniProgram.UrlScheme
   ]
 
   defmacro __using__(opts \\ []) do
