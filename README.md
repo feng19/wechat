@@ -57,6 +57,9 @@ YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)
 
 WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 ```
+
+更多详情请见：[WeChat模块](https://hexdocs.pm/wechat_sdk/WeChat.html)
+
 ### 支持接口列表
 
 [微信官方文档](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
