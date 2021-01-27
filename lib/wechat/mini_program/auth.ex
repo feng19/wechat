@@ -1,6 +1,6 @@
 defmodule WeChat.MiniProgram.Auth do
   @moduledoc """
-  权限接口
+  小程序 - 权限接口
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Utils, ServerMessage.Encryptor, Storage.Cache}
@@ -10,7 +10,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   服务端获取开放数据 -
-  [Official API Docs Link](#{@open_ability_doc_link}/signature.html){:target="_blank"}
+  [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
 
   [小程序登录](#{@open_ability_doc_link}/login.html)
   """
@@ -31,7 +31,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   服务端获取开放数据 - 包含敏感数据 -
-  [Official API Docs Link](#{@open_ability_doc_link}/signature.html){:target="_blank"}
+  [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
 
   * [小程序登录](#{@open_ability_doc_link}/login.html)
   * [加密数据解密算法](#{@open_ability_doc_link}/signature.html#加密数据解密算法)
@@ -54,7 +54,7 @@ defmodule WeChat.MiniProgram.Auth do
   @doc """
   小程序登录
 
-  Official API Docs Link:
+  官方文档:
     * [Mini Program](#{@doc_link}/login/auth.code2Session.html){:target="_blank"}
     * [Component](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Mini_Programs/WeChat_login.html){:target="_blank"}
   """
@@ -86,7 +86,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   支付后获取用户的`UnionId` -
-  [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
+  [官方文档](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -106,7 +106,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   支付后获取用户的`UnionId` - 微信支付订单号(`transaction_id`) -
-  [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
+  [官方文档](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -128,7 +128,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   支付后获取用户的`UnionId` - 微信支付商户订单号和微信支付商户号(`out_trade_no`及`mch_id`) -
-  [Official API Docs Link](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
+  [官方文档](#{@doc_link}/user-info/auth.getPaidUnionId.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -155,7 +155,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   获取AccessToken -
-  [Official API Docs Link](#{@doc_link}/access-token/auth.getAccessToken.html){:target="_blank"}
+  [官方文档](#{@doc_link}/access-token/auth.getAccessToken.html){:target="_blank"}
   """
   @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do

@@ -2,7 +2,7 @@ defmodule WeChat.Plug.WebPageOAuth2 do
   @moduledoc """
   网页授权
 
-  [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html){:target="_blank"}
 
   ## Usage
 

@@ -12,7 +12,7 @@ defmodule WeChat.Menu do
 
   @doc """
   创建接口 -
-  [Official API Docs Link](#{@doc_link}/Creating_Custom-Defined_Menu.html){:target="_blank"}
+  [官方文档](#{@doc_link}/Creating_Custom-Defined_Menu.html){:target="_blank"}
 
   自定义菜单能够帮助公众号丰富界面，让用户更好更快地理解公众号的功能。
 
@@ -55,7 +55,7 @@ defmodule WeChat.Menu do
 
   @doc """
   查询接口 -
-  [Official API Docs Link](#{@doc_link}/Querying_Custom_Menus.html){:target="_blank"}
+  [官方文档](#{@doc_link}/Querying_Custom_Menus.html){:target="_blank"}
 
   本接口将会提供公众号当前使用的自定义菜单的配置，如果公众号是通过API调用设置的菜单，则返回菜单的开发配置，
   而如果公众号是在公众平台官网通过网站功能发布菜单，则本接口返回运营者设置的菜单配置。
@@ -79,7 +79,7 @@ defmodule WeChat.Menu do
 
   @doc """
   删除接口 -
-  [Official API Docs Link](#{@doc_link}/Deleting_Custom-Defined_Menu.html){:target="_blank"}
+  [官方文档](#{@doc_link}/Deleting_Custom-Defined_Menu.html){:target="_blank"}
 
   使用接口创建自定义菜单后，开发者还可使用接口删除当前使用的自定义菜单。另请注意，在个性化菜单时，调用此接口会删除默认菜单及全部个性化菜单。
   """
@@ -90,7 +90,7 @@ defmodule WeChat.Menu do
 
   @doc """
   创建个性化菜单 -
-  [Official API Docs Link](#{@doc_link}/Personalized_menu_interface.html#0){:target="_blank"}
+  [官方文档](#{@doc_link}/Personalized_menu_interface.html#0){:target="_blank"}
   """
   @spec add_conditional_menu(WeChat.client(), body :: map) :: WeChat.response()
   def add_conditional_menu(client, body) do
@@ -101,7 +101,7 @@ defmodule WeChat.Menu do
 
   @doc """
   删除个性化菜单 -
-  [Official API Docs Link](#{@doc_link}/Personalized_menu_interface.html#1){:target="_blank"}
+  [官方文档](#{@doc_link}/Personalized_menu_interface.html#1){:target="_blank"}
   """
   @spec del_conditional_menu(WeChat.client(), menu_id) :: WeChat.response()
   def del_conditional_menu(client, menu_id) do
@@ -112,7 +112,7 @@ defmodule WeChat.Menu do
 
   @doc """
   测试个性化菜单匹配结果 -
-  [Official API Docs Link](#{@doc_link}/Personalized_menu_interface.html#2){:target="_blank"}
+  [官方文档](#{@doc_link}/Personalized_menu_interface.html#2){:target="_blank"}
   """
   @spec try_match_menu(WeChat.client(), user_id) :: WeChat.response()
   def try_match_menu(client, user_id) do

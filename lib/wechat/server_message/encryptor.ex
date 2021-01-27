@@ -2,7 +2,7 @@ defmodule WeChat.ServerMessage.Encryptor do
   @moduledoc """
   消息加解密
 
-  [API Docs Link](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Technical_Plan.html)
+  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Technical_Plan.html)
   """
 
   @typedoc """

@@ -2,7 +2,7 @@ defmodule WeChat.CustomService do
   @moduledoc """
   客服帐号管理
 
-  [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html#0){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html#0){:target="_blank"}
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
@@ -25,7 +25,7 @@ defmodule WeChat.CustomService do
 
   @doc """
   添加客服帐号 -
-  [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
+  [官方文档](#{@doc_link}#1){:target="_blank"}
 
   每个公众号最多添加100个客服账号。
   """
@@ -40,7 +40,7 @@ defmodule WeChat.CustomService do
 
   @doc """
   修改客服帐号 -
-  [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
+  [官方文档](#{@doc_link}#2){:target="_blank"}
   """
   @spec update_kf_account(WeChat.client(), kf_account, nickname, password) :: WeChat.response()
   def update_kf_account(client, kf_account, nickname, password) do
@@ -53,7 +53,7 @@ defmodule WeChat.CustomService do
 
   @doc """
   删除客服帐号 -
-  [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
+  [官方文档](#{@doc_link}#3){:target="_blank"}
   """
   @spec del_kf_account(WeChat.client(), kf_account, nickname, password) :: WeChat.response()
   def del_kf_account(client, kf_account, nickname, password) do
@@ -66,7 +66,7 @@ defmodule WeChat.CustomService do
 
   @doc """
   设置客服帐号的头像 -
-  [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
+  [官方文档](#{@doc_link}#4){:target="_blank"}
 
   头像图片文件必须是jpg格式，推荐使用640*640大小的图片以达到最佳效果。
   """
@@ -86,7 +86,7 @@ defmodule WeChat.CustomService do
 
   @doc """
   设置客服帐号的头像(binary) -
-  [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
+  [官方文档](#{@doc_link}#4){:target="_blank"}
 
   头像图片文件必须是jpg格式，推荐使用640*640大小的图片以达到最佳效果。
   """
@@ -107,7 +107,7 @@ defmodule WeChat.CustomService do
 
   @doc """
   获取所有客服账号 -
-  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  [官方文档](#{@doc_link}#5){:target="_blank"}
 
   获取公众号中所设置的客服基本信息，包括客服工号、客服昵称、客服登录账号。
   """

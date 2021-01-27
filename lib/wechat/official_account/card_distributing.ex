@@ -2,7 +2,7 @@ defmodule WeChat.CardDistributing do
   @moduledoc """
   微信卡券 - 投放卡券
 
-  [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html){:target="_blank"}
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
@@ -12,7 +12,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   创建二维码接口 -
-  [Official API Docs Link](#{@doc_link}#0){:target="_blank"}
+  [官方文档](#{@doc_link}#0){:target="_blank"}
 
   开发者可调用该接口生成一张卡券二维码供用户扫码后添加卡券到卡包。
 
@@ -27,7 +27,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   创建货架接口 -
-  [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
+  [官方文档](#{@doc_link}#3){:target="_blank"}
 
   开发者需调用该接口创建货架链接，用于卡券投放。创建货架时需填写投放路径的场景字段。
   """
@@ -38,7 +38,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   群发卡券 - 导入自定义code(仅对自定义code商户) -
-  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  [官方文档](#{@doc_link}#5){:target="_blank"}
   """
   @spec import_code(WeChat.client(), Card.card_id(), [Card.card_code()]) :: WeChat.response()
   def import_code(client, card_id, code_list) do
@@ -51,7 +51,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   群发卡券 - 查询导入code数目接口 -
-  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  [官方文档](#{@doc_link}#5){:target="_blank"}
   """
   @spec get_code_count(WeChat.client(), Card.card_id()) :: WeChat.response()
   def get_code_count(client, card_id) do
@@ -62,7 +62,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   群发卡券 - 核查code接口 -
-  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  [官方文档](#{@doc_link}#5){:target="_blank"}
   """
   @spec check_code(WeChat.client(), Card.card_id(), [Card.card_code()]) :: WeChat.response()
   def check_code(client, card_id, code_list) do
@@ -75,7 +75,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   图文消息群发卡券 -
-  [Official API Docs Link](#{@doc_link}#6){:target="_blank"}
+  [官方文档](#{@doc_link}#6){:target="_blank"}
 
   支持开发者调用该接口获取卡券嵌入图文消息的标准格式代码，将返回代码填入 [新增临时素材](#{doc_link_prefix()}/doc/offiaccount/Asset_Management/New_temporary_materials) 中content字段，即可获取嵌入卡券的图文消息素材。
 
@@ -90,7 +90,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   设置测试白名单 -
-  [Official API Docs Link](#{@doc_link}#12){:target="_blank"}
+  [官方文档](#{@doc_link}#12){:target="_blank"}
   """
   @spec set_test_whitelist(WeChat.client(), [
           {:openid, [WeChat.openid()]} | {:username, [User.username()]}
@@ -109,7 +109,7 @@ defmodule WeChat.CardDistributing do
 
   @doc """
   设置测试白名单 -
-  [Official API Docs Link](#{@doc_link}#12){:target="_blank"}
+  [官方文档](#{@doc_link}#12){:target="_blank"}
   """
   @spec set_test_whitelist(WeChat.client(), [WeChat.openid()], [User.username()]) ::
           WeChat.response()

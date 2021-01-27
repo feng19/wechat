@@ -2,7 +2,7 @@ defmodule WeChat.UserTag do
   @moduledoc """
   标签管理
 
-  [API Docs Link](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html){:target="_blank"}
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
@@ -14,7 +14,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   创建标签 -
-  [Official API Docs Link](#{@doc_link}#1){:target="_blank"}
+  [官方文档](#{@doc_link}#1){:target="_blank"}
   """
   @spec create(WeChat.client(), tag_name) :: WeChat.response()
   def create(client, name) do
@@ -27,7 +27,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   获取公众号已创建的标签 -
-  [Official API Docs Link](#{@doc_link}#2){:target="_blank"}
+  [官方文档](#{@doc_link}#2){:target="_blank"}
   """
   @spec get(WeChat.client()) :: WeChat.response()
   def get(client) do
@@ -38,7 +38,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   编辑标签 -
-  [Official API Docs Link](#{@doc_link}#3){:target="_blank"}
+  [官方文档](#{@doc_link}#3){:target="_blank"}
   """
   @spec update(WeChat.client(), tag_id, tag_name) :: WeChat.response()
   def update(client, id, name) do
@@ -51,7 +51,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   删除标签 -
-  [Official API Docs Link](#{@doc_link}#4){:target="_blank"}
+  [官方文档](#{@doc_link}#4){:target="_blank"}
   """
   @spec delete(WeChat.client(), tag_id) :: WeChat.response()
   def delete(client, id) do
@@ -64,7 +64,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   获取标签下粉丝列表 -
-  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  [官方文档](#{@doc_link}#5){:target="_blank"}
   """
   @spec get_tag_users(WeChat.client(), tag_id) :: WeChat.response()
   def get_tag_users(client, id) do
@@ -77,7 +77,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   获取标签下粉丝列表 - 翻页 -
-  [Official API Docs Link](#{@doc_link}#5){:target="_blank"}
+  [官方文档](#{@doc_link}#5){:target="_blank"}
   """
   @spec get_tag_users(WeChat.client(), tag_id, next_openid :: WeChat.openid()) ::
           WeChat.response()
@@ -91,7 +91,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   批量为用户打标签 -
-  [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  [官方文档](#{@doc_link}){:target="_blank"}
   """
   @spec batch_tagging_users(WeChat.client(), tag_id, [WeChat.openid()]) :: WeChat.response()
   def batch_tagging_users(client, id, openid_list) do
@@ -104,7 +104,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   批量为用户取消标签 -
-  [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  [官方文档](#{@doc_link}){:target="_blank"}
   """
   @spec batch_untagging_users(WeChat.client(), tag_id, [WeChat.openid()]) :: WeChat.response()
   def batch_untagging_users(client, id, openid_list) do
@@ -117,7 +117,7 @@ defmodule WeChat.UserTag do
 
   @doc """
   获取用户身上的标签列表 -
-  [Official API Docs Link](#{@doc_link}){:target="_blank"}
+  [官方文档](#{@doc_link}){:target="_blank"}
   """
   @spec get_user_tags(WeChat.client(), WeChat.openid()) :: WeChat.response()
   def get_user_tags(client, openid) do

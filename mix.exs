@@ -114,7 +114,10 @@ defmodule WeChat.MixProject do
            # 第三方平台
            WeChat.Component
          ]},
-        {"小程序 APIs", [MiniProgram.Auth]}
+        {"小程序 APIs", [
+          MiniProgram.Auth,
+          MiniProgram.Code
+        ]}
       ]
     ]
   end

@@ -50,7 +50,7 @@ defmodule WeChat.WebPage do
   @doc """
   网页授权 - 请求`code`
 
-  Official API Docs Link:
+  官方文档:
   * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#0){:target="_blank"}
   * [Component](#{@component_doc_link}){:target="_blank"}
 
@@ -88,7 +88,7 @@ defmodule WeChat.WebPage do
   @doc """
   网页授权 - 通过`code`换取`access_token`
 
-  Official API Docs Link:
+  官方文档:
     * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#1){:target="_blank"}
     * [Component](#{@component_doc_link}){:target="_blank"}
   """
@@ -126,7 +126,7 @@ defmodule WeChat.WebPage do
 
   `refresh_token`有效期为30天，当`refresh_token`失效之后，需要用户重新授权。
 
-  Official API Docs Link:
+  官方文档:
     * [Official Account](#{@doc_link}/Wechat_webpage_authorization.html#2){:target="_blank"}
     * [Component](#{@component_doc_link}){:target="_blank"}
   """
@@ -157,7 +157,7 @@ defmodule WeChat.WebPage do
 
   @doc """
   网页授权 - 拉取用户信息(需`scope`为`snsapi_userinfo`) -
-  [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#3){:target="_blank"}
+  [官方文档](#{@doc_link}/Wechat_webpage_authorization.html#3){:target="_blank"}
 
   如果网页授权作用域为`snsapi_userinfo`,则此时开发者可以通过access_token和openid拉取用户信息了.
   """
@@ -202,7 +202,7 @@ defmodule WeChat.WebPage do
 
   @doc """
   网页授权 - 检验授权凭证(`access_token`)是否有效 -
-  [Official API Docs Link](#{@doc_link}/Wechat_webpage_authorization.html#4){:target="_blank"}
+  [官方文档](#{@doc_link}/Wechat_webpage_authorization.html#4){:target="_blank"}
   """
   @spec auth(WeChat.openid(), access_token) :: WeChat.response()
   def auth(requester \\ Requester, openid, access_token) do
@@ -213,7 +213,7 @@ defmodule WeChat.WebPage do
 
   @doc """
   生成JS-SDK配置 -
-  [Official API Docs Link](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
+  [官方文档](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
   """
   @spec js_sdk_config(WeChat.client(), url) :: js_sdk_config
   def js_sdk_config(client, url) do
@@ -227,7 +227,7 @@ defmodule WeChat.WebPage do
 
   @doc """
   生成JS-SDK配置(by ticket) -
-  [Official API Docs Link](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
+  [官方文档](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
   """
   @spec sign_jssdk(js_api_ticket, url, WeChat.appid()) :: js_sdk_config
   def sign_jssdk(jsapi_ticket, url, appid) do
@@ -296,7 +296,7 @@ defmodule WeChat.WebPage do
 
   @doc """
   卡券签名 -
-  [Official API Docs Link](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
+  [官方文档](#{@doc_link}/JS-SDK.html#65){:target="_blank"}
   """
   @compile {:inline, sign_card: 1}
   @spec sign_card(list :: [String.t()]) :: map
@@ -311,7 +311,7 @@ defmodule WeChat.WebPage do
 
   @doc """
   获取`api_ticket` -
-  [Official API Docs Link](#{@doc_link}/JS-SDK.html#62){:target="_blank"}
+  [官方文档](#{@doc_link}/JS-SDK.html#62){:target="_blank"}
   """
   @spec get_ticket(WeChat.client(), js_api_ticket_type) :: WeChat.response()
   def get_ticket(client, type) do
