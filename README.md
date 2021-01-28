@@ -22,29 +22,41 @@ end
 
 ### 定义 `Client` 模块
 
-```elixir
+#### 公众号(默认):
 
-# 公众号(`default`):
-
-defmodule YourApp.WeChatAppCodeName do
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
   @moduledoc "CodeName"
   use WeChat,
     appid: "wx-appid",
     appsecret: "appsecret"
-end
+  end
+  ```
 
-# or
+#### 小程序:
 
-# 第三方应用:
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat,
+    app_type: :mini_program,
+    appid: "wx-appid",
+    appsecret: "appsecret"
+  end
+  ```
 
-defmodule YourApp.WeChatAppCodeName do
+#### 第三方应用:
+
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
   @moduledoc "CodeName"
   use WeChat,
     by_component?: true,
+    app_type: :official_account | :mini_program, # 默认为 :official_account
     appid: "wx-appid",
     component_appid: "wx-third-appid", # 第三方 appid
-end
-```
+  end
+  ```
 
 ### 调用接口
 
@@ -75,6 +87,13 @@ WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 * 小程序(WIP)
 
 更多接口正在开发中……
+
+## 快速测试
+
+微信提供申请测试号，用于快速测试
+
+- [申请公众号测试号](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Requesting_an_API_Test_Account.html)
+- [申请小程序测试号](https://developers.weixin.qq.com/miniprogram/dev/devtools/sandbox.html)
 
 ## Contributing
 
