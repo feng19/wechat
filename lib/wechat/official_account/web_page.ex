@@ -35,7 +35,8 @@ defmodule WeChat.WebPage do
           timestamp: timestamp,
           nonceStr: nonce_str
         }
-  @type card_config :: %{cardId: Card.card_id(), cardExt: String.t()}
+  @type card_ext :: String.t()
+  @type card_config :: %{cardId: Card.card_id(), cardExt: card_ext}
 
   @typedoc """
   JS API的临时票据类型

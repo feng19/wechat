@@ -29,6 +29,8 @@ defmodule WeChat.Material do
   @typep file_path :: Path.t()
   @typep filename :: String.t()
   @typep file_data :: binary
+  @typep title :: String.t()
+  @typep description :: String.t()
 
   @doc """
   新增临时素材 - 文件 -
@@ -37,7 +39,7 @@ defmodule WeChat.Material do
   公众号经常有需要用到一些临时性的多媒体素材的场景，例如在使用接口特别是发送消息时，对多媒体文件、多媒体消息的获取和调用等操作，
   是通过media_id来进行的。素材管理接口对所有认证的订阅号和服务号开放。通过本接口，公众号可以新增临时素材（即上传临时多媒体文件）。
   """
-  @spec upload_media(WeChat.client(), material_type, file_path :: Path.t()) :: WeChat.response()
+  @spec upload_media(WeChat.client(), material_type, file_path) :: WeChat.response()
   def upload_media(client, type, file_path) do
     multipart =
       Multipart.new()
@@ -127,6 +129,32 @@ defmodule WeChat.Material do
       |> Multipart.add_file_content(file_data, filename, name: "media")
 
     client.post("/cgi-bin/media/uploadimg", multipart,
+      query: [access_token: client.get_access_token()]
+    )
+  end
+
+  @doc """
+  上传图文消息素材 -
+  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html#1){:target="_blank"}
+  """
+  @spec upload_news(WeChat.client(), articles) :: WeChat.response()
+  def upload_news(client, articles) do
+    client.post("/cgi-bin/media/uploadnews", json_map(articles: articles),
+      query: [access_token: client.get_access_token()]
+    )
+  end
+
+  @doc """
+  获取批量推送类型为 `mpvideo` 时要求的 `media_id` -
+  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html#2){:target="_blank"}
+
+  原 `media_id` 需通过 [素材管理] -> [新增素材] 来得到
+  """
+  @spec upload_video(WeChat.client(), media_id, title, description) :: WeChat.response()
+  def upload_video(client, media_id, title, description) do
+    client.post(
+      "/cgi-bin/media/uploadvideo",
+      json_map(media_id: media_id, title: title, description: description),
       query: [access_token: client.get_access_token()]
     )
   end

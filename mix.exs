@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{ServerMessage, MiniProgram, Storage}
 
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
@@ -82,7 +82,9 @@ defmodule WeChat.MixProject do
           # 消息管理 - 模板消息
           WeChat.Template,
           # 消息管理 - 群发接口和原创效验
-          WeChat.BatchSends
+          WeChat.BatchSends,
+          # 素材管理
+          WeChat.Material,
         ]
       },
       {"微信卡券 APIs",
@@ -112,8 +114,6 @@ defmodule WeChat.MixProject do
        [
          # 自定义菜单
          WeChat.Menu,
-         # 素材管理
-         WeChat.Material,
          # 图文消息留言管理
          WeChat.Comment,
          # 账号管理
