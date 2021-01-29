@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{ServerMessage, MiniProgram, Storage}
 
-  @version "0.1.1"
+  @version "0.1.2"
 
   def project do
     [
