@@ -12,12 +12,13 @@ defmodule WeChat.Material do
     * `video` - 视频
     * `voice` - 语音
     * `news`  - 图文
+    * `thumb`  - 缩略图
 
   support type
     * String.t :: ["image", "video", "voice", "news"]
     * atom :: [:image, :video, :voice, :news]
   """
-  @type material_type :: :image | :video | :voice | :news | String.t()
+  @type material_type :: :image | :video | :voice | :news | :thumb | String.t()
   @typedoc "素材的数量"
   @type material_count :: 1..20
   @typedoc "媒体文件ID"
@@ -31,6 +32,7 @@ defmodule WeChat.Material do
   @typep file_data :: binary
   @typep title :: String.t()
   @typep description :: String.t()
+  @typep introduction :: String.t()
 
   @doc """
   新增临时素材 - 文件 -
@@ -190,6 +192,47 @@ defmodule WeChat.Material do
 
     client.post("/cgi-bin/material/add_material", multipart,
       query: [access_token: client.get_access_token(), type: to_string(type)]
+    )
+  end
+
+  @doc """
+  新增其他类型永久素材 - 视频 -
+  [官方文档](#{@doc_link}/Adding_Permanent_Assets.html#新增其他类型永久素材){:target="_blank"}
+
+  请注意：图片素材将进入公众平台官网素材管理模块中的默认分组。
+  """
+  @spec add_video_material(WeChat.client(), title, introduction, file_path) :: WeChat.response()
+  def add_video_material(client, title, introduction, file_path) do
+    description = Jason.encode!(json_map(title: title, introduction: introduction))
+
+    multipart =
+      Multipart.new()
+      |> Multipart.add_file(file_path, name: "media")
+      |> Multipart.add_field("description", description)
+
+    client.post("/cgi-bin/material/add_material", multipart,
+      query: [access_token: client.get_access_token(), type: "video"]
+    )
+  end
+
+  @doc """
+  新增其他类型永久素材(binary) - 视频 -
+  [官方文档](#{@doc_link}/Adding_Permanent_Assets.html#新增其他类型永久素材){:target="_blank"}
+
+  请注意：图片素材将进入公众平台官网素材管理模块中的默认分组。
+  """
+  @spec add_video_material(WeChat.client(), title, introduction, filename, file_data) ::
+          WeChat.response()
+  def add_video_material(client, title, introduction, filename, file_data) do
+    description = Jason.encode!(json_map(title: title, introduction: introduction))
+
+    multipart =
+      Multipart.new()
+      |> Multipart.add_file_content(file_data, filename, name: "media")
+      |> Multipart.add_field("description", description)
+
+    client.post("/cgi-bin/material/add_material", multipart,
+      query: [access_token: client.get_access_token(), type: "video"]
     )
   end
 

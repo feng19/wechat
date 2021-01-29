@@ -84,7 +84,7 @@ defmodule WeChat.MixProject do
           # 消息管理 - 群发接口和原创效验
           WeChat.BatchSends,
           # 素材管理
-          WeChat.Material,
+          WeChat.Material
         ]
       },
       {"微信卡券 APIs",
