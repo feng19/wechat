@@ -108,6 +108,10 @@ defmodule WeChat do
   服务器配置里的 `token` 值，在接收消息时用于校验签名
   """
   @type token :: String.t()
+  @typedoc "错误码"
+  @type err_code :: non_neg_integer
+  @typedoc "错误信息"
+  @type err_msg :: String.t()
 
   @typedoc """
   参数

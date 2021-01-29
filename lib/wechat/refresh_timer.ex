@@ -3,6 +3,7 @@ defmodule WeChat.RefreshTimer do
   token 刷新器
 
   这个是默认的刷新器，当然也支持自定义的刷新器，可以这样配置：
+
   ```elixir
 
   config :wechat, :refresh_timer, YourRefreshTimer
@@ -33,6 +34,14 @@ defmodule WeChat.RefreshTimer do
   ```
 
   `options` 配置说明见：`t:options/0`
+
+  为了适应 `Storage` 在 `RefreshTimer` 启动之后才启动，可以开启延时启动刷新:
+
+  ```elixir
+  config :wechat, WeChat.RefreshTimer, wait_for_signal: true
+  ```
+
+  不配置默认为立即启动刷新
   """
   use GenServer
   require Logger
@@ -67,6 +76,11 @@ defmodule WeChat.RefreshTimer do
             optional(:refresh_retry_interval) => refresh_retry_interval,
             optional(:refresh_options) => WeChat.RefreshHelper.refresh_options()
           }
+
+  @spec start_monitor() :: :ok
+  def start_monitor do
+    GenServer.call(__MODULE__, :start_monitor)
+  end
 
   @spec add(WeChat.client(), options) :: :ok
   def add(client, opts) do
@@ -104,32 +118,83 @@ defmodule WeChat.RefreshTimer do
     state =
       Map.new(state, fn
         client when is_atom(client) ->
-          {client, do_add(client, %{})}
+          {client, init_client_options(client, %{})}
 
         {client, opts} ->
-          {client, do_add(client, opts)}
+          {client, init_client_options(client, opts)}
       end)
 
-    {:ok, state}
+    clients = Map.keys(state)
+
+    options =
+      :wechat
+      |> Application.get_env(__MODULE__, %{})
+      |> Map.new()
+
+    state =
+      %{wait_for_signal: false}
+      |> Map.merge(options)
+      |> Map.merge(state)
+      |> Map.put(:clients, clients)
+
+    continue =
+      if state.wait_for_signal do
+        :wait_for_signal
+      else
+        :start_monitor
+      end
+
+    {:ok, state, {:continue, continue}}
   end
 
   @impl true
-  def handle_call({:add, client, opts}, _from, state) do
-    opts = do_add(client, opts)
-    state = Map.put(state, client, opts)
+  def handle_continue(:wait_for_signal, state) do
+    {:noreply, state}
+  end
+
+  def handle_continue(:start_monitor, state) do
+    state =
+      Enum.reduce(state.clients, state, fn client, acc ->
+        options = start_monitor_client(client, Map.get(acc, client))
+        Map.put(acc, client, options)
+      end)
+
+    {:noreply, %{state | wait_for_signal: false}}
+  end
+
+  @impl true
+  def handle_call(:start_monitor, _from, state) do
+    {:reply, :ok, state, {:continue, :start_monitor}}
+  end
+
+  def handle_call({:add, client, options}, _from, state) do
+    options =
+      if state.wait_for_signal do
+        init_client_options(client, options)
+      else
+        options = init_client_options(client, options)
+        start_monitor_client(client, options)
+      end
+
+    state =
+      state
+      |> Map.put(client, options)
+      |> Map.put(:clients, [client | state.clients])
+
     {:reply, :ok, state}
   end
 
   def handle_call({:remove, client}, _from, state) do
     {get, state} = Map.pop(state, client)
+    clients = List.delete(state.clients, client)
 
     with {_client, opts} <- get do
       Enum.each(opts.refresh_options, fn {_key, _fun, timer} ->
-        :erlang.cancel_timer(timer)
+        cancel_timer(timer)
       end)
     end
 
-    {:reply, :ok, state}
+    {:reply, :ok, %{state | clients: clients}}
   end
 
   def handle_call({:refresh, client}, _from, state) do
@@ -224,7 +289,13 @@ defmodule WeChat.RefreshTimer do
     end
   end
 
-  defp do_add(client, opts) do
+  defp init_client_options(client, options) do
+    Logger.info(
+      "Initialize WeChat Client: #{inspect(client)} by AppType: #{client.app_type()}, Storage: #{
+        inspect(client.storage())
+      }."
+    )
+
     default_refresh_before_expired =
       if match?(:hub, client.server_role()) do
         @refresh_before_expired
@@ -232,35 +303,32 @@ defmodule WeChat.RefreshTimer do
         2 * @refresh_before_expired
       end
 
-    opts =
-      Map.merge(opts, %{
+    options =
+      Map.merge(options, %{
         refresh_before_expired:
-          Map.get(opts, :refresh_before_expired, default_refresh_before_expired),
+          Map.get(options, :refresh_before_expired, default_refresh_before_expired),
         refresh_retry_interval:
-          Map.get(opts, :refresh_retry_interval, @refresh_retry_interval) * 1000
+          Map.get(options, :refresh_retry_interval, @refresh_retry_interval) * 1000
       })
 
     Cache.set_client(client)
 
-    refresh_options = init_refresh_options(client, opts)
+    refresh_options = init_refresh_options(client, options)
+    Map.put(options, :refresh_options, refresh_options)
+  end
 
-    Logger.info(
-      "Initialize WeChat Client: #{inspect(client)} by AppType: #{client.app_type()}, Storage: #{
-        inspect(client.storage())
-      }."
-    )
+  defp start_monitor_client(client, options) do
+    Logger.info("Monitoring WeChat Client: #{inspect(client)}.")
 
     refresh_options =
-      for {id_type, store_key, fun} <- refresh_options do
-        store_id = get_store_id_by_id_type(id_type, client)
-
+      for {{store_id, store_key}, fun, _timer} <- options.refresh_options do
         timer =
           case restore_and_cache(store_id, store_key, client) do
             false ->
-              refresh_token(store_id, store_key, fun, client, opts)
+              refresh_token(store_id, store_key, fun, client, options)
 
             {true, expires_in} ->
-              ((expires_in - opts.refresh_before_expired) * 1000)
+              ((expires_in - options.refresh_before_expired) * 1000)
               |> max(0)
               |> start_refresh_token_timer(store_id, store_key, client)
           end
@@ -268,7 +336,7 @@ defmodule WeChat.RefreshTimer do
         {{store_id, store_key}, fun, timer}
       end
 
-    Map.put(opts, :refresh_options, refresh_options)
+    %{options | refresh_options: refresh_options}
   end
 
   defp do_refresh(client, %{refresh_options: refresh_options} = opts) do
@@ -278,13 +346,16 @@ defmodule WeChat.RefreshTimer do
 
     refresh_options =
       for {{store_id, store_key}, fun, timer} <- refresh_options do
-        :erlang.cancel_timer(timer)
+        cancel_timer(timer)
         timer = refresh_token(store_id, store_key, fun, client, opts)
         {{store_id, store_key}, fun, timer}
       end
 
     %{opts | refresh_options: refresh_options}
   end
+
+  defp cancel_timer(nil), do: :ignore
+  defp cancel_timer(timer), do: :erlang.cancel_timer(timer)
 
   @compile {:inline, get_store_id_by_id_type: 2}
   defp get_store_id_by_id_type(:appid, client), do: client.appid()
@@ -336,18 +407,24 @@ defmodule WeChat.RefreshTimer do
   end
 
   defp init_refresh_options(client, opts) do
-    case Map.get(opts, :refresh_options) do
-      fun when is_function(fun, 0) ->
-        fun.()
+    refresh_options =
+      case Map.get(opts, :refresh_options) do
+        fun when is_function(fun, 0) ->
+          fun.()
 
-      fun when is_function(fun, 1) ->
-        fun.(client)
+        fun when is_function(fun, 1) ->
+          fun.(client)
 
-      refresh_options when is_list(refresh_options) ->
-        refresh_options
+        refresh_options when is_list(refresh_options) ->
+          refresh_options
 
-      nil ->
-        WeChat.RefreshHelper.get_refresh_options_by_client(client)
+        nil ->
+          WeChat.RefreshHelper.get_refresh_options_by_client(client)
+      end
+
+    for {id_type, store_key, fun} <- refresh_options do
+      store_id = get_store_id_by_id_type(id_type, client)
+      {{store_id, store_key}, fun, nil}
     end
   end
 end

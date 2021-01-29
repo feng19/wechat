@@ -57,6 +57,7 @@ defmodule WeChat.Card do
   """
   @type cond_source :: 0 | 1
   @type date :: Date.t() | String.t()
+  @type is_open :: boolean
 
   @doc """
   创建卡券 -
@@ -81,7 +82,7 @@ defmodule WeChat.Card do
   * 可以通过手机公众号、电脑商户后台，轻松操作收款并查看核销记录，交易对账，并支持离线下载。
   * 支持会员营销，二次营销，如会员卡交易送积分，抵扣积分，买单后赠券等。
   """
-  @spec set_pay_cell(WeChat.client(), card_id, is_open :: boolean) :: WeChat.response()
+  @spec set_pay_cell(WeChat.client(), card_id, is_open) :: WeChat.response()
   def set_pay_cell(client, card_id, is_open) do
     client.post(
       "/card/paycell/set",
@@ -103,7 +104,7 @@ defmodule WeChat.Card do
     * 高峰期店内人流量大，扫码/输码核销速度不能满足短时需求；
     * 会议入场，短时有大量核销任务；
   """
-  @spec set_self_consume_cell(WeChat.client(), card_id, is_open :: boolean) :: WeChat.response()
+  @spec set_self_consume_cell(WeChat.client(), card_id, is_open) :: WeChat.response()
   def set_self_consume_cell(client, card_id, is_open) do
     client.post(
       "/card/selfconsumecell/set",
@@ -164,7 +165,10 @@ defmodule WeChat.Card do
   Code解码接口 -
   [官方文档](#{@doc_link}/Redeeming_a_coupon_voucher_or_card.html#3){:target="_blank"}
 
-  消耗code接口是核销卡券的唯一接口,开发者可以调用当前接口将用户的优惠券进行核销，该过程不可逆。
+  code解码接口支持两种场景：
+
+  - 商家获取 `choos_card_info` 后，将 `card_id` 和 `encrypt_code` 字段通过解码接口，获取真实 `code`。
+  - 卡券内跳转外链的签名中会对 `code` 进行加密处理，通过调用解码接口获取真实 `code`。
   """
   @spec decrypt_code(WeChat.client(), encrypt_code :: String.t()) :: WeChat.response()
   def decrypt_code(client, encrypt_code) do
