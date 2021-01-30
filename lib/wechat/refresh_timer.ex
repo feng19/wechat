@@ -41,6 +41,8 @@ defmodule WeChat.RefreshTimer do
   config :wechat, WeChat.RefreshTimer, wait_for_signal: true
   ```
 
+  当所有的 `Storage` 都已经完成，可以即可通过 `WeChat.RefreshTimer.start_monitor/0` 方法刷新 `token`
+
   不配置默认为立即启动刷新
   """
   use GenServer
@@ -246,7 +248,7 @@ defmodule WeChat.RefreshTimer do
         storage.store(store_id, store_key, %{"value" => value, "expired_time" => expired_time})
 
       Logger.info(
-        "Store appid: #{store_id}, key: #{store_key} by #{inspect(storage)} => #{inspect(result)}."
+        "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."
       )
     end
   end
@@ -261,15 +263,15 @@ defmodule WeChat.RefreshTimer do
         Cache.put_cache(store_id, store_key, value)
 
         Logger.info(
-          "Get appid: #{store_id}, key: #{store_key}, expires_in: #{diff} from storage: #{
-            inspect(storage)
-          } succeed."
+          "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{
+            diff
+          } ."
         )
 
         {true, diff}
       else
         Logger.info(
-          "Get appid: #{store_id}, key: #{store_key}] from storage: #{inspect(storage)} token expired."
+          "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, but the token expired."
         )
 
         false
@@ -280,7 +282,7 @@ defmodule WeChat.RefreshTimer do
 
       error ->
         Logger.warn(
-          "Get appid: #{store_id}, key: #{store_key} from storage: #{inspect(client.storage())} error: #{
+          "Call #{inspect(client.storage())}.restore(#{store_id}, #{store_key}) failed, return error: #{
             inspect(error)
           }."
         )
@@ -362,7 +364,7 @@ defmodule WeChat.RefreshTimer do
   defp get_store_id_by_id_type(:component_appid, client), do: client.component_appid()
   defp get_store_id_by_id_type(store_id, _client) when is_binary(store_id), do: store_id
 
-  defp refresh_token(store_id, store_key, fun, client, opts) do
+  defp refresh_token(store_id, store_key, fun, client, options) do
     case fun.(client) do
       {:ok, list, expires_in} when is_list(list) ->
         now = Utils.now_unix()
@@ -373,11 +375,11 @@ defmodule WeChat.RefreshTimer do
         end)
 
         Logger.info(
-          "Refresh appid: #{store_id}, key: #{store_key}, expires_in: #{expires_in} succeed."
+          "Refresh appid: #{store_id}, key: #{store_key} succeed, get expires_in: #{expires_in}."
         )
 
-        ((expires_in - opts.refresh_before_expired) * 1000)
-        |> max(0)
+        ((expires_in - options.refresh_before_expired) * 1000)
+        |> max(options.refresh_retry_interval)
         |> start_refresh_token_timer(store_id, store_key, client)
 
       {:ok, token, expires_in} ->
@@ -385,23 +387,28 @@ defmodule WeChat.RefreshTimer do
         cache_and_store(store_id, store_key, token, expired_time, client)
 
         Logger.info(
-          "Refresh appid: #{store_id}, key: #{store_key}, expires_in: #{expires_in} succeed."
+          "Refresh appid: #{store_id}, key: #{store_key} succeed, get expires_in: #{expires_in}."
         )
 
-        ((expires_in - opts.refresh_before_expired) * 1000)
-        |> max(0)
+        ((expires_in - options.refresh_before_expired) * 1000)
+        |> max(options.refresh_retry_interval)
         |> start_refresh_token_timer(store_id, store_key, client)
 
       error ->
+        refresh_retry_interval = options.refresh_retry_interval
+
         Logger.warn(
-          "Refresh appid: #{store_id}, key: #{store_key} error: #{inspect(error)}, Will be retry again one minute later."
+          "Refresh appid: #{store_id}, key: #{store_key} failed, return error: #{inspect(error)}, Will be retry again #{
+            refresh_retry_interval
+          }s later."
         )
 
-        start_refresh_token_timer(opts.refresh_retry_interval, store_id, store_key, client)
+        start_refresh_token_timer(refresh_retry_interval, store_id, store_key, client)
     end
   end
 
   defp start_refresh_token_timer(time, store_id, store_key, client) do
+    Logger.info("Start Refresh Timer for appid: #{store_id}, key: #{store_key}, time: #{time}s.")
     info = %{store_id: store_id, store_key: store_key, client: client}
     :erlang.start_timer(time, self(), {:refresh_token, info})
   end
