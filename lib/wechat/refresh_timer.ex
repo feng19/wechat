@@ -300,9 +300,9 @@ defmodule WeChat.RefreshTimer do
 
     default_refresh_before_expired =
       if match?(:hub, client.server_role()) do
-        @refresh_before_expired
-      else
         2 * @refresh_before_expired
+      else
+        @refresh_before_expired
       end
 
     options =
