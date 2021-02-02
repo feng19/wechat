@@ -156,25 +156,26 @@ defmodule WeChat do
   @type requester :: module()
   @type response :: Tesla.Env.result()
 
-  @doc """
-  根据 `appid` 获取 `client`
-  """
-  @spec get_client_by_appid(appid) :: nil | client
-  defdelegate get_client_by_appid(appid), to: WeChat.Storage.Cache, as: :search_client
-
   defmacro __using__(options \\ []) do
     quote do
       use WeChat.ClientBuilder, unquote(options)
     end
   end
 
-  @spec build_client(module, options) :: {:ok, module}
-  def build_client(module_name, options) do
+  @doc """
+  根据 `appid` 获取 `client`
+  """
+  @spec get_client_by_appid(appid) :: nil | client
+  defdelegate get_client_by_appid(appid), to: WeChat.Storage.Cache, as: :search_client
+
+  @doc "动态构建 client"
+  @spec build_client(client, options) :: {:ok, client}
+  def build_client(client, options) do
     with {:module, module, _binary, _term} <-
            Module.create(
-             module_name,
+             client,
              quote do
-               @moduledoc "#{unquote(module_name)}"
+               @moduledoc false
                use WeChat.ClientBuilder, unquote(options)
              end,
              Macro.Env.location(__ENV__)

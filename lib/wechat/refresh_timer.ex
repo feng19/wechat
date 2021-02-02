@@ -67,7 +67,8 @@ defmodule WeChat.RefreshTimer do
 
   option
   - `:refresh_before_expired`: 在 `token` 过去前多少秒刷新，单位：秒，可选，
-  `server_role=hub` 时, 默认值：`2 * #{@refresh_before_expired}` 秒；
+  为保证 `hub` & `hub_client` 刷新正常，请保持两者的时间一致；
+  `server_role=hub_client` 时, 默认值：`#{@refresh_before_expired} + 30` 秒；
   其余角色默认值：`#{@refresh_before_expired}` 秒
   - `:refresh_retry_interval`: 刷新 `token` 失败的重试间隔，单位：秒，可选，默认值：`#{@refresh_retry_interval * 1000}` 秒
   - `:refresh_options`: 刷新 `token` 配置，可选，默认值：`WeChat.RefreshHelper.get_refresh_options_by_client/1` 的输出结果
@@ -299,8 +300,8 @@ defmodule WeChat.RefreshTimer do
     )
 
     default_refresh_before_expired =
-      if match?(:hub, client.server_role()) do
-        2 * @refresh_before_expired
+      if match?(:hub_client, client.server_role()) do
+        @refresh_before_expired + 30
       else
         @refresh_before_expired
       end
