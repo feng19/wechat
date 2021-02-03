@@ -41,7 +41,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[toUser]]></ToUserName>
     <FromUserName><![CDATA[fromUser]]></FromUserName>
     <CreateTime>12345678</CreateTime>
-    <MsgType><![CDATA[text]]></MsgType>
+    <MsgType>text></MsgType>
     <Content><![CDATA[你好]]></Content>
   </xml>
   ```
@@ -67,7 +67,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[toUser]]></ToUserName>
     <FromUserName><![CDATA[fromUser]]></FromUserName>
     <CreateTime>12345678</CreateTime>
-    <MsgType><![CDATA[image]]></MsgType>
+    <MsgType>image</MsgType>
     <Image>
       <MediaId><![CDATA[media_id]]></MediaId>
     </Image>
@@ -97,7 +97,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[toUser]]></ToUserName>
     <FromUserName><![CDATA[fromUser]]></FromUserName>
     <CreateTime>12345678</CreateTime>
-    <MsgType><![CDATA[voice]]></MsgType>
+    <MsgType>voice</MsgType>
     <Voice>
       <MediaId><![CDATA[media_id]]></MediaId>
     </Voice>
@@ -127,7 +127,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[toUser]]></ToUserName>
     <FromUserName><![CDATA[fromUser]]></FromUserName>
     <CreateTime>12345678</CreateTime>
-    <MsgType><![CDATA[video]]></MsgType>
+    <MsgType>video</MsgType>
     <Video>
       <MediaId><![CDATA[media_id]]></MediaId>
       <Title><![CDATA[title]]></Title>
@@ -161,7 +161,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[toUser]]></ToUserName>
     <FromUserName><![CDATA[fromUser]]></FromUserName>
     <CreateTime>12345678</CreateTime>
-    <MsgType><![CDATA[music]]></MsgType>
+    <MsgType>music</MsgType>
     <Music>
       <Title><![CDATA[title]]></Title>
       <Description><![CDATA[description]]></Description>
@@ -208,7 +208,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[toUser]]></ToUserName>
     <FromUserName><![CDATA[fromUser]]></FromUserName>
     <CreateTime>12345678</CreateTime>
-    <MsgType><![CDATA[news]]></MsgType>
+    <MsgType>news</MsgType>
     <ArticleCount>1</ArticleCount>
     <Articles>
       <item>
@@ -252,7 +252,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[touser]]></ToUserName>
     <FromUserName><![CDATA[fromuser]]></FromUserName>
     <CreateTime>1399197672</CreateTime>
-    <MsgType><![CDATA[transfer_customer_service]]></MsgType>
+    <MsgType>transfer_customer_service</MsgType>
   </xml>
   ```
   """
@@ -276,7 +276,7 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <ToUserName><![CDATA[touser]]></ToUserName>
     <FromUserName><![CDATA[fromuser]]></FromUserName>
     <CreateTime>1399197672</CreateTime>
-    <MsgType><![CDATA[transfer_customer_service]]></MsgType>
+    <MsgType>transfer_customer_service</MsgType>
     <TransInfo>
       <KfAccount><![CDATA[test1@test]]></KfAccount>
     </TransInfo>

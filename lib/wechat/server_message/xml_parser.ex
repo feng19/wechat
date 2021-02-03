@@ -57,11 +57,7 @@ defmodule WeChat.ServerMessage.XmlParser do
 
       {name, content} ->
         with [{"item", _}] <- Enum.uniq_by(content, &elem(&1, 0)) do
-          content =
-            content
-            |> Stream.map(&elem(&1, 1))
-            |> Enum.map(&stack_to_map/1)
-
+          content = Enum.map(content, &(&1 |> elem(1) |> stack_to_map()))
           {name, content}
         else
           _ ->

@@ -1,7 +1,7 @@
 defmodule WeChatTest do
   use ExUnit.Case
   alias WeChat.Utils
-  alias WeChat.ServerMessage.{EventHandler, XmlMessage}
+  alias WeChat.ServerMessage.{EventHandler, XmlMessage, XmlParser}
   doctest WeChat
 
   test "Auto generate functions" do
@@ -68,6 +68,27 @@ defmodule WeChatTest do
     assert apply(WxApp5, :appid, []) == "wx2c2769f8efd9abc2"
     assert false == function_exported?(WxApp5.WebPage, :code2access_token, 1)
     assert function_exported?(WxApp5.MiniProgram.Auth, :code2session, 1)
+  end
+
+  test "xml_parse" do
+    timestamp = Utils.now_unix()
+
+    {:ok, map} =
+      XmlMessage.reply_text(
+        "oia2TjjewbmiOUlr6X-1crbLOvLw",
+        "gh_7f083739789a",
+        timestamp,
+        "hello world"
+      )
+      |> XmlParser.parse()
+
+    assert map == %{
+             "Content" => "hello world",
+             "CreateTime" => to_string(timestamp),
+             "FromUserName" => "gh_7f083739789a",
+             "MsgType" => "text",
+             "ToUserName" => "oia2TjjewbmiOUlr6X-1crbLOvLw"
+           }
   end
 
   test "Encrypt Msg" do
