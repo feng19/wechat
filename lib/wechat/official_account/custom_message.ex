@@ -2,6 +2,7 @@ defmodule WeChat.CustomMessage do
   @moduledoc """
   消息管理 - 客服消息
 
+  同时支持 公众号 & 小程序
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html){:target="_blank"}
   """
   import Jason.Helpers

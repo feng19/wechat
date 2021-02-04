@@ -20,6 +20,10 @@ defmodule WeChat.ClientBuilder do
     storage: WeChat.Storage.File,
     requester: WeChat.Requester
   ]
+  @both_modules [
+    WeChat.CustomMessage,
+    WeChat.SubscribeMessage
+  ]
   @official_account_modules [
     WeChat.Menu,
     WeChat.Material,
@@ -27,7 +31,6 @@ defmodule WeChat.ClientBuilder do
     WeChat.CardManaging,
     WeChat.CardDistributing,
     WeChat.CustomService,
-    WeChat.CustomMessage,
     WeChat.BatchSends,
     WeChat.Template,
     WeChat.User,
@@ -41,7 +44,6 @@ defmodule WeChat.ClientBuilder do
     MiniProgram.Auth,
     MiniProgram.Code,
     MiniProgram.UrlScheme,
-    MiniProgram.SubscribeMessage,
     MiniProgram.NearbyPOI
   ]
 
@@ -53,10 +55,10 @@ defmodule WeChat.ClientBuilder do
     sub_modules =
       case app_type do
         :official_account ->
-          @official_account_modules
+          @official_account_modules ++ @both_modules
 
         :mini_program ->
-          @mini_program_modules
+          @mini_program_modules ++ @both_modules
 
         _ ->
           raise ArgumentError, "please set app_type in [:official_account, :mini_program]"

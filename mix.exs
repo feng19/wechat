@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{ServerMessage, MiniProgram, Storage}
 
-  @version "0.2.2"
+  @version "0.3.0"
 
   def project do
     [
@@ -79,6 +79,8 @@ defmodule WeChat.MixProject do
           WeChat.CustomMessage,
           # 消息管理 - 客服帐号管理
           WeChat.CustomService,
+          # 订阅信息
+          WeChat.SubscribeMessage,
           # 消息管理 - 模板消息
           WeChat.Template,
           # 消息管理 - 群发接口和原创效验
@@ -126,7 +128,6 @@ defmodule WeChat.MixProject do
          MiniProgram.Auth,
          MiniProgram.Code,
          MiniProgram.UrlScheme,
-         MiniProgram.SubscribeMessage,
          MiniProgram.NearbyPOI
        ]}
     ]

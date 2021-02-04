@@ -14,7 +14,7 @@ defmodule WeChat.MiniProgram.Code do
   """
   @type scene :: String.t()
   @typedoc """
-  扫码进入的小程序页面路径
+  小程序页面路径
 
   最大长度 `128` 字节，不能为空；对于小游戏，可以只传入 `query` 部分，来实现传参效果，如：传入 `?foo=bar`，
   即可在 `wx.getLaunchOptionsSync` 接口中的 `query` 参数获取到 `{foo:"bar"}`。

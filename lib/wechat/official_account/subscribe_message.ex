@@ -1,6 +1,8 @@
-defmodule WeChat.MiniProgram.SubscribeMessage do
+defmodule WeChat.SubscribeMessage do
   @moduledoc """
   订阅信息
+
+  同时支持 公众号 & 小程序
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
@@ -13,7 +15,7 @@ defmodule WeChat.MiniProgram.SubscribeMessage do
   @typedoc """
   模板标题 id
 
-  可通过接口获取，也可登录小程序后台查看获取
+  可通过接口获取，也可登录 公众号/小程序 后台查看获取
   """
   @type tid :: String.t()
   @typedoc """
@@ -40,7 +42,7 @@ defmodule WeChat.MiniProgram.SubscribeMessage do
 
   默认为: 正式版
   """
-  @type miniprogram_state :: String.t() | :developer | :trial | :formal
+  @type mini_program_state :: String.t() | :developer | :trial | :formal
   @typedoc """
   进入小程序查看”的语言类型
 
@@ -54,10 +56,30 @@ defmodule WeChat.MiniProgram.SubscribeMessage do
   默认为: `zh_CN`
   """
   @type lang :: String.t()
-  @type send_options :: %{
-          :page => Code.path(),
-          :miniprogram_state => miniprogram_state,
-          :lang => lang
+  @typedoc "跳转网页时填写"
+  @type jump_page_url :: String.t()
+  @type send_options :: official_account_send_options | mini_program_send_options
+  @type jump_mini_program_object :: %{
+          appid: WeChat.appid(),
+          pagepath: Code.path()
+        }
+  @typedoc """
+  公众号 发送配置
+
+  - `page` 和 `miniprogram` 同时不填，无跳转；
+  - `page` 和 `miniprogram` 同时填写，优先跳转小程序；
+  """
+  @type official_account_send_options :: %{
+          optional(:page) => jump_page_url,
+          optional(:miniprogram) => jump_mini_program_object
+        }
+  @typedoc """
+  小程序 发送配置
+  """
+  @type mini_program_send_options :: %{
+          optional(:page) => Code.path(),
+          optional(:miniprogram_state) => mini_program_state,
+          optional(:lang) => lang
         }
 
   @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/subscribe-message/"
