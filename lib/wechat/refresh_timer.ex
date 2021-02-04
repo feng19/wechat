@@ -266,7 +266,7 @@ defmodule WeChat.RefreshTimer do
         Logger.info(
           "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{
             diff
-          } ."
+          }s."
         )
 
         {true, diff}
@@ -376,7 +376,7 @@ defmodule WeChat.RefreshTimer do
         end)
 
         Logger.info(
-          "Refresh appid: #{store_id}, key: #{store_key} succeed, get expires_in: #{expires_in}."
+          "Refresh appid: #{store_id}, key: #{store_key} succeed, get expires_in: #{expires_in}s."
         )
 
         ((expires_in - options.refresh_before_expired) * 1000)
@@ -388,7 +388,7 @@ defmodule WeChat.RefreshTimer do
         cache_and_store(store_id, store_key, token, expired_time, client)
 
         Logger.info(
-          "Refresh appid: #{store_id}, key: #{store_key} succeed, get expires_in: #{expires_in}."
+          "Refresh appid: #{store_id}, key: #{store_key} succeed, get expires_in: #{expires_in}s."
         )
 
         ((expires_in - options.refresh_before_expired) * 1000)
