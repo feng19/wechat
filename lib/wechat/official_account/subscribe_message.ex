@@ -2,7 +2,10 @@ defmodule WeChat.SubscribeMessage do
   @moduledoc """
   订阅信息
 
-  同时支持 公众号 & 小程序
+  同时支持
+
+  - [公众号](#{WeChat.Utils.doc_link_prefix()}/doc/offiaccount/Subscription_Messages/intro.html)
+  - [小程序](#{WeChat.Utils.doc_link_prefix()}/miniprogram/dev/framework/open-ability/subscribe-message.html)
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
@@ -82,7 +85,7 @@ defmodule WeChat.SubscribeMessage do
           optional(:lang) => lang
         }
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/subscribe-message/"
+  @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/subscribe-message"
 
   @doc """
   组合模板并添加至帐号下的个人模板库 -
@@ -161,8 +164,10 @@ defmodule WeChat.SubscribeMessage do
   end
 
   @doc """
-  发送订阅消息 -
-  [官方文档](#{@doc_link}/subscribeMessage.send.html){:target="_blank"}
+  发送订阅消息
+
+  - [公众号](#{doc_link_prefix()}/doc/offiaccount/Subscription_Messages/api.html#send发送订阅通知){:target="_blank"}
+  - [小程序](#{@doc_link}/subscribeMessage.send.html){:target="_blank"}
   """
   @spec send(WeChat.client(), WeChat.openid(), template_id, send_data, send_options) ::
           WeChat.response()
