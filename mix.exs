@@ -134,7 +134,10 @@ defmodule WeChat.MixProject do
        [
          Work,
          Work.Agent,
-         Work.Message
+         Work.Message,
+         Work.Department,
+         Work.User,
+         Work.Tag
        ]}
     ]
   end

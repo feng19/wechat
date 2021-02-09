@@ -11,7 +11,7 @@ defmodule WeChat.Work.Agent do
 
   在管理后台->“应用与小程序”->“应用”，点进某个应用，即可看到 agentid
   """
-  @type agent_id :: integer | String.t()
+  @type agent_id :: integer | atom
   @type agent_name :: atom | agent_id
   @typedoc """
   secret 是企业应用里面用于保障数据安全的“钥匙” -

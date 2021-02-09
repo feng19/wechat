@@ -12,13 +12,12 @@ defmodule WeChat.Work do
   alias WeChat.Work
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
-  @term_introduction_doc_link "#{work_doc_link_prefix()}/90000/90135/90665"
 
   @type client :: module()
 
   @typedoc """
   每个企业都拥有唯一的 corpid -
-  [官方文档](#{@term_introduction_doc_link}#corpid)
+  [官方文档](#{@doc_link}/90665#corpid)
 
   获取此信息可在管理后台“我的企业”－“企业信息”下查看“企业ID”（需要有管理员权限）
 
@@ -26,32 +25,8 @@ defmodule WeChat.Work do
   @type corp_id :: String.t()
 
   @typedoc """
-  每个成员都有唯一的 userid -
-  [官方文档](#{@term_introduction_doc_link}#userid)
-
-  即所谓“帐号”。在管理后台->“通讯录”->点进某个成员的详情页，可以看到。
-  """
-  @type user_id :: String.t()
-
-  @typedoc """
-  每个部门都有唯一的id -
-  [官方文档](#{@term_introduction_doc_link}#部门id)
-
-  在管理后台->“通讯录”->“组织架构”->点击某个部门右边的小圆点可以看到
-  """
-  @type department_id :: integer
-
-  @typedoc """
-  每个标签都有唯一的标签id -
-  [官方文档](#{@term_introduction_doc_link}#tagid)
-
-  在管理后台->“通讯录”->“标签”，选中某个标签，在右上角会有“标签详情”按钮，点击即可看到
-  """
-  @type tag_id :: integer
-
-  @typedoc """
   每个应用都有唯一的 agentid -
-  [官方文档](#{@term_introduction_doc_link}#agentid)
+  [官方文档](#{@doc_link}/90665#agentid)
 
   在管理后台->“应用与小程序”->“应用”，点进某个应用，即可看到 agentid
   """
@@ -62,7 +37,7 @@ defmodule WeChat.Work do
 
   @typedoc """
   secret 是企业应用里面用于保障数据安全的“钥匙” -
-  [官方文档](#{@term_introduction_doc_link}#secret)
+  [官方文档](#{@doc_link}/90665#secret)
 
   每一个应用都有一个独立的访问密钥，为了保证数据的安全，secret务必不能泄漏。
   目前 `secret` 有：
@@ -106,7 +81,7 @@ defmodule WeChat.Work do
 
   @typedoc """
   access_token 是企业后台去企业微信的后台获取信息时的重要票据 -
-  [官方文档](#{@term_introduction_doc_link}#access_token)
+  [官方文档](#{@doc_link}/90665#access_token)
 
   由 `corpid` 和 `secret` 产生。所有接口在通信时都需要携带此信息用于验证接口的访问权限
   """
