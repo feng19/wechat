@@ -36,3 +36,9 @@ defmodule WxApp do
     token: "spamtest",
     gen_sub_module?: false
 end
+
+defmodule WxWork do
+  use WeChat.Work,
+    corp_id: "corp_id",
+    agents: [%WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}]
+end

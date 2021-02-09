@@ -15,7 +15,7 @@ defmodule WeChat.RefreshHelper do
           {store_id_type | WeChat.Storage.Adapter.store_id(), key_name, refresh_fun}
   @type refresh_options :: [refresh_option]
 
-  alias WeChat.{Account, WebPage, Component, MiniProgram, Utils}
+  alias WeChat.{Account, WebPage, Component, MiniProgram, Work, Utils}
 
   @doc """
   根据不同的 `client` 的 `app_type` & `by_component?` 输出不同的 `refresh_options`
@@ -30,10 +30,6 @@ defmodule WeChat.RefreshHelper do
     if client.by_component?() do
       component_refresh_options(client)
     else
-      unless function_exported?(client, :appsecret, 0) do
-        raise RuntimeError, "Please set :appsecret when defining #{inspect(client)}."
-      end
-
       if match?(:hub_client, client.server_role()) and match?(nil, client.storage()) do
         raise RuntimeError,
               "Not accept storage: nil when server_role: :hub_client, please set a module for :storage when defining #{
@@ -42,9 +38,23 @@ defmodule WeChat.RefreshHelper do
       end
 
       case client.app_type() do
-        :official_account -> official_account_refresh_options(client)
-        :mini_program -> mini_program_refresh_options(client)
+        :official_account ->
+          check_secret(client)
+          official_account_refresh_options(client)
+
+        :mini_program ->
+          check_secret(client)
+          mini_program_refresh_options(client)
+
+        :work ->
+          work_refresh_options(client)
       end
+    end
+  end
+
+  defp check_secret(client) do
+    unless function_exported?(client, :appsecret, 0) do
+      raise RuntimeError, "Please set :appsecret when defining #{inspect(client)}."
     end
   end
 
@@ -95,6 +105,14 @@ defmodule WeChat.RefreshHelper do
            &__MODULE__.refresh_component_access_token/1},
           {appid, :access_token, &__MODULE__.refresh_authorizer_access_token/1}
         ]
+
+        # TODO
+        # :work ->
+        #   [
+        #     {component_appid, :component_access_token,
+        #      &__MODULE__.refresh_component_access_token/1},
+        #     {appid, :access_token, &__MODULE__.refresh_authorizer_access_token/1}
+        #   ]
     end
   end
 
@@ -104,11 +122,30 @@ defmodule WeChat.RefreshHelper do
   刷新如下`token`：
   - `access_token`
   """
-  @spec mini_program_refresh_options(WeChat.client()) :: refresh_options
+  @spec mini_program_refresh_options(Work.client()) :: refresh_options
   def mini_program_refresh_options(client),
     do: [
       {client.appid(), :access_token, &__MODULE__.refresh_mini_program_access_token/1}
     ]
+
+  @doc """
+  输出[企业微信]的 `refresh_options`
+
+  刷新如下`token`：
+  - `access_token`
+  """
+  @spec work_refresh_options(WeChat.client()) :: refresh_options
+  def work_refresh_options(client) do
+    Enum.map(client.agents, fn %{id: agent_id, secret: secret} ->
+      unless secret do
+        raise RuntimeError,
+              "Please set :secret for agent:#{agent_id} when defining #{inspect(client)}."
+      end
+
+      cache_id = client.agent2cache_id(agent_id)
+      {cache_id, :access_token, &__MODULE__.refresh_work_access_token(&1, cache_id)}
+    end)
+  end
 
   @spec refresh_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_access_token(client) do
@@ -164,6 +201,15 @@ defmodule WeChat.RefreshHelper do
   @spec refresh_mini_program_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_mini_program_access_token(client) do
     with :not_hub_client <- get_hub_client_token(client, :access_token),
+         {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
+         %{"access_token" => access_token, "expires_in" => expires_in} <- data do
+      {:ok, access_token, expires_in}
+    end
+  end
+
+  @spec refresh_work_access_token(Work.client(), Cache.cache_id()) :: refresh_fun_result
+  def refresh_work_access_token(client, cache_id) do
+    with :not_hub_client <- get_hub_client_token(client, cache_id, :access_token),
          {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}

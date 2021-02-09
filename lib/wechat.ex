@@ -58,6 +58,7 @@ defmodule WeChat do
 
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.Storage.Cache
 
   @typedoc """
   OpenID 普通用户的标识，对当前公众号唯一
@@ -112,6 +113,8 @@ defmodule WeChat do
   @type err_code :: non_neg_integer
   @typedoc "错误信息"
   @type err_msg :: String.t()
+  @typep app :: String.t()
+  @typep url :: String.t()
 
   @typedoc """
   参数
@@ -158,7 +161,7 @@ defmodule WeChat do
 
   defmacro __using__(options \\ []) do
     quote do
-      use WeChat.ClientBuilder, unquote(options)
+      use WeChat.Builder, unquote(options)
     end
   end
 
@@ -176,11 +179,35 @@ defmodule WeChat do
              client,
              quote do
                @moduledoc false
-               use WeChat.ClientBuilder, unquote(options)
+               use WeChat.Builder, unquote(options)
              end,
              Macro.Env.location(__ENV__)
            ) do
       {:ok, module}
     end
+  end
+
+  # hub_oauth2_url
+
+  @spec set_hub_oauth2_url(client, url) :: true
+  def set_hub_oauth2_url(client, url) when is_binary(url) do
+    Cache.put_cache(client.appid(), :hub_oauth2_url, url)
+  end
+
+  @spec get_hub_oauth2_url(client) :: nil | url
+  def get_hub_oauth2_url(client) do
+    Cache.get_cache(client.appid(), :hub_oauth2_url)
+  end
+
+  # oauth2_app_url
+
+  @spec set_oauth2_app_url(client, app, url) :: true
+  def set_oauth2_app_url(client, app, url) when is_binary(app) and is_binary(url) do
+    Cache.put_cache(client.appid(), {:oauth2_app, app}, url)
+  end
+
+  @spec get_oauth2_app_url(client, app) :: nil | url
+  def get_oauth2_app_url(client, app) do
+    Cache.get_cache(client.appid(), {:oauth2_app, app})
   end
 end

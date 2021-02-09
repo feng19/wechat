@@ -94,7 +94,7 @@ if Code.ensure_loaded?(Plug) do
     end
 
     def hub_client_oauth2(conn, query_params, client) do
-      if hub_oauth2_url = Cache.get_hub_oauth2_url(client) do
+      if hub_oauth2_url = WeChat.get_hub_oauth2_url(client) do
         {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
         {state, query_params} = Map.pop(query_params, "state", "")
         request_url = Path.join([hub_oauth2_url | conn.path_params["path"]])
@@ -124,7 +124,7 @@ if Code.ensure_loaded?(Plug) do
       path_params = conn.path_params
       app = path_params["app"]
 
-      if oauth2_app_url = Cache.get_oauth2_app_url(client, app) do
+      if oauth2_app_url = WeChat.get_oauth2_app_url(client, app) do
         request_url = Path.join([oauth2_app_url | path_params["path"]])
 
         redirect_uri =

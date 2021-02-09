@@ -1,4 +1,4 @@
-defmodule WeChat.ClientBuilder do
+defmodule WeChat.Builder do
   @moduledoc false
   alias WeChat.{Component, MiniProgram}
 
@@ -47,8 +47,8 @@ defmodule WeChat.ClientBuilder do
     MiniProgram.NearbyPOI
   ]
 
-  defmacro __using__(opts \\ []) do
-    opts = Macro.prewalk(opts, &Macro.expand(&1, __CALLER__))
+  defmacro __using__(options \\ []) do
+    opts = Macro.prewalk(options, &Macro.expand(&1, __CALLER__))
     default_opts = Keyword.merge(@default_opts, opts)
     app_type = Keyword.fetch!(default_opts, :app_type)
 
@@ -109,7 +109,6 @@ defmodule WeChat.ClientBuilder do
 
     base =
       quote do
-        def default_opts, do: unquote(default_opts)
         def code_name, do: unquote(code_name)
         def get_access_token, do: WeChat.Storage.Cache.get_cache(unquote(appid), :access_token)
         defdelegate get(url), to: unquote(requester)

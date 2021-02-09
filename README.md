@@ -2,7 +2,9 @@
 
 **WeChat SDK for Elixir**
 
-目前 `Elixir` 中支持最完善的微信SDK。
+- 目前 `Elixir` 中支持最完善的微信SDK
+- 已支持: 公众号/小程序/第三方应用
+- WIP: 企业微信
 
 ## Installation
 
@@ -22,45 +24,56 @@ end
 
 ### 定义 `Client` 模块
 
-#### 公众号(默认):
+#### 公众号(默认)
 
   ```elixir
   defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    appid: "wx-appid",
-    appsecret: "appsecret"
+    @moduledoc "CodeName"
+    use WeChat,
+      appid: "wx-appid",
+      appsecret: "appsecret"
   end
   ```
 
-#### 小程序:
+#### 小程序
 
   ```elixir
   defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    app_type: :mini_program,
-    appid: "wx-appid",
-    appsecret: "appsecret"
+    @moduledoc "CodeName"
+    use WeChat,
+      app_type: :mini_program,
+      appid: "wx-appid",
+      appsecret: "appsecret"
   end
   ```
 
-#### 第三方应用:
+#### 第三方应用
 
   ```elixir
   defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    by_component?: true,
-    app_type: :official_account | :mini_program, # 默认为 :official_account
-    appid: "wx-appid",
-    component_appid: "wx-third-appid", # 第三方 appid
+    @moduledoc "CodeName"
+    use WeChat,
+      by_component?: true,
+      app_type: :official_account | :mini_program, # 默认为 :official_account
+      appid: "wx-appid",
+      component_appid: "wx-third-appid", # 第三方 appid
+  end
+  ```
+
+#### 企业微信
+
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
+    @moduledoc "CodeName"
+    use WeChat.Work,
+      corp_id: "corp_id",
+      agents: [%Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}, ...]
   end
   ```
 
 ### 调用接口
 
-同时支持两种方式调用
+除企业微信的 `client` 外，都同时支持两种方式调用：
 
 ```elixir
 YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)

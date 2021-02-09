@@ -19,7 +19,20 @@ defmodule WeChatTest do
 
     assert WxApp.aes_key() == aes_key
     assert WxApp.token() == "spamtest"
-    assert is_list(WxApp.default_opts()) == true
+    assert true = Enum.all?(1..3, &function_exported?(WxApp, :get, &1))
+    assert true = Enum.all?(2..4, &function_exported?(WxApp, :post, &1))
+  end
+
+  test "Auto generate functions(Work)" do
+    assert WxWork.app_type() == :work
+    assert WxWork.by_component?() == false
+    assert WxWork.server_role() == :client
+    assert WxWork.storage() == WeChat.Storage.File
+    assert WxWork.appid() == "corp_id"
+    assert is_list(WxWork.agents())
+    assert WxWork.agent2cache_id(10000) == "corp_id_10000"
+    assert WxWork.agent2cache_id(:agent_name) == "corp_id_10000"
+
     assert true = Enum.all?(1..3, &function_exported?(WxApp, :get, &1))
     assert true = Enum.all?(2..4, &function_exported?(WxApp, :post, &1))
   end
