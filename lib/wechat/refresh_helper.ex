@@ -143,7 +143,7 @@ defmodule WeChat.RefreshHelper do
       end
 
       cache_id = client.agent2cache_id(agent_id)
-      {cache_id, :access_token, &__MODULE__.refresh_work_access_token(&1, cache_id)}
+      {cache_id, :access_token, &__MODULE__.refresh_work_access_token(&1, cache_id, agent_id)}
     end)
   end
 
@@ -207,10 +207,11 @@ defmodule WeChat.RefreshHelper do
     end
   end
 
-  @spec refresh_work_access_token(Work.client(), Cache.cache_id()) :: refresh_fun_result
-  def refresh_work_access_token(client, cache_id) do
+  @spec refresh_work_access_token(Work.client(), Cache.cache_id(), Work.agent_id()) ::
+          refresh_fun_result
+  def refresh_work_access_token(client, cache_id, agent_id) do
     with :not_hub_client <- get_hub_client_token(client, cache_id, :access_token),
-         {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
+         {:ok, %{status: 200, body: data}} <- Work.get_access_token(client, agent_id),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
     end

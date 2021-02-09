@@ -159,6 +159,7 @@ defmodule WeChat do
   @type requester :: module()
   @type response :: Tesla.Env.result()
 
+  @doc false
   defmacro __using__(options \\ []) do
     quote do
       use WeChat.Builder, unquote(options)
