@@ -30,12 +30,19 @@ if Code.ensure_loaded?(Plug) do
     - 服务器角色为 `hub`：
 
       ```elixir
-      get "/wx/oauth2/:code_name/:app/callback/*path", WeChat.Plug.WebPageOAuth2, :hub_oauth2_callback
+      get "/wx/oauth2/:env/callback/*path", WeChat.Plug.WebPageOAuth2, [client: Client, action: :hub_oauth2_callback]
+      # or
+      get "/wx/oauth2/:code_name/:env/callback/*path", WeChat.Plug.WebPageOAuth2, :hub_oauth2_callback
       ```
 
     - 服务器角色为 `hub_client`：
 
       ```elixir
+      scope "/wx/oauth2", WeChat.Plug do
+        get "/callback/*path", WebPageOAuth2, [client: Client, action: :oauth2_callback]
+        get "/*path", WebPageOAuth2, [client: Client, action: :hub_client_oauth2]
+      end
+      # or
       scope "/wx/oauth2/:code_name", WeChat.Plug do
         get "/callback/*path", WebPageOAuth2, :oauth2_callback
         get "/*path", WebPageOAuth2, :hub_client_oauth2
@@ -44,6 +51,8 @@ if Code.ensure_loaded?(Plug) do
 
     用户在微信进入下面这个链接：
 
+        /wx/oauth2/*path?xx=xx
+        # or
         /wx/oauth2/:code_name/*path?xx=xx
 
     经过 `plug` 之后，会跳转到微信的网页授权：
@@ -52,6 +61,8 @@ if Code.ensure_loaded?(Plug) do
 
     用户完成授权之后，微信会跳转回 `REDIRECT_URI/?code=CODE&state=STATE`，即：
 
+        /wx/oauth2/callback/*path?xx=xx
+        # or
         /wx/oauth2/:code_name/callback/*path?xx=xx
 
     默认的 `oauth2_callback` 函数拿到 `query` 里面的 `code` 换取 `access_token`，
@@ -93,25 +104,7 @@ if Code.ensure_loaded?(Plug) do
       apply(__MODULE__, action, [conn, conn.query_params, client])
     end
 
-    def hub_client_oauth2(conn, query_params, client) do
-      if hub_oauth2_url = WeChat.get_hub_oauth2_url(client) do
-        {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
-        {state, query_params} = Map.pop(query_params, "state", "")
-        request_url = Path.join([hub_oauth2_url | conn.path_params["path"]])
-
-        redirect_uri =
-          case URI.encode_query(query_params) do
-            "" -> request_url
-            qs -> request_url <> "?" <> qs
-          end
-
-        oauth2_authorize_url = WebPage.oauth2_authorize_url(client, redirect_uri, scope, state)
-        redirect(conn, oauth2_authorize_url)
-      else
-        not_found(conn)
-      end
-    end
-
+    @doc doc_group: :action
     def oauth2(conn, query_params, client) do
       {scope, query_params} = Map.pop(query_params, "scope", "snsapi_base")
       {state, query_params} = Map.pop(query_params, "state", "")
@@ -120,49 +113,31 @@ if Code.ensure_loaded?(Plug) do
       redirect(conn, oauth2_authorize_url)
     end
 
-    def hub_oauth2_callback(conn, %{"code" => _} = query_params, client) do
-      path_params = conn.path_params
-      app = path_params["app"]
-
-      if oauth2_app_url = WeChat.get_oauth2_app_url(client, app) do
-        request_url = Path.join([oauth2_app_url | path_params["path"]])
-
-        redirect_uri =
-          case URI.encode_query(query_params) do
-            "" -> request_url
-            qs -> request_url <> "?" <> qs
-          end
-
-        redirect(conn, redirect_uri)
-      else
-        not_found(conn)
-      end
-    end
-
-    def hub_oauth2_callback(conn, _query_params, _client) do
-      not_found(conn)
-    end
-
+    @doc doc_group: :action
     def oauth2_callback(conn, %{"code" => code} = query_params, client) do
+      timestamp = WeChat.Utils.now_unix()
+
       with {:ok, %{status: 200, body: info}} <- WebPage.code2access_token(client, code),
            access_token when access_token != nil <- info["access_token"],
            openid when openid != nil <- info["openid"] do
-        query_string =
+        info = Map.put(info, "timestamp", timestamp)
+        path = Path.join(["/" | conn.path_params["path"]])
+
+        redirect_path =
           query_params
           |> Map.delete("code")
           |> URI.encode_query()
           |> case do
-            "" -> ""
-            qs -> "?" <> qs
+            "" -> path
+            qs -> path <> "?" <> qs
           end
-
-        path = Path.join(["/" | conn.path_params["path"]]) <> query_string
 
         conn
         |> fetch_session()
         |> put_session(:openid, openid)
         |> put_session(:appid, client.appid())
-        |> redirect(path)
+        |> put_session(:access_info, info)
+        |> redirect(redirect_path)
       else
         error ->
           Logger.info("oauth2_callback failed, #{inspect(error)}")
@@ -180,7 +155,31 @@ if Code.ensure_loaded?(Plug) do
       not_found(conn)
     end
 
-    defp not_found(conn) do
+    @doc doc_group: :action
+    def hub_oauth2_callback(conn, %{"code" => _}, client) do
+      path_params = conn.path_params
+
+      if client_oauth2_callback_url = WeChat.get_oauth2_env_url(client, path_params["env"]) do
+        request_url = Path.join([client_oauth2_callback_url | path_params["path"]])
+
+        redirect_uri =
+          case conn.query_string do
+            "" -> request_url
+            qs -> request_url <> "?" <> qs
+          end
+
+        redirect(conn, redirect_uri)
+      else
+        not_found(conn)
+      end
+    end
+
+    def hub_oauth2_callback(conn, _query_params, _client) do
+      not_found(conn)
+    end
+
+    @doc false
+    def not_found(conn) do
       conn
       |> put_resp_content_type("text/plain")
       |> send_resp(404, "not_found")
@@ -197,6 +196,7 @@ if Code.ensure_loaded?(Plug) do
       |> send_resp(302, body)
     end
 
+    # callback_uri => "/wx/oauth2/callback/*path?xx=xx"
     # callback_uri => "/wx/oauth2/:code_name/callback/*path?xx=xx"
     defp get_callback_url(conn) do
       request_url = request_url(%{conn | query_string: ""})

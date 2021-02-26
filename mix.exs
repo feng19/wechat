@@ -46,7 +46,8 @@ defmodule WeChat.MixProject do
       main: "readme",
       formatter_opts: [gfm: true],
       extras: ["README.md", "LICENSE"],
-      groups_for_modules: groups_for_modules()
+      groups_for_modules: groups_for_modules(),
+      groups_for_functions: [Action: &(&1[:doc_group] == :action)]
     ]
   end
 

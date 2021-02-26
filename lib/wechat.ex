@@ -113,7 +113,7 @@ defmodule WeChat do
   @type err_code :: non_neg_integer
   @typedoc "错误信息"
   @type err_msg :: String.t()
-  @typep app :: String.t()
+  @typep env :: String.t()
   @typep url :: String.t()
 
   @typedoc """
@@ -188,27 +188,27 @@ defmodule WeChat do
     end
   end
 
-  # hub_oauth2_url
+  # hub_url
 
-  @spec set_hub_oauth2_url(client, url) :: true
-  def set_hub_oauth2_url(client, url) when is_binary(url) do
-    Cache.put_cache(client.appid(), :hub_oauth2_url, url)
+  @spec set_hub_url(client, url) :: true
+  def set_hub_url(client, url) when is_binary(url) do
+    Cache.put_cache(client.appid(), :hub_url, url)
   end
 
-  @spec get_hub_oauth2_url(client) :: nil | url
-  def get_hub_oauth2_url(client) do
-    Cache.get_cache(client.appid(), :hub_oauth2_url)
+  @spec get_hub_url(client) :: nil | url
+  def get_hub_url(client) do
+    Cache.get_cache(client.appid(), :hub_url)
   end
 
-  # oauth2_app_url
+  # oauth2_env_url
 
-  @spec set_oauth2_app_url(client, app, url) :: true
-  def set_oauth2_app_url(client, app, url) when is_binary(app) and is_binary(url) do
-    Cache.put_cache(client.appid(), {:oauth2_app, app}, url)
+  @spec set_oauth2_env_url(client, env, url) :: true
+  def set_oauth2_env_url(client, env, url) when is_binary(env) and is_binary(url) do
+    Cache.put_cache(client.appid(), {:oauth2_env, env}, url)
   end
 
-  @spec get_oauth2_app_url(client, app) :: nil | url
-  def get_oauth2_app_url(client, app) do
-    Cache.get_cache(client.appid(), {:oauth2_app, app})
+  @spec get_oauth2_env_url(client, env) :: nil | url
+  def get_oauth2_env_url(client, env) do
+    Cache.get_cache(client.appid(), {:oauth2_env, env})
   end
 end
