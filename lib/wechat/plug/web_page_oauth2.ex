@@ -51,9 +51,9 @@ if Code.ensure_loaded?(Plug) do
 
     用户在微信进入下面这个链接：
 
-        /wx/oauth2/*path?xx=xx
+        "/wx/oauth2/*path?xx=xx"
         # or
-        /wx/oauth2/:code_name/*path?xx=xx
+        "/wx/oauth2/:code_name/*path?xx=xx"
 
     经过 `plug` 之后，会跳转到微信的网页授权：
 
@@ -61,15 +61,14 @@ if Code.ensure_loaded?(Plug) do
 
     用户完成授权之后，微信会跳转回 `REDIRECT_URI/?code=CODE&state=STATE`，即：
 
-        /wx/oauth2/callback/*path?xx=xx
+        "/wx/oauth2/callback/*path?xx=xx"
         # or
-        /wx/oauth2/:code_name/callback/*path?xx=xx
+        "/wx/oauth2/:code_name/callback/*path?xx=xx"
 
     默认的 `oauth2_callback` 函数拿到 `query` 里面的 `code` 换取 `access_token`，
     成功之后将 `openid` 和 `appid` 写入到 `session`，之后跳转到路径：
 
-        /*path?xx=xx
-
+        "/*path?xx=xx"
     """
     import Plug.Conn
     require Logger
