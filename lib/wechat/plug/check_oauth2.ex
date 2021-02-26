@@ -31,6 +31,7 @@ if Code.ensure_loaded?(Plug) do
     import Plug.Conn
     alias WeChat.Plug.WebPageOAuth2
 
+    @doc false
     def init(options) do
       options =
         case options do
@@ -78,6 +79,7 @@ if Code.ensure_loaded?(Plug) do
       [appid: client.appid(), redirect_fun: redirect_fun]
     end
 
+    @doc false
     def call(conn, appid: appid, redirect_fun: redirect_fun) do
       with openid when openid != nil <- get_session(conn, "openid"),
            ^appid <- get_session(conn, "appid") do

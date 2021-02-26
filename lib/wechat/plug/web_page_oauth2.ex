@@ -75,6 +75,7 @@ if Code.ensure_loaded?(Plug) do
     require Logger
     alias WeChat.{WebPage, Storage.Cache}
 
+    @doc false
     def init(action) when is_atom(action), do: action
 
     def init(options) do
@@ -92,6 +93,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
+    @doc false
     def call(%{path_params: %{"code_name" => code_name}} = conn, action) when is_atom(action) do
       if client = Cache.search_client_by_name(code_name) do
         apply(__MODULE__, action, [conn, conn.query_params, client])
@@ -151,12 +153,12 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    def oauth2_callback(conn, _options) do
+    def oauth2_callback(conn, _, _options) do
       not_found(conn)
     end
 
     @doc doc_group: :action
-    def hub_oauth2_callback(conn, %{"code" => _}, client) do
+    def hub_oauth2_callback(conn, %{"code" => _} = _query_params, client) do
       path_params = conn.path_params
 
       if client_oauth2_callback_url = WeChat.get_oauth2_env_url(client, path_params["env"]) do

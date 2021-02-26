@@ -32,6 +32,7 @@ if Code.ensure_loaded?(Plug) do
     import Plug.Conn
     alias WeChat.ServerMessage
 
+    @doc false
     def init(opts) do
       opts = Map.new(opts)
 
@@ -42,6 +43,7 @@ if Code.ensure_loaded?(Plug) do
       opts
     end
 
+    @doc false
     def call(%{method: "GET", query_params: query_params} = conn, %{client: client}) do
       {status, resp} = ServerMessage.EventHandler.handle_get(query_params, client)
       send_resp(conn, status, resp)
