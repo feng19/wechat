@@ -47,7 +47,7 @@ if Code.ensure_loaded?(Plug) do
       oauth2_callback_path =
         if Map.get(options, :need_code_name, false) do
           options
-          |> Map.get_lazy(:oauth2_callback_path, "/wx/oauth2/callback")
+          |> Map.get(:oauth2_callback_path, "/wx/oauth2/callback")
           |> String.trim_trailing("/callback")
           |> Path.join("/" <> client.code_name() <> "/callback")
         else
