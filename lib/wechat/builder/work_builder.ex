@@ -24,9 +24,9 @@ defmodule WeChat.WorkBuilder do
           raise ArgumentError, "please set at least one Work.Agent for :agents option"
 
         agents when is_list(agents) ->
+          agents = Code.eval_quoted(agents, [], __CALLER__) |> elem(0)
+
           agents
-          |> Code.eval_quoted()
-          |> elem(0)
           |> Enum.all?(&is_struct(&1, WeChat.Work.Agent))
           |> unless do
             raise ArgumentError, "please set Work.Agent struct for :agents option"
@@ -50,7 +50,7 @@ defmodule WeChat.WorkBuilder do
         def storage, do: unquote(storage)
         def server_role, do: unquote(server_role)
         def by_component?, do: unquote(by_component?)
-        def agents, do: unquote(agents)
+        def agents, do: unquote(Macro.escape(agents))
 
         def get_access_token(agent) do
           agent
@@ -68,8 +68,6 @@ defmodule WeChat.WorkBuilder do
 
     {agent2cache_id_funs, agent_secret_funs} =
       agents
-      |> Code.eval_quoted()
-      |> elem(0)
       |> Enum.map(fn agent ->
         name = agent.name
         id = agent.id

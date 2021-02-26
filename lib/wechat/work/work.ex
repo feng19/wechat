@@ -5,7 +5,11 @@ defmodule WeChat.Work do
   ```elixir
   use WeChat.Work,
     corp_id: "corp_id",
-    agents: [%WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}, ...]
+    agents: [
+      contacts_agent(secret: "your_contacts_secret"),
+      %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"},
+      ...
+    ]
   ```
   """
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
@@ -90,6 +94,7 @@ defmodule WeChat.Work do
   @doc false
   defmacro __using__(options \\ []) do
     quote do
+      import WeChat.Work.Agent
       use WeChat.WorkBuilder, unquote(options)
     end
   end

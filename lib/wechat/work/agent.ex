@@ -42,4 +42,11 @@ defmodule WeChat.Work.Agent do
 
   @enforce_keys [:id]
   defstruct [:name, :id, :secret, :encoding_aes_key, :token]
+
+  @doc """
+  通讯录应用
+  """
+  def contacts_agent(options \\ []) do
+    struct(%__MODULE__{id: :contacts, name: "address book"}, options)
+  end
 end

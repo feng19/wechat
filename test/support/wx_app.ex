@@ -40,5 +40,8 @@ end
 defmodule WxWork do
   use WeChat.Work,
     corp_id: "corp_id",
-    agents: [%WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}]
+    agents: [
+      contacts_agent(secret: "your_contacts_secret"),
+      %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}
+    ]
 end

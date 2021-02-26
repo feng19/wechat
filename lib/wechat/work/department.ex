@@ -1,5 +1,5 @@
 defmodule WeChat.Work.Department do
-  @moduledoc "部门管理"
+  @moduledoc "通讯录管理-部门管理"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
@@ -21,14 +21,17 @@ defmodule WeChat.Work.Department do
   获取指定部门及其下的子部门（以及及子部门的子部门等等，递归）。
   如果不填 `department_id`，默认获取全量组织架构
   """
-  @spec list(Work.client(), Work.agent(), department_id) :: WeChat.response()
-  def list(client, agent) do
-    client.get("/cgi-bin/department/list", query: [access_token: client.get_access_token(agent)])
+  @spec list(Work.client()) :: WeChat.response()
+  def list(client) do
+    client.get("/cgi-bin/department/list",
+      query: [access_token: client.get_access_token(:contacts)]
+    )
   end
 
-  def list(client, agent, department_id) do
+  @spec list(Work.client(), department_id) :: WeChat.response()
+  def list(client, department_id) do
     client.get("/cgi-bin/department/list",
-      query: [id: department_id, access_token: client.get_access_token(agent)]
+      query: [id: department_id, access_token: client.get_access_token(:contacts)]
     )
   end
 end
