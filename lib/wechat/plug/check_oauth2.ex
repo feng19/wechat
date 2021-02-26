@@ -43,6 +43,7 @@ if Code.ensure_loaded?(Plug) do
         end
 
       client = options.client
+      server_role = client.server_role()
 
       oauth2_callback_path =
         if Map.get(options, :need_code_name, false) do
@@ -54,27 +55,29 @@ if Code.ensure_loaded?(Plug) do
           Map.get(options, :oauth2_callback_path, "/wx/oauth2/callback")
         end
 
+      oauth2_callback_path =
+        if server_role == :hub_client do
+          case Map.get(options, :env) do
+            nil ->
+              oauth2_callback_path
+
+            env when is_binary(env) or is_atom(env) ->
+              oauth2_callback_path
+              |> String.trim_trailing("/callback")
+              |> Path.join("/" <> to_string(env) <> "/callback")
+          end
+        else
+          oauth2_callback_path
+        end
+
       scope = Map.get(options, :scope, "snsapi_base")
       state = Map.get(options, :state, "")
 
       redirect_fun =
-        case client.server_role() do
-          :hub_client ->
-            case Map.get(options, :env) do
-              nil ->
-                oauth2_callback_path
-
-              env when is_binary(env) or is_atom(env) ->
-                oauth2_callback_path
-                |> String.trim_trailing("/callback")
-                |> Path.join("/" <> to_string(env) <> "/callback")
-            end
-
-            &__MODULE__.hub_client_oauth2/5
-
+        case server_role do
+          :hub_client -> &__MODULE__.hub_client_oauth2/5
           # [:client, :hub]
-          _ ->
-            &__MODULE__.client_oauth2/5
+          _ -> &__MODULE__.client_oauth2/5
         end
 
       %{
