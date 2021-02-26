@@ -5,8 +5,6 @@ if Code.ensure_loaded?(Plug) do
 
     ## Usage
 
-    ### 服务器角色为 `client`：
-
         plug WeChat.Plug.CheckOauth2, client: Client
 
     可选参数:
@@ -14,23 +12,21 @@ if Code.ensure_loaded?(Plug) do
     - `:oauth2_callback_path`: 默认值为 `"/wx/oauth2/callback"`
     - `:need_code_name`: 默认值为 `false`, `oauth2_callback_path` 是多个应用的话，请设置为 `true`,
     如上面的配置 `:oauth2_callback_path` 已经包含 `code_name`, `:need_code_name` 请不要设置为 `true`
+    - `:env`: `Client` 的 `server_role=hub_client` 时，可以配置此 `env`
     - `:scope`: `"snsapi_base"` | `"snsapi_userinfo"`， 默认值为 `"snsapi_base"`
     - `:state`: 默认值为 `""`
 
+    ** 注意 **: 服务器角色为 `hub_client` 时，请确保已经配置 `hub_url`:
+
+        WeChat.set_hub_url(Client, "https://wx.example.com")
+
     检测到未授权将会跳转到下面这个链接:
 
-        /wx/oauth2/callback/*path?xx=xx
+        "/wx/oauth2/callback/*path?xx=xx"
         # or
-        /wx/oauth2/:code_name/callback/*path?xx=xx
-
-    ### 服务器角色为 `hub_client`:
-
-        plug WeChat.Plug.CheckOauth2, client: Client
-
-    检测到未授权将会跳转到下面这个链接:
-
-        HubOauth2Url <> "*path?xx=xx"
-
+        "/wx/oauth2/:code_name/callback/*path?xx=xx"
+        # or
+        HubUrl <> "/wx/oauth2/:code_name/:env/callback/*path?xx=xx"
     """
     import Plug.Conn
     alias WeChat.Plug.WebPageOAuth2
@@ -60,19 +56,26 @@ if Code.ensure_loaded?(Plug) do
       scope = Map.get(options, :scope, "snsapi_base")
       state = Map.get(options, :state, "")
 
-      case client.server_role() do
-        :hub_client ->
-          [
-            appid: client.appid(),
-            redirect_fun: &hub_client_oauth2(&1, client, oauth2_callback_path, scope, state)
-          ]
+      redirect_fun =
+        case client.server_role() do
+          :client ->
+            &client_oauth2(&1, client, oauth2_callback_path, scope, state)
 
-        :client ->
-          [
-            appid: client.appid(),
-            redirect_fun: &client_oauth2(&1, client, oauth2_callback_path, scope, state)
-          ]
-      end
+          :hub_client ->
+            case Map.get(options, :env) do
+              nil ->
+                oauth2_callback_path
+
+              env when is_binary(env) or is_atom(env) ->
+                oauth2_callback_path
+                |> String.trim_trailing("/callback")
+                |> Path.join("/" <> to_string(env) <> "/callback")
+            end
+
+            &hub_client_oauth2(&1, client, oauth2_callback_path, scope, state)
+        end
+
+      [appid: client.appid(), redirect_fun: redirect_fun]
     end
 
     def call(conn, appid: appid, redirect_fun: redirect_fun) do
