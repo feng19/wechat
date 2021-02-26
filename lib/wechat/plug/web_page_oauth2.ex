@@ -13,8 +13,8 @@ if Code.ensure_loaded?(Plug) do
 
       ```elixir
       scope "/wx/oauth2", WeChat.Plug do
-        get "/callback/*path", WebPageOAuth2, [client: Client, action: :oauth2_callback]
-        get "/*path", WebPageOAuth2, [client: Client, action: :oauth2]
+        get "/callback/*path", WebPageOAuth2, client: Client, action: :oauth2_callback
+        get "/*path", WebPageOAuth2, client: Client, action: :oauth2
       end
       ```
 
@@ -30,7 +30,7 @@ if Code.ensure_loaded?(Plug) do
     - 服务器角色为 `hub`：
 
       ```elixir
-      get "/wx/oauth2/:env/callback/*path", WeChat.Plug.WebPageOAuth2, [client: Client, action: :hub_oauth2_callback]
+      get "/wx/oauth2/:env/callback/*path", WeChat.Plug.WebPageOAuth2, client: Client, action: :hub_oauth2_callback
       # or
       get "/wx/oauth2/:code_name/:env/callback/*path", WeChat.Plug.WebPageOAuth2, :hub_oauth2_callback
       ```
@@ -39,8 +39,8 @@ if Code.ensure_loaded?(Plug) do
 
       ```elixir
       scope "/wx/oauth2", WeChat.Plug do
-        get "/callback/*path", WebPageOAuth2, [client: Client, action: :oauth2_callback]
-        get "/*path", WebPageOAuth2, [client: Client, action: :hub_client_oauth2]
+        get "/callback/*path", WebPageOAuth2, client: Client, action: :oauth2_callback
+        get "/*path", WebPageOAuth2, client: Client, action: :hub_client_oauth2
       end
       # or
       scope "/wx/oauth2/:code_name", WeChat.Plug do
