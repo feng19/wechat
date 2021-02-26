@@ -57,7 +57,7 @@ if Code.ensure_loaded?(Plug) do
 
     经过 `plug` 之后，会跳转到微信的网页授权：
 
-        https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect
+        "https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect"
 
     用户完成授权之后，微信会跳转回 `REDIRECT_URI/?code=CODE&state=STATE`，即：
 
