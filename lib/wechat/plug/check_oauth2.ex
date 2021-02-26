@@ -70,11 +70,11 @@ if Code.ensure_loaded?(Plug) do
                 |> Path.join("/" <> to_string(env) <> "/callback")
             end
 
-            &hub_client_oauth2(&1, client, oauth2_callback_path, scope, state)
+            &__MODULE__.hub_client_oauth2(&1, client, oauth2_callback_path, scope, state)
 
           # [:client, :hub]
           _ ->
-            &client_oauth2(&1, client, oauth2_callback_path, scope, state)
+            &__MODULE__.client_oauth2(&1, client, oauth2_callback_path, scope, state)
         end
 
       [appid: client.appid(), redirect_fun: redirect_fun]
@@ -93,14 +93,14 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp client_oauth2(conn, client, oauth2_callback_path, scope, state) do
+    def client_oauth2(conn, client, oauth2_callback_path, scope, state) do
       host = request_url(%{conn | query_string: "", request_path: ""})
 
       Path.join([host, oauth2_callback_path, conn.request_path])
       |> oauth2_authorize_url(conn, client, scope, state)
     end
 
-    defp hub_client_oauth2(conn, client, oauth2_callback_path, scope, state) do
+    def hub_client_oauth2(conn, client, oauth2_callback_path, scope, state) do
       if hub_url = WeChat.get_hub_url(client) do
         Path.join([hub_url, oauth2_callback_path, conn.request_path])
         |> oauth2_authorize_url(conn, client, scope, state)
