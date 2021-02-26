@@ -59,9 +59,6 @@ if Code.ensure_loaded?(Plug) do
 
       redirect_fun =
         case client.server_role() do
-          :client ->
-            &client_oauth2(&1, client, oauth2_callback_path, scope, state)
-
           :hub_client ->
             case Map.get(options, :env) do
               nil ->
@@ -74,6 +71,10 @@ if Code.ensure_loaded?(Plug) do
             end
 
             &hub_client_oauth2(&1, client, oauth2_callback_path, scope, state)
+
+          # [:client, :hub]
+          _ ->
+            &client_oauth2(&1, client, oauth2_callback_path, scope, state)
         end
 
       [appid: client.appid(), redirect_fun: redirect_fun]
