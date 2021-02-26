@@ -70,25 +70,39 @@ if Code.ensure_loaded?(Plug) do
                 |> Path.join("/" <> to_string(env) <> "/callback")
             end
 
-            &__MODULE__.hub_client_oauth2(&1, client, oauth2_callback_path, scope, state)
+            &__MODULE__.hub_client_oauth2/5
 
           # [:client, :hub]
           _ ->
-            &__MODULE__.client_oauth2(&1, client, oauth2_callback_path, scope, state)
+            &__MODULE__.client_oauth2/5
         end
 
-      [appid: client.appid(), redirect_fun: redirect_fun]
+      %{
+        appid: client.appid(),
+        client: client,
+        oauth2_callback_path: oauth2_callback_path,
+        scope: scope,
+        state: state,
+        redirect_fun: redirect_fun
+      }
     end
 
     @doc false
-    def call(conn, appid: appid, redirect_fun: redirect_fun) do
+    def call(conn, %{appid: appid} = options) do
       with openid when openid != nil <- get_session(conn, "openid"),
            ^appid <- get_session(conn, "appid") do
         conn
       else
         _ ->
+          redirect_fun = options.redirect_fun
+
           conn
-          |> redirect_fun.()
+          |> redirect_fun.(
+            options.client,
+            options.oauth2_callback_path,
+            options.scope,
+            options.state
+          )
           |> halt()
       end
     end
