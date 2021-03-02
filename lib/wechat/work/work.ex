@@ -107,7 +107,7 @@ defmodule WeChat.Work do
              client,
              quote do
                @moduledoc false
-               use WeChat.WorkBuilder, unquote(options)
+               use WeChat.WorkBuilder, unquote(Macro.escape(options))
              end,
              Macro.Env.location(__ENV__)
            ) do

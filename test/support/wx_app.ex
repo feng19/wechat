@@ -45,3 +45,11 @@ defmodule WxWork do
       %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}
     ]
 end
+
+defmodule WxWork2 do
+  use WeChat.Work,
+    corp_id: "corp_id",
+    agents: [
+      %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}
+    ]
+end

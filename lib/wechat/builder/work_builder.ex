@@ -1,11 +1,20 @@
 defmodule WeChat.WorkBuilder do
   @moduledoc false
+  alias WeChat.Work
 
   @default_opts [
     server_role: :client,
     by_component?: false,
     storage: WeChat.Storage.File,
     requester: WeChat.WorkRequester
+  ]
+
+  @sub_modules [
+    Work.Message,
+    {
+      :contacts,
+      [Work.Contacts.Tag, Work.Contacts.User, Work.Contacts.Department]
+    }
   ]
 
   defmacro __using__(options \\ []) do
@@ -104,6 +113,26 @@ defmodule WeChat.WorkBuilder do
       end)
       |> Enum.unzip()
 
-    [base | agent2cache_id_funs] ++ agent_secret_funs
+    sub_modules =
+      if Keyword.get(opts, :gen_sub_module?, true) do
+        client = __CALLER__.module
+
+        @sub_modules
+        |> Enum.reduce([], fn
+          {agent, modules}, acc ->
+            case Enum.find(agents, &match?(^agent, &1.id)) do
+              nil -> acc
+              _ -> modules ++ acc
+            end
+
+          module, acc ->
+            [module | acc]
+        end)
+        |> WeChat.Builder.gen_sub_modules(client, 2)
+      else
+        []
+      end
+
+    [base | agent2cache_id_funs] ++ agent_secret_funs ++ sub_modules
   end
 end

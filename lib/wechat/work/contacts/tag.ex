@@ -1,4 +1,4 @@
-defmodule WeChat.Work.Tag do
+defmodule WeChat.Work.Contacts.Tag do
   @moduledoc "通讯录管理-标签管理"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]

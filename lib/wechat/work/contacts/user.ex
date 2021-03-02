@@ -1,4 +1,4 @@
-defmodule WeChat.Work.User do
+defmodule WeChat.Work.Contacts.User do
   @moduledoc "通讯录管理-成员管理"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]

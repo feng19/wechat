@@ -1,4 +1,4 @@
-defmodule WeChat.Work.Department do
+defmodule WeChat.Work.Contacts.Department do
   @moduledoc "通讯录管理-部门管理"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]

@@ -33,8 +33,15 @@ defmodule WeChatTest do
     assert WxWork.agent2cache_id(10000) == "corp_id_10000"
     assert WxWork.agent2cache_id(:agent_name) == "corp_id_10000"
 
-    assert true = Enum.all?(1..3, &function_exported?(WxApp, :get, &1))
-    assert true = Enum.all?(2..4, &function_exported?(WxApp, :post, &1))
+    assert true = Enum.all?(1..3, &function_exported?(WxWork, :get, &1))
+    assert true = Enum.all?(2..4, &function_exported?(WxWork, :post, &1))
+    assert function_exported?(WxWork.Message, :send_message, 2)
+    assert function_exported?(WxWork.Contacts.Department, :list, 0)
+  end
+
+  test "Auto generate functions(Work) - exclude" do
+    assert function_exported?(WxWork2.Message, :send_message, 2)
+    assert false == function_exported?(WxWork2.Contacts.Department, :list, 0)
   end
 
   test "build official_account client" do

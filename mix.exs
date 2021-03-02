@@ -48,7 +48,7 @@ defmodule WeChat.MixProject do
       extras: ["README.md", "LICENSE"],
       groups_for_modules: groups_for_modules(),
       groups_for_functions: [Action: &(&1[:doc_group] == :action)],
-      nest_modules_by_prefix: [ServerMessage, MiniProgram, Work]
+      nest_modules_by_prefix: [ServerMessage, MiniProgram, Work, Work.Contacts]
     ]
   end
 
@@ -137,9 +137,9 @@ defmodule WeChat.MixProject do
          Work,
          Work.Agent,
          Work.Message,
-         Work.Department,
-         Work.User,
-         Work.Tag
+         Work.Contacts.Department,
+         Work.Contacts.User,
+         Work.Contacts.Tag
        ]}
     ]
   end

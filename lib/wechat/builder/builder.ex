@@ -138,7 +138,7 @@ defmodule WeChat.Builder do
     [base | get_funs]
   end
 
-  defp gen_sub_modules(sub_modules, parent_module) do
+  def gen_sub_modules(sub_modules, parent_module, drop_amount \\ 1) do
     client_module =
       parent_module
       |> Module.split()
@@ -150,7 +150,7 @@ defmodule WeChat.Builder do
         sub_modules,
         [],
         fn module, acc ->
-          {file, ast} = gen_sub_module(module, parent_module, client_module)
+          {file, ast} = _gen_sub_module(module, parent_module, client_module, drop_amount)
           {ast, [quote(do: @external_resource(unquote(file))) | acc]}
         end
       )
@@ -158,7 +158,7 @@ defmodule WeChat.Builder do
     files ++ sub_module_ast_list
   end
 
-  defp gen_sub_module(module, parent_module, client_module) do
+  defp _gen_sub_module(module, parent_module, client_module, drop_amount) do
     file = module.__info__(:compile)[:source]
 
     {:ok, ast} =
@@ -175,7 +175,7 @@ defmodule WeChat.Builder do
     new_module_name_alias =
       module
       |> Module.split()
-      |> List.delete_at(0)
+      |> Enum.drop(drop_amount)
       |> Enum.map(&String.to_atom/1)
 
     ast =
