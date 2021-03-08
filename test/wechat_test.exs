@@ -35,12 +35,16 @@ defmodule WeChatTest do
 
     assert true = Enum.all?(1..3, &function_exported?(WxWork, :get, &1))
     assert true = Enum.all?(2..4, &function_exported?(WxWork, :post, &1))
+    assert Code.ensure_loaded?(WxWork.Message)
     assert function_exported?(WxWork.Message, :send_message, 2)
+    assert Code.ensure_loaded?(WxWork.Contacts.Department)
     assert function_exported?(WxWork.Contacts.Department, :list, 0)
   end
 
   test "Auto generate functions(Work) - exclude" do
+    assert Code.ensure_loaded?(WxWork2.Message)
     assert function_exported?(WxWork2.Message, :send_message, 2)
+    assert false == Code.ensure_loaded?(WxWork2.Contacts.Department)
     assert false == function_exported?(WxWork2.Contacts.Department, :list, 0)
   end
 
@@ -112,17 +116,27 @@ defmodule WeChatTest do
   end
 
   test "Encrypt Msg" do
+    client = WxApp
     timestamp = Utils.now_unix()
+    to_openid = "oia2TjjewbmiOUlr6X-1crbLOvLw"
+    from_wx_no = "gh_7f083739789a"
+    content = "hello world"
+    xml_text = XmlMessage.reply_text(to_openid, from_wx_no, timestamp, content)
 
-    xml_string =
-      XmlMessage.reply_text(
-        "oia2TjjewbmiOUlr6X-1crbLOvLw",
-        "gh_7f083739789a",
+    xml_string = EventHandler.encode_xml_msg(xml_text, timestamp, client)
+    {:ok, xml} = XmlParser.parse(xml_string)
+
+    {:ok, :encrypted_xml, xml_text} =
+      EventHandler.decode_xml_msg(
+        xml["Encrypt"],
+        xml["MsgSignature"],
+        xml["Nonce"],
         timestamp,
-        "hello world"
+        client
       )
-      |> EventHandler.encode_xml_msg(timestamp, WxApp)
 
-    assert is_binary(xml_string) == true
+    assert xml_text["ToUserName"] == to_openid
+    assert xml_text["FromUserName"] == from_wx_no
+    assert xml_text["Content"] == content
   end
 end

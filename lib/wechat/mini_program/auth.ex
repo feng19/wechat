@@ -45,7 +45,7 @@ defmodule WeChat.MiniProgram.Auth do
     with {:ok, session_key} <- Base.decode64(session_key),
          {:ok, iv} <- Base.decode64(iv),
          {:ok, encrypted_data} <- Base.decode64(encrypted_data) do
-      :crypto.block_decrypt(:aes_cbc, session_key, iv, encrypted_data)
+      :crypto.crypto_one_time(:aes_128_cbc, session_key, iv, encrypted_data, false)
       |> Encryptor.decode_padding_with_pkcs7()
       |> Jason.decode()
     end

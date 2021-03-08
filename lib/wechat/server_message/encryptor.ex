@@ -72,12 +72,12 @@ defmodule WeChat.ServerMessage.Encryptor do
 
   defp encrypt_with_aes_cbc(plain_text, aes_key) do
     iv = binary_part(aes_key, 0, @aes_block_size)
-    :crypto.block_encrypt(:aes_cbc, aes_key, iv, plain_text)
+    :crypto.crypto_one_time(:aes_256_cbc, aes_key, iv, plain_text, true)
   end
 
   defp decrypt_with_aes_cbc(cipher_text, aes_key) do
     iv = binary_part(aes_key, 0, @aes_block_size)
-    :crypto.block_decrypt(:aes_cbc, aes_key, iv, cipher_text)
+    :crypto.crypto_one_time(:aes_256_cbc, aes_key, iv, cipher_text, false)
   end
 
   # get AES key from encoding_aes_key.
