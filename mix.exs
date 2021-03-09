@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{ServerMessage, MiniProgram, Work, Storage}
 
-  @version "0.4.1"
+  @version "0.5.0"
 
   def project do
     [
@@ -48,7 +48,7 @@ defmodule WeChat.MixProject do
       extras: ["README.md", "LICENSE"],
       groups_for_modules: groups_for_modules(),
       groups_for_functions: [Action: &(&1[:doc_group] == :action)],
-      nest_modules_by_prefix: [ServerMessage, MiniProgram, Work, Work.Contacts]
+      nest_modules_by_prefix: [ServerMessage, MiniProgram, MiniProgram.Live, Work, Work.Contacts]
     ]
   end
 
@@ -130,7 +130,11 @@ defmodule WeChat.MixProject do
          MiniProgram.Auth,
          MiniProgram.Code,
          MiniProgram.UrlScheme,
-         MiniProgram.NearbyPOI
+         MiniProgram.NearbyPOI,
+         MiniProgram.Live.Room,
+         MiniProgram.Live.Goods,
+         MiniProgram.Live.Role,
+         MiniProgram.Live.Subscribe
        ]},
       {"企业微信 APIs",
        [

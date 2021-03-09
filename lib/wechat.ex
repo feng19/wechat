@@ -68,6 +68,7 @@ defmodule WeChat do
   [Docs Link](#{doc_link_prefix()}/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html){:target="_blank"}
   """
   @type openid :: String.t()
+  @type openid_list :: [openid]
 
   @typedoc """
   UnionID 不同应用下的唯一ID

@@ -37,7 +37,7 @@ defmodule WeChat.UserBlacklist do
   拉黑用户 -
   [官方文档](#{@doc_link}#2){:target="_blank"}
   """
-  @spec batch_blacklist(WeChat.client(), [WeChat.openid()]) :: WeChat.response()
+  @spec batch_blacklist(WeChat.client(), WeChat.openid_list()) :: WeChat.response()
   def batch_blacklist(client, openid_list) do
     client.post(
       "/cgi-bin/tags/members/batchblacklist",
@@ -50,7 +50,7 @@ defmodule WeChat.UserBlacklist do
   取消拉黑用户 -
   [官方文档](#{@doc_link}#3){:target="_blank"}
   """
-  @spec batch_unblacklist(WeChat.client(), [WeChat.openid()]) :: WeChat.response()
+  @spec batch_unblacklist(WeChat.client(), WeChat.openid_list()) :: WeChat.response()
   def batch_unblacklist(client, openid_list) do
     client.post(
       "/cgi-bin/tags/members/batchunblacklist",

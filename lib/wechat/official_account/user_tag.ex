@@ -93,7 +93,7 @@ defmodule WeChat.UserTag do
   批量为用户打标签 -
   [官方文档](#{@doc_link}){:target="_blank"}
   """
-  @spec batch_tagging_users(WeChat.client(), tag_id, [WeChat.openid()]) :: WeChat.response()
+  @spec batch_tagging_users(WeChat.client(), tag_id, WeChat.openid_list()) :: WeChat.response()
   def batch_tagging_users(client, id, openid_list) do
     client.post(
       "/cgi-bin/tags/members/batchtagging",
@@ -106,7 +106,7 @@ defmodule WeChat.UserTag do
   批量为用户取消标签 -
   [官方文档](#{@doc_link}){:target="_blank"}
   """
-  @spec batch_untagging_users(WeChat.client(), tag_id, [WeChat.openid()]) :: WeChat.response()
+  @spec batch_untagging_users(WeChat.client(), tag_id, WeChat.openid_list()) :: WeChat.response()
   def batch_untagging_users(client, id, openid_list) do
     client.post(
       "/cgi-bin/tags/members/batchuntagging",

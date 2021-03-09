@@ -71,7 +71,7 @@ defmodule WeChat.BatchSends do
 
   一串OpenID列表，OpenID最少2个，最多10000个
   """
-  @type openid_list :: [WeChat.openid()]
+  @type openid_list :: WeChat.openid_list()
   @typedoc "消息发送任务的ID"
   @type msg_id :: String.t()
   @typedoc """

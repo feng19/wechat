@@ -19,6 +19,8 @@ defmodule WeChat.Work.Message do
   """
   @spec send_message(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def send_message(client, agent, body) do
-    client.post("/cgi-bin/message/send", body, query: [access_token: client.get_access_token(agent)])
+    client.post("/cgi-bin/message/send", body,
+      query: [access_token: client.get_access_token(agent)]
+    )
   end
 end

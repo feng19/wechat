@@ -44,7 +44,11 @@ defmodule WeChat.Builder do
     MiniProgram.Auth,
     MiniProgram.Code,
     MiniProgram.UrlScheme,
-    MiniProgram.NearbyPOI
+    MiniProgram.NearbyPOI,
+    MiniProgram.Live.Room,
+    MiniProgram.Live.Goods,
+    MiniProgram.Live.Role,
+    MiniProgram.Live.Subscribe
   ]
 
   defmacro __using__(options \\ []) do

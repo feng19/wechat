@@ -5,6 +5,10 @@ defmodule WeChat.User do
 
   @typedoc "微信号"
   @type username :: String.t()
+  @typedoc "微信号列表"
+  @type username_list :: [username]
+  @typedoc "昵称"
+  @type nickname :: String.t()
   @typedoc """
   国家地区语言
     * `"zh_CN"` - 简体

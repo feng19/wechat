@@ -86,8 +86,8 @@ defmodule WeChat.RefreshTimer do
   end
 
   @spec add(WeChat.client(), options) :: :ok
-  def add(client, opts) do
-    GenServer.call(__MODULE__, {:add, client, opts})
+  def add(client, opts \\ %{}) do
+    GenServer.call(__MODULE__, {:add, client, Map.new(opts)})
   end
 
   @spec remove(WeChat.client()) :: :ok

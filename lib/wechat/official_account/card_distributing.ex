@@ -93,7 +93,7 @@ defmodule WeChat.CardDistributing do
   [官方文档](#{@doc_link}#12){:target="_blank"}
   """
   @spec set_test_whitelist(WeChat.client(), [
-          {:openid, [WeChat.openid()]} | {:username, [User.username()]}
+          {:openid, WeChat.openid_list()} | {:username, User.username_list()}
         ]) :: WeChat.response()
   def set_test_whitelist(client, openid: openid_list) do
     client.post("/card/testwhitelist/set", json_map(openid: openid_list),
@@ -111,7 +111,7 @@ defmodule WeChat.CardDistributing do
   设置测试白名单 -
   [官方文档](#{@doc_link}#12){:target="_blank"}
   """
-  @spec set_test_whitelist(WeChat.client(), [WeChat.openid()], [User.username()]) ::
+  @spec set_test_whitelist(WeChat.client(), WeChat.openid_list(), User.username_list()) ::
           WeChat.response()
   def set_test_whitelist(client, openid_list, username_list) do
     client.post(
