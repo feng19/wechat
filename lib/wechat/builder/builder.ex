@@ -57,16 +57,18 @@ defmodule WeChat.Builder do
     app_type = Keyword.fetch!(default_opts, :app_type)
 
     sub_modules =
-      case app_type do
-        :official_account ->
-          @official_account_modules ++ @both_modules
+      Keyword.get_lazy(default_opts, :sub_modules, fn ->
+        case app_type do
+          :official_account ->
+            @official_account_modules ++ @both_modules
 
-        :mini_program ->
-          @mini_program_modules ++ @both_modules
+          :mini_program ->
+            @mini_program_modules ++ @both_modules
 
-        _ ->
-          raise ArgumentError, "please set app_type in [:official_account, :mini_program]"
-      end
+          _ ->
+            raise ArgumentError, "please set app_type in [:official_account, :mini_program]"
+        end
+      end)
 
     {sub_modules, default_opts} =
       if Keyword.get(default_opts, :by_component?, false) do
@@ -150,14 +152,12 @@ defmodule WeChat.Builder do
       |> String.to_atom()
 
     {sub_module_ast_list, files} =
-      Enum.map_reduce(
-        sub_modules,
-        [],
-        fn module, acc ->
-          {file, ast} = _gen_sub_module(module, parent_module, client_module, drop_amount)
-          {ast, [quote(do: @external_resource(unquote(file))) | acc]}
-        end
-      )
+      sub_modules
+      |> Enum.uniq()
+      |> Enum.map_reduce([], fn module, acc ->
+        {file, ast} = _gen_sub_module(module, parent_module, client_module, drop_amount)
+        {ast, [quote(do: @external_resource(unquote(file))) | acc]}
+      end)
 
     files ++ sub_module_ast_list
   end

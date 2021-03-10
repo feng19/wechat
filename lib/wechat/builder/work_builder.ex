@@ -114,10 +114,11 @@ defmodule WeChat.WorkBuilder do
       |> Enum.unzip()
 
     sub_modules =
-      if Keyword.get(opts, :gen_sub_module?, true) do
+      if Keyword.get(default_opts, :gen_sub_module?, true) do
         client = __CALLER__.module
 
-        @sub_modules
+        default_opts
+        |> Keyword.get(:sub_modules, @sub_modules)
         |> Enum.reduce([], fn
           {agent, modules}, acc ->
             case Enum.find(agents, &match?(^agent, &1.id)) do
