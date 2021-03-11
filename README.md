@@ -6,6 +6,8 @@
 - 已支持: 公众号/小程序/第三方应用
 - WIP: 企业微信
 
+[在线文档](http://hexdocs.pm/wechat_sdk/)
+
 ## Installation
 
 You can use wechat in your projects by adding it to your `mix.exs` dependencies:
@@ -13,12 +15,10 @@ You can use wechat in your projects by adding it to your `mix.exs` dependencies:
 ```elixir
 def deps do
   [
-    {:wechat, "~> 0.5.0", hex: :wechat_sdk}
+    {:wechat, "~> 0.6.0", hex: :wechat_sdk}
   ]
 end
 ```
-
-[在线文档](http://hexdocs.pm/wechat_sdk/).
 
 ## Usage
 

@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{ServerMessage, MiniProgram, Work, Storage}
 
-  @version "0.5.0"
+  @version "0.6.0"
 
   def project do
     [
@@ -35,7 +35,7 @@ defmodule WeChat.MixProject do
       {:tesla, "~> 1.4"},
       {:finch, "~> 0.5"},
       {:jason, "~> 1.2"},
-      {:saxy, "~> 1.2"},
+      {:saxy, "~> 1.2", optional: true},
       {:plug, "~> 1.11", optional: true},
       {:ex_doc, "~> 0.22", only: [:docs, :dev], runtime: false}
     ]
