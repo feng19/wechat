@@ -133,6 +133,7 @@ defmodule WeChat.MixProject do
          MiniProgram.NearbyPOI,
          MiniProgram.Search,
          MiniProgram.OCR,
+         MiniProgram.Security,
          MiniProgram.Live.Room,
          MiniProgram.Live.Goods,
          MiniProgram.Live.Role,

@@ -13,7 +13,7 @@ You can use wechat in your projects by adding it to your `mix.exs` dependencies:
 ```elixir
 def deps do
   [
-    {:wechat, "~> 0.4.0", hex: :wechat_sdk}
+    {:wechat, "~> 0.5.0", hex: :wechat_sdk}
   ]
 end
 ```
@@ -84,22 +84,6 @@ WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 ```
 
 更多详情请见：[WeChat模块](https://hexdocs.pm/wechat_sdk/WeChat.html)
-
-### 支持接口列表
-
-[微信官方文档](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
-
-* 消息管理
-* 素材管理
-* 图文消息留言管理
-* 自定义菜单
-* 用户管理
-* 账号管理
-* 微信卡券(WIP)
-* 第三方平台
-* 小程序(WIP)
-
-更多接口正在开发中……
 
 ## 快速测试
 
