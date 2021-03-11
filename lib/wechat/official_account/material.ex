@@ -63,7 +63,7 @@ defmodule WeChat.Material do
   def upload_media(client, type, filename, file_data) do
     multipart =
       Multipart.new()
-      |> Multipart.add_file_content(file_data, filename, name: "media")
+      |> Multipart.add_file_content(file_data, filename, name: "media", detect_content_type: true)
 
     client.post("/cgi-bin/media/upload", multipart,
       query: [access_token: client.get_access_token(), type: to_string(type)]
@@ -111,7 +111,7 @@ defmodule WeChat.Material do
   def upload_image(client, file_path) do
     multipart =
       Multipart.new()
-      |> Multipart.add_file(file_path, name: "media")
+      |> Multipart.add_file(file_path, name: "media", detect_content_type: true)
 
     client.post("/cgi-bin/media/uploadimg", multipart,
       query: [access_token: client.get_access_token()]
@@ -128,7 +128,10 @@ defmodule WeChat.Material do
   def upload_image(client, filename, file_data) do
     multipart =
       Multipart.new()
-      |> Multipart.add_file_content(file_data, filename, name: "media")
+      |> Multipart.add_file_content(file_data, filename,
+        name: "media",
+        headers: [{"content-type", MIME.from_path(filename)}]
+      )
 
     client.post("/cgi-bin/media/uploadimg", multipart,
       query: [access_token: client.get_access_token()]
@@ -171,7 +174,7 @@ defmodule WeChat.Material do
   def add_material(client, type, file_path) do
     multipart =
       Multipart.new()
-      |> Multipart.add_file(file_path, name: "media")
+      |> Multipart.add_file(file_path, name: "media", detect_content_type: true)
 
     client.post("/cgi-bin/material/add_material", multipart,
       query: [access_token: client.get_access_token(), type: to_string(type)]
@@ -188,7 +191,10 @@ defmodule WeChat.Material do
   def add_material(client, type, filename, file_data) do
     multipart =
       Multipart.new()
-      |> Multipart.add_file_content(file_data, filename, name: "media")
+      |> Multipart.add_file_content(file_data, filename,
+        name: "media",
+        headers: [{"content-type", MIME.from_path(filename)}]
+      )
 
     client.post("/cgi-bin/material/add_material", multipart,
       query: [access_token: client.get_access_token(), type: to_string(type)]
@@ -207,7 +213,7 @@ defmodule WeChat.Material do
 
     multipart =
       Multipart.new()
-      |> Multipart.add_file(file_path, name: "media")
+      |> Multipart.add_file(file_path, name: "media", detect_content_type: true)
       |> Multipart.add_field("description", description)
 
     client.post("/cgi-bin/material/add_material", multipart,
@@ -228,7 +234,10 @@ defmodule WeChat.Material do
 
     multipart =
       Multipart.new()
-      |> Multipart.add_file_content(file_data, filename, name: "media")
+      |> Multipart.add_file_content(file_data, filename,
+        name: "media",
+        headers: [{"content-type", MIME.from_path(filename)}]
+      )
       |> Multipart.add_field("description", description)
 
     client.post("/cgi-bin/material/add_material", multipart,
