@@ -2,6 +2,10 @@
 
 **WeChat SDK for Elixir**
 
+[![Hex.pm](https://img.shields.io/hexpm/v/wechat_sdk.svg?maxAge=2592000)](https://hex.pm/packages/wechat_sdk)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-9768d1.svg)](https://hexdocs.pm/wechat_sdk)
+[![Hex.pm](https://img.shields.io/hexpm/dt/wechat_sdk.svg?maxAge=2592000)](https://hex.pm/packages/wechat_sdk)
+
 - 目前 `Elixir` 中支持最完善的微信SDK
 - 已支持: 公众号/小程序/第三方应用
 - WIP: 企业微信
