@@ -208,7 +208,7 @@ if Code.ensure_loaded?(Plug) do
             {String.trim_trailing(request_url, "/"), ""}
 
           path ->
-            path = Path.join(path, "/")
+            path = Enum.join(path, "/")
 
             prefix_path = request_url |> String.trim_trailing("/") |> String.trim_trailing(path)
 
