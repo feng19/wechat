@@ -209,9 +209,8 @@ if Code.ensure_loaded?(Plug) do
 
           path ->
             path = Enum.join(path, "/")
-
-            prefix_path = request_url |> String.trim_trailing("/") |> String.trim_trailing(path)
-
+            tail_length = String.length(path)
+            prefix_path = String.slice(request_url, 0..-(tail_length + 2))
             {prefix_path, path}
         end
 
