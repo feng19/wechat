@@ -77,7 +77,7 @@ end
 
 ### 调用接口
 
-除企业微信的 `client` 外，都同时支持两种方式调用：
+所有类型的 `client`，都同时支持两种方式调用：
 
 ```elixir
 YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)

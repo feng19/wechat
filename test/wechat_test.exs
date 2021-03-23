@@ -125,15 +125,15 @@ defmodule WeChatTest do
 
     xml_string = EventHandler.encode_xml_msg(xml_text, timestamp, client)
     {:ok, xml} = XmlParser.parse(xml_string)
+    encrypt_content = xml["Encrypt"]
 
-    {:ok, :encrypted_xml, xml_text} =
-      EventHandler.decode_xml_msg(
-        xml["Encrypt"],
-        xml["MsgSignature"],
-        xml["Nonce"],
-        timestamp,
-        client
-      )
+    params = %{
+      "msg_signature" => xml["MsgSignature"],
+      "nonce" => xml["Nonce"],
+      "timestamp" => timestamp
+    }
+
+    {:ok, :encrypted_xml, xml_text} = EventHandler.decode_xml_msg(encrypt_content, params, client)
 
     assert xml_text["ToUserName"] == to_openid
     assert xml_text["FromUserName"] == from_wx_no

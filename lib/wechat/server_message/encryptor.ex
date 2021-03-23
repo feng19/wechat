@@ -51,6 +51,7 @@ defmodule WeChat.ServerMessage.Encryptor do
     {appid, msg}
   end
 
+  @doc false
   def encode_padding_with_pkcs7(data) do
     pad =
       data
@@ -64,12 +65,14 @@ defmodule WeChat.ServerMessage.Encryptor do
     data <> String.duplicate(<<pad::8>>, pad)
   end
 
+  @doc false
   def decode_padding_with_pkcs7(data) do
     data_size = byte_size(data)
     <<pad::8>> = binary_part(data, data_size, -1)
     binary_part(data, 0, data_size - pad)
   end
 
+  @compile {:inline, encrypt_with_aes_cbc: 2, decrypt_with_aes_cbc: 2}
   defp encrypt_with_aes_cbc(plain_text, aes_key) do
     iv = binary_part(aes_key, 0, @aes_block_size)
     :crypto.crypto_one_time(:aes_256_cbc, aes_key, iv, plain_text, true)

@@ -85,8 +85,8 @@ if Code.ensure_loaded?(Plug) do
 
             {500, "Internal Server Error"}
         else
+          # 被动回复推送消息
           {:reply, xml_string, timestamp} ->
-            # 被动回复推送消息
             {200, reply_msg(reply_type, xml_string, timestamp, client)}
 
           :retry ->
@@ -155,22 +155,27 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    @spec handle_event_xml(params, body :: String.t(), WeChat.client()) ::
+    defp check_msg_signature?(encrypt_content, params, client) do
+      with signature when signature != nil <- params["msg_signature"],
+           nonce when nonce != nil <- params["nonce"],
+           timestamp when timestamp != nil <- params["timestamp"] do
+        Plug.Crypto.secure_compare(
+          signature,
+          Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)])
+        )
+      end
+    end
+
+    @spec handle_event_xml(params, body :: String.t() | map, WeChat.client()) ::
             {:ok, data_type, xml} | {:error, String.t()}
     def handle_event_xml(params, body, client) do
       case XmlParser.parse(body) do
+        # 安全模式
         {:ok, %{"Encrypt" => encrypt_content}} ->
-          # 安全模式
-          decode_xml_msg(
-            encrypt_content,
-            params["msg_signature"],
-            params["nonce"],
-            params["timestamp"],
-            client
-          )
+          decode_xml_msg(encrypt_content, params, client)
 
+        # 明文模式
         {:ok, xml} when is_map(xml) ->
-          # 明文模式
           {:ok, :plaqin_text, xml}
 
         _error ->
@@ -182,18 +187,12 @@ if Code.ensure_loaded?(Plug) do
             {:ok, data_type, json} | {:error, String.t()}
     def handle_event_json(params, body, client) when is_map(body) do
       case body do
+        # 安全模式
         %{"Encrypt" => encrypt_content} ->
-          # 安全模式
-          decode_json_msg(
-            encrypt_content,
-            params["msg_signature"],
-            params["nonce"],
-            params["timestamp"],
-            client
-          )
+          decode_json_msg(encrypt_content, params, client)
 
+        # 明文模式
         {:ok, json} when is_map(json) ->
-          # 明文模式
           {:ok, :plaqin_text, json}
 
         _error ->
@@ -203,18 +202,12 @@ if Code.ensure_loaded?(Plug) do
 
     def handle_event_json(params, body, client) do
       case Jason.decode(body) do
+        # 安全模式
         {:ok, %{"Encrypt" => encrypt_content}} ->
-          # 安全模式
-          decode_xml_msg(
-            encrypt_content,
-            params["msg_signature"],
-            params["nonce"],
-            params["timestamp"],
-            client
-          )
+          decode_json_msg(encrypt_content, params, client)
 
+        # 明文模式
         {:ok, json} when is_map(json) ->
-          # 明文模式
           {:ok, :plaqin_text, json}
 
         _error ->
@@ -323,14 +316,12 @@ if Code.ensure_loaded?(Plug) do
       "success"
     end
 
-    @compile {:inline, decode_xml_msg: 5, decode_json_msg: 5, encode_xml_msg: 3}
+    @compile {:inline, decode_xml_msg: 3, decode_json_msg: 3, encode_xml_msg: 3}
 
-    @spec decode_xml_msg(encrypt_content, signature, nonce, timestamp, WeChat.client()) ::
+    @spec decode_xml_msg(encrypt_content, params, WeChat.client()) ::
             {:ok, :encrypted, xml_string} | {:error, String.t()}
-    def decode_xml_msg(encrypt_content, signature, nonce, timestamp, client) do
-      with gen_signature <-
-             Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
-           true <- Plug.Crypto.secure_compare(signature, gen_signature),
+    def decode_xml_msg(encrypt_content, params, client) do
+      with true <- check_msg_signature?(encrypt_content, params, client),
            appid <- client.appid(),
            {^appid, xml_string} <- Encryptor.decrypt(encrypt_content, client.aes_key()),
            {:ok, xml} <- XmlParser.parse(xml_string) do
@@ -341,12 +332,10 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    @spec decode_json_msg(encrypt_content, signature, nonce, timestamp, WeChat.client()) ::
+    @spec decode_json_msg(encrypt_content, params, WeChat.client()) ::
             {:ok, :encrypted, json_string} | {:error, String.t()}
-    def decode_json_msg(encrypt_content, signature, nonce, timestamp, client) do
-      with gen_signature <-
-             Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)]),
-           true <- Plug.Crypto.secure_compare(signature, gen_signature),
+    def decode_json_msg(encrypt_content, params, client) do
+      with true <- check_msg_signature?(encrypt_content, params, client),
            appid <- client.appid(),
            {^appid, json_string} <- Encryptor.decrypt(encrypt_content, client.aes_key()),
            {:ok, json} <- Jason.decode(json_string) do
