@@ -164,7 +164,7 @@ defmodule WeChat.WebPage do
   """
   @spec user_info(WeChat.openid(), access_token) :: WeChat.response()
   def user_info(openid, access_token) do
-    Requester.get("/sns/userinfo",
+    Requester.OfficialAccount.get("/sns/userinfo",
       query: [access_token: access_token, openid: openid]
     )
   end
@@ -179,7 +179,7 @@ defmodule WeChat.WebPage do
 
   @spec user_info(WeChat.openid(), access_token, User.lang()) :: WeChat.response()
   def user_info(openid, access_token, lang) do
-    Requester.get("/sns/userinfo",
+    Requester.OfficialAccount.get("/sns/userinfo",
       query: [
         access_token: access_token,
         openid: openid,
@@ -206,7 +206,7 @@ defmodule WeChat.WebPage do
   [官方文档](#{@doc_link}/Wechat_webpage_authorization.html#4){:target="_blank"}
   """
   @spec auth(WeChat.openid(), access_token) :: WeChat.response()
-  def auth(requester \\ Requester, openid, access_token) do
+  def auth(requester \\ Requester.OfficialAccount, openid, access_token) do
     requester.get("/sns/auth",
       query: [access_token: access_token, openid: openid]
     )

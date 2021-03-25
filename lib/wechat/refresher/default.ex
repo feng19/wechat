@@ -1,54 +1,51 @@
-defmodule WeChat.RefreshTimer do
+defmodule WeChat.Refresher.Default do
   @moduledoc """
   token 刷新器
 
-  这个是默认的刷新器，当然也支持自定义的刷新器，可以这样配置：
+  本模块为默认的刷新器
+
+  需要修改为自定义的刷新器，可以这样配置：
 
   ```elixir
-
-  config :wechat, :refresh_timer, YourRefreshTimer
-
-  # or with state
-
-  config :wechat, :refresh_timer, {YourRefreshTimer, state}
+  config :wechat, :refresher, YourRefresher
   ```
 
-  默认的刷新器支持多种配置：
-  ### 配置1
+  修改刷新器的配置，支持多种配置方式：
+  ### 方式1
 
   ```elixir
   config :wechat, :refresh_settings, [ClientA, ClientB, ClientC]
   ```
 
   以上配置会自动为三个 `Client` 定时刷新 `token` ，默认会在 `token` 过期前 `30` 分钟刷新，`token` 刷新失败的重试间隔为 `1` 分钟，
-  默认的 `token` 刷新列表为：`WeChat.RefreshHelper.get_refresh_options_by_client/1` 输出的结果
+  默认的 `token` 刷新列表为：`WeChat.Refresher.DefaultSettings.get_refresh_options_by_client/1` 输出的结果
 
-  ### 配置2
+  ### 方式2
 
   ```elixir
-  config :wechat, :refresh_settings, [{ClientA, options}, ClientB, ClientC]
+  config :wechat, :refresh_settings, [{ClientA, client_setting}, ClientB, ClientC]
 
   # or
 
-  config :wechat, :refresh_settings, %{ClientA => options, ClientB => options, ClientC => options}
+  config :wechat, :refresh_settings, %{ClientA => client_setting, ClientB => client_setting, ClientC => client_setting}
   ```
 
-  `options` 配置说明见：`t:options/0`
+  `client_setting` 配置说明见：`t:client_setting/0`
 
-  为了适应 `Storage` 在 `RefreshTimer` 启动之后才启动，可以开启延时启动刷新:
+  为了适应 `Storage` 在 `Refresher` 启动之后才启动，可以开启延时启动刷新:
 
   ```elixir
-  config :wechat, WeChat.RefreshTimer, wait_for_signal: true
+  config :wechat, WeChat.Refresher.Default, wait_for_signal: true
   ```
 
-  当所有的 `Storage` 都已经完成，可以即可通过 `WeChat.RefreshTimer.start_monitor/0` 方法刷新 `token`
+  当所有的 `Storage` 都已经完成，可以即可通过 `WeChat.Refresher.Default.start_monitor/0` 方法刷新 `token`
 
   不配置默认为立即启动刷新
   """
   use GenServer
   require Logger
   alias WeChat.Storage.Adapter, as: StorageAdapter
-  alias WeChat.{Utils, Storage.Cache}
+  alias WeChat.{Utils, Storage.Cache, Refresher.DefaultSettings}
 
   # 过期前 30 分钟刷新
   @refresh_before_expired 30 * 60
@@ -71,21 +68,27 @@ defmodule WeChat.RefreshTimer do
   `server_role=hub_client` 时, 默认值：`#{@refresh_before_expired} + 30` 秒；
   其余角色默认值：`#{@refresh_before_expired}` 秒
   - `:refresh_retry_interval`: 刷新 `token` 失败的重试间隔，单位：秒，可选，默认值：`#{@refresh_retry_interval * 1000}` 秒
-  - `:refresh_options`: 刷新 `token` 配置，可选，默认值：`WeChat.RefreshHelper.get_refresh_options_by_client/1` 的输出结果
+  - `:refresh_options`: 刷新 `token` 配置，可选，默认值：`WeChat.Refresher.DefaultSettings.get_refresh_options_by_client/1` 的输出结果
   """
-  @type options ::
+  @type client_setting ::
           %{
             optional(:refresh_before_expired) => refresh_before_expired,
             optional(:refresh_retry_interval) => refresh_retry_interval,
-            optional(:refresh_options) => WeChat.RefreshHelper.refresh_options()
+            optional(:refresh_options) => DefaultSettings.refresh_options()
           }
+  @type client_settings :: [WeChat.client()] | %{WeChat.client() => client_setting}
+  @type state :: %{
+          :wait_for_signal => boolean,
+          :clients => [WeChat.client()],
+          WeChat.client() => client_setting
+        }
 
   @spec start_monitor() :: :ok
   def start_monitor do
     GenServer.call(__MODULE__, :start_monitor)
   end
 
-  @spec add(WeChat.client(), options) :: :ok
+  @spec add(WeChat.client(), client_setting) :: :ok
   def add(client, opts \\ %{}) do
     GenServer.call(__MODULE__, {:add, client, Map.new(opts)})
   end
@@ -101,25 +104,25 @@ defmodule WeChat.RefreshTimer do
   end
 
   @spec refresh_key(
+          WeChat.client(),
           StorageAdapter.store_id(),
           StorageAdapter.store_key(),
           StorageAdapter.value(),
-          expired_time :: integer(),
-          WeChat.client()
+          expires :: integer()
         ) :: :ok
-  def refresh_key(store_id, store_key, value, expired_time, client) do
-    GenServer.cast(__MODULE__, {:refresh_key, store_id, store_key, value, expired_time, client})
+  def refresh_key(client, store_id, store_key, value, expires) do
+    GenServer.cast(__MODULE__, {:refresh_key, client, store_id, store_key, value, expires})
   end
 
-  @spec start_link(state :: %{WeChat.client() => options}) :: GenServer.on_start()
-  def start_link(state \\ %{}) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  @spec start_link(client_settings) :: GenServer.on_start()
+  def start_link(client_settings \\ %{}) do
+    GenServer.start_link(__MODULE__, client_settings, name: __MODULE__)
   end
 
   @impl true
-  def init(state) do
+  def init(client_settings) do
     state =
-      Map.new(state, fn
+      Map.new(client_settings, fn
         client when is_atom(client) ->
           {client, init_client_options(client, %{})}
 
@@ -212,8 +215,8 @@ defmodule WeChat.RefreshTimer do
   end
 
   @impl true
-  def handle_cast({:refresh_key, store_id, store_key, value, expired_time, client}, state) do
-    cache_and_store(store_id, store_key, value, expired_time, client)
+  def handle_cast({:refresh_key, client, store_id, store_key, value, expires}, state) do
+    cache_and_store(store_id, store_key, value, expires, client)
     {:ok, state}
   end
 
@@ -239,14 +242,13 @@ defmodule WeChat.RefreshTimer do
     end
   end
 
-  defp cache_and_store(store_id, store_key, value, expired_time, client) do
+  defp cache_and_store(store_id, store_key, value, expires, client) do
     Cache.put_cache(store_id, store_key, value)
 
     with storage when storage != nil <- client.storage(),
          # 因为 hub_client 是从 storage 中读取 token 的，因此不需要再做写入操作
          true <- client.server_role() != :hub_client do
-      result =
-        storage.store(store_id, store_key, %{"value" => value, "expired_time" => expired_time})
+      result = storage.store(store_id, store_key, %{"value" => value, "expired_time" => expires})
 
       Logger.info(
         "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."
@@ -256,9 +258,9 @@ defmodule WeChat.RefreshTimer do
 
   defp restore_and_cache(store_id, store_key, client) do
     with storage when storage != nil <- client.storage(),
-         {:ok, %{"value" => value, "expired_time" => expired_time}} <-
+         {:ok, %{"value" => value, "expired_time" => expires}} <-
            storage.restore(store_id, store_key) do
-      diff = expired_time - Utils.now_unix()
+      diff = expires - Utils.now_unix()
 
       if diff > 0 do
         Cache.put_cache(store_id, store_key, value)
@@ -360,19 +362,14 @@ defmodule WeChat.RefreshTimer do
   defp cancel_timer(nil), do: :ignore
   defp cancel_timer(timer), do: :erlang.cancel_timer(timer)
 
-  @compile {:inline, get_store_id_by_id_type: 2}
-  defp get_store_id_by_id_type(:appid, client), do: client.appid()
-  defp get_store_id_by_id_type(:component_appid, client), do: client.component_appid()
-  defp get_store_id_by_id_type(store_id, _client) when is_binary(store_id), do: store_id
-
   defp refresh_token(store_id, store_key, fun, client, options) do
     case fun.(client) do
       {:ok, list, expires_in} when is_list(list) ->
         now = Utils.now_unix()
 
         Enum.each(list, fn {key, token, expires_in} ->
-          expired_time = now + expires_in
-          cache_and_store(store_id, key, token, expired_time, client)
+          expires = now + expires_in
+          cache_and_store(store_id, key, token, expires, client)
         end)
 
         Logger.info(
@@ -381,11 +378,10 @@ defmodule WeChat.RefreshTimer do
 
         ((expires_in - options.refresh_before_expired) * 1000)
         |> max(options.refresh_retry_interval)
-        |> start_refresh_token_timer(store_id, store_key, client)
 
       {:ok, token, expires_in} ->
-        expired_time = Utils.now_unix() + expires_in
-        cache_and_store(store_id, store_key, token, expired_time, client)
+        expires = Utils.now_unix() + expires_in
+        cache_and_store(store_id, store_key, token, expires, client)
 
         Logger.info(
           "Refresh appid: #{store_id}, key: #{store_key} succeed, get expires_in: #{expires_in}s."
@@ -393,7 +389,6 @@ defmodule WeChat.RefreshTimer do
 
         ((expires_in - options.refresh_before_expired) * 1000)
         |> max(options.refresh_retry_interval)
-        |> start_refresh_token_timer(store_id, store_key, client)
 
       error ->
         refresh_retry_interval = options.refresh_retry_interval
@@ -404,8 +399,9 @@ defmodule WeChat.RefreshTimer do
           }s later."
         )
 
-        start_refresh_token_timer(refresh_retry_interval, store_id, store_key, client)
+        refresh_retry_interval
     end
+    |> start_refresh_token_timer(store_id, store_key, client)
   end
 
   defp start_refresh_token_timer(time, store_id, store_key, client) do
@@ -427,11 +423,10 @@ defmodule WeChat.RefreshTimer do
           refresh_options
 
         nil ->
-          WeChat.RefreshHelper.get_refresh_options_by_client(client)
+          DefaultSettings.get_refresh_options_by_client(client)
       end
 
-    for {id_type, store_key, fun} <- refresh_options do
-      store_id = get_store_id_by_id_type(id_type, client)
+    for {store_id, store_key, fun} <- refresh_options do
       {{store_id, store_key}, fun, nil}
     end
   end

@@ -1,6 +1,6 @@
 defmodule WeChat.MixProject do
   use Mix.Project
-  alias WeChat.{ServerMessage, MiniProgram, Work, Storage}
+  alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work}
 
   @version "0.6.2"
 
@@ -48,21 +48,22 @@ defmodule WeChat.MixProject do
       extras: ["README.md", "LICENSE"],
       groups_for_modules: groups_for_modules(),
       groups_for_functions: [Action: &(&1[:doc_group] == :action)],
-      nest_modules_by_prefix: [ServerMessage, MiniProgram, MiniProgram.Live, Work, Work.Contacts]
+      nest_modules_by_prefix: [
+        Requester,
+        Refresher,
+        ServerMessage,
+        Storage,
+        MiniProgram,
+        MiniProgram.Live,
+        Work,
+        Work.Contacts
+      ]
     ]
   end
 
   defp groups_for_modules do
     [
-      {"Basic",
-       [
-         WeChat,
-         WeChat.RefreshTimer,
-         WeChat.RefreshHelper
-       ]},
-      {"Storage", [Storage.Adapter, Storage.File, Storage.Cache]},
       {"Structure", [WeChat.Material.Article]},
-      {"Requester", [WeChat.Requester, WeChat.WorkRequester]},
       {
         "用户管理 APIs",
         [

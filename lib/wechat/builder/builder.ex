@@ -18,7 +18,7 @@ defmodule WeChat.Builder do
     server_role: :client,
     by_component?: false,
     storage: WeChat.Storage.File,
-    requester: WeChat.Requester
+    requester: WeChat.Requester.OfficialAccount
   ]
   @both_modules [
     WeChat.CustomMessage,

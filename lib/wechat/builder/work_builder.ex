@@ -6,7 +6,7 @@ defmodule WeChat.WorkBuilder do
     server_role: :client,
     by_component?: false,
     storage: WeChat.Storage.File,
-    requester: WeChat.WorkRequester
+    requester: WeChat.Requester.Work
   ]
 
   @sub_modules [

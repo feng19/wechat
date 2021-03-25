@@ -212,4 +212,8 @@ defmodule WeChat do
   def get_oauth2_env_url(client, env) do
     Cache.get_cache(client.appid(), {:oauth2_env, env})
   end
+
+  def get_refresher do
+    Application.get_env(:wechat, :refresher, WeChat.Refresher.Default)
+  end
 end

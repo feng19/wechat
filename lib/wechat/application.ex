@@ -9,19 +9,12 @@ defmodule WeChat.Application do
     WeChat.Storage.Cache.init_table()
     finch_pool = Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
 
-    refresh_timer =
-      case Application.get_env(:wechat, :refresh_timer, WeChat.RefreshTimer) do
-        refresh_timer when is_atom(refresh_timer) ->
-          refresh_settings = Application.get_env(:wechat, :refresh_settings, %{})
-          {refresh_timer, refresh_settings}
-
-        child = {refresh_timer, _} when is_atom(refresh_timer) ->
-          child
-      end
+    refresher = WeChat.get_refresher()
+    refresh_settings = Application.get_env(:wechat, :refresh_settings, %{})
 
     children = [
       {Finch, name: WeChat.Finch, pools: %{:default => finch_pool}},
-      refresh_timer
+      {refresher, refresh_settings}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

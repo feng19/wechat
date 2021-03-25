@@ -1,6 +1,6 @@
-defmodule WeChat.Requester do
+defmodule WeChat.Requester.OfficialAccount do
   @moduledoc """
-  默认的请求客户端
+  默认的请求客户端(公众号&小程序&第三方)
 
   ```
   use Tesla

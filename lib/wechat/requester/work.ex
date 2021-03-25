@@ -1,4 +1,4 @@
-defmodule WeChat.WorkRequester do
+defmodule WeChat.Requester.Work do
   @moduledoc """
   默认的请求客户端(企业微信)
 

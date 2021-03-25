@@ -7,8 +7,8 @@
 [![Hex.pm](https://img.shields.io/hexpm/dt/wechat_sdk.svg?maxAge=2592000)](https://hex.pm/packages/wechat_sdk)
 
 - 目前 `Elixir` 中支持最完善的微信SDK
-- 已支持: 公众号/小程序/第三方应用
-- WIP: 企业微信
+- 已支持: 公众号/小程序/第三方应用/企业微信
+- WIP: 企业微信服务商
 
 [在线文档](http://hexdocs.pm/wechat_sdk/)
 

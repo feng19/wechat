@@ -1,9 +1,8 @@
-defmodule WeChat.RefreshHelper do
+defmodule WeChat.Refresher.DefaultSettings do
   @moduledoc """
   帮助模块： 输出刷新 `token` 的列表
   """
 
-  @type store_id_type :: :appid | :component_appid
   @type key_name :: atom
   @type token :: String.t()
   @type expires_in :: non_neg_integer
@@ -11,8 +10,7 @@ defmodule WeChat.RefreshHelper do
   @type refresh_fun_result ::
           {:ok, token, expires_in} | {:ok, token_list, expires_in} | {:error, any}
   @type refresh_fun :: (WeChat.client() -> refresh_fun_result)
-  @type refresh_option ::
-          {store_id_type | WeChat.Storage.Adapter.store_id(), key_name, refresh_fun}
+  @type refresh_option :: {WeChat.Storage.Adapter.store_id(), key_name, refresh_fun}
   @type refresh_options :: [refresh_option]
 
   alias WeChat.{Account, WebPage, Component, MiniProgram, Work, Utils}

@@ -10,7 +10,7 @@ if Code.ensure_loaded?(Plug) do
     """
     require Logger
     import WeChat.Utils, only: [doc_link_prefix: 0]
-    alias WeChat.{Utils, Component, RefreshTimer, Storage.Cache}
+    alias WeChat.{Utils, Component, Storage.Cache}
     alias WeChat.ServerMessage.{Encryptor, XmlParser, XmlMessage}
 
     @type data_type :: :plaqin_text | :encrypted_xml | :encrypted_json
@@ -283,21 +283,23 @@ if Code.ensure_loaded?(Plug) do
            } <- authorization_info do
         now = Utils.now_unix()
 
-        RefreshTimer.refresh_key(
+        refresher = WeChat.get_refresher()
+
+        refresher.refresh_key(
+          client,
           authorizer_appid,
           :access_token,
           authorizer_access_token,
-          now + expires_in,
-          client
+          now + expires_in
         )
 
         # 官网并未说明有效期是多少，暂时指定一年有效期
-        RefreshTimer.refresh_key(
+        refresher.refresh_key(
+          client,
           authorizer_appid,
           :authorizer_refresh_token,
           authorizer_refresh_token,
-          now + 356 * 24 * 60 * 60,
-          client
+          now + 356 * 24 * 60 * 60
         )
       end
 
