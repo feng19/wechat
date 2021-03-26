@@ -146,10 +146,8 @@ if Code.ensure_loaded?(Plug) do
            {timestamp, ""} <- Integer.parse(timestamp),
            now_timestamp <- Utils.now_unix(),
            true <- now_timestamp >= timestamp and now_timestamp - timestamp <= 5 do
-        Plug.Crypto.secure_compare(
-          signature,
-          Utils.sha1([client.token(), nonce, to_string(timestamp)])
-        )
+        challenge = Utils.sha1([client.token(), nonce, to_string(timestamp)])
+        Plug.Crypto.secure_compare(challenge, signature)
       else
         _ -> false
       end
@@ -159,10 +157,10 @@ if Code.ensure_loaded?(Plug) do
       with signature when signature != nil <- params["msg_signature"],
            nonce when nonce != nil <- params["nonce"],
            timestamp when timestamp != nil <- params["timestamp"] do
-        Plug.Crypto.secure_compare(
-          signature,
-          Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)])
-        )
+        challenge = Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)])
+        Plug.Crypto.secure_compare(challenge, signature)
+      else
+        _ -> false
       end
     end
 
@@ -329,8 +327,7 @@ if Code.ensure_loaded?(Plug) do
            {:ok, xml} <- XmlParser.parse(xml_string) do
         {:ok, :encrypted_xml, xml}
       else
-        _error ->
-          {:error, "invalid"}
+        _error -> {:error, "invalid"}
       end
     end
 
@@ -343,8 +340,7 @@ if Code.ensure_loaded?(Plug) do
            {:ok, json} <- Jason.decode(json_string) do
         {:ok, :encrypted_json, json}
       else
-        _error ->
-          {:error, "invalid"}
+        _error -> {:error, "invalid"}
       end
     end
 
