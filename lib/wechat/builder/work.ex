@@ -1,6 +1,6 @@
-defmodule WeChat.WorkBuilder do
+defmodule WeChat.Builder.Work do
   @moduledoc false
-  alias WeChat.Work
+  alias WeChat.{Work, Work.Contacts, Builder.Utils}
 
   @default_opts [
     server_role: :client,
@@ -11,10 +11,7 @@ defmodule WeChat.WorkBuilder do
 
   @sub_modules [
     Work.Message,
-    {
-      :contacts,
-      [Work.Contacts.Tag, Work.Contacts.User, Work.Contacts.Department]
-    }
+    {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]}
   ]
 
   defmacro __using__(options \\ []) do
@@ -129,7 +126,7 @@ defmodule WeChat.WorkBuilder do
           module, acc ->
             [module | acc]
         end)
-        |> WeChat.Builder.gen_sub_modules(client, 2)
+        |> Utils.gen_sub_modules(client, 2)
       else
         []
       end

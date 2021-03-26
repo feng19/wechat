@@ -163,7 +163,7 @@ defmodule WeChat do
   @doc false
   defmacro __using__(options \\ []) do
     quote do
-      use WeChat.Builder, unquote(options)
+      use WeChat.Builder.OfficialAccount, unquote(options)
     end
   end
 
@@ -181,7 +181,7 @@ defmodule WeChat do
              client,
              quote do
                @moduledoc false
-               use WeChat.Builder, unquote(options)
+               use WeChat.Builder.OfficialAccount, unquote(Macro.escape(options))
              end,
              Macro.Env.location(__ENV__)
            ) do

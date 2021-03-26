@@ -95,7 +95,7 @@ defmodule WeChat.Work do
   defmacro __using__(options \\ []) do
     quote do
       import WeChat.Work.Agent
-      use WeChat.WorkBuilder, unquote(options)
+      use WeChat.Builder.Work, unquote(options)
     end
   end
 
@@ -107,7 +107,7 @@ defmodule WeChat.Work do
              client,
              quote do
                @moduledoc false
-               use WeChat.WorkBuilder, unquote(Macro.escape(options))
+               use WeChat.Builder.Work, unquote(Macro.escape(options))
              end,
              Macro.Env.location(__ENV__)
            ) do
