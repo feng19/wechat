@@ -12,8 +12,8 @@ defmodule WeChat.Builder.Pay do
 
       def start_link(opts) do
         opts = Map.new(opts)
-        requester_a = get_requester_spec(:a, client, opts.cacerts)
-        requester_b = get_requester_spec(:b, client, opts.cacerts)
+        requester_a = WeChat.Pay.get_requester_spec(:a, __MODULE__, opts.cacerts)
+        requester_b = WeChat.Pay.get_requester_spec(:b, __MODULE__, opts.cacerts)
         requester_name = elem(requester_a, 1) |> Keyword.get(:name)
         WeChat.Pay.put_requester_opts(__MODULE__, requester_name, opts.serial_no)
         refresher = Map.get(opts, :refresher, WeChat.Refresher.Pay)
