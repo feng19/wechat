@@ -37,8 +37,14 @@ defmodule WeChat.Pay do
     end
   end
 
-  def put_requester_opts(client, name, serial_no) do
-    :persistent_term.put({:wechat, {client, :requester_opts}}, %{name: name, serial_no: serial_no})
+  def put_requester_opts(client, id, serial_no) do
+    name = finch_name(client, id)
+
+    :persistent_term.put({:wechat, {client, :requester_opts}}, %{
+      id: id,
+      name: name,
+      serial_no: serial_no
+    })
   end
 
   def get_requester_opts(client) do
@@ -59,9 +65,10 @@ defmodule WeChat.Pay do
     :persistent_term.erase({:wechat, {client, serial_no}})
   end
 
+  defp finch_name(client, id), do: :"#{client}.Finch.#{id}"
+
   def get_requester_spec(id, client, cacerts) when is_atom(id) do
-    id_str = to_string(id) |> String.upcase()
-    name = :"#{__MODULE__}.Finch.#{id_str}"
+    name = finch_name(client, id)
 
     finch_pool =
       Application.get_env(:wechat, :finch_pool, size: 32, count: 8) ++
@@ -75,7 +82,9 @@ defmodule WeChat.Pay do
           ]
         ]
 
-    {Finch, id: id, name: name, pools: %{:default => finch_pool}}
+    options = [name: name, pools: %{:default => finch_pool}]
+    spec = Finch.child_spec(options)
+    %{spec | id: id}
   end
 
   # [平台证书更新指引](https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay5_0.shtml)
@@ -84,17 +93,8 @@ defmodule WeChat.Pay do
   #  * 然后 将新的 Finch 进程名写入到 :persistent_term 保存
   #  * 请求的时候，从 :persistent_term 获取 Finch 进程名，然后再请求
   def start_next_requester(client, opts) do
-    %{name: name} = get_requester_opts(client)
-
-    now_id =
-      name
-      |> to_string()
-      |> String.split(".")
-      |> List.last()
-      |> String.downcase()
-      |> String.to_existing_atom()
-
-    id = List.delete([:a, :b], now_id) |> hd()
+    %{id: now_id} = get_requester_opts(client)
+    id = List.delete([:A, :B], now_id) |> hd()
     finch_spec = get_requester_spec(id, client, opts.cacerts)
     sup = :"#{client}.Supervisor"
 

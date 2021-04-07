@@ -12,10 +12,9 @@ defmodule WeChat.Builder.Pay do
 
       def start_link(opts) do
         opts = Map.new(opts)
-        requester_a = WeChat.Pay.get_requester_spec(:a, __MODULE__, opts.cacerts)
-        requester_b = WeChat.Pay.get_requester_spec(:b, __MODULE__, opts.cacerts)
-        requester_name = elem(requester_a, 1) |> Keyword.get(:name)
-        WeChat.Pay.put_requester_opts(__MODULE__, requester_name, opts.serial_no)
+        requester_a = WeChat.Pay.get_requester_spec(:A, __MODULE__, opts.cacerts)
+        requester_b = WeChat.Pay.get_requester_spec(:B, __MODULE__, opts.cacerts)
+        WeChat.Pay.put_requester_opts(__MODULE__, :A, opts.serial_no)
         refresher = Map.get(opts, :refresher, WeChat.Refresher.Pay)
         children = [{refresher, {__MODULE__, opts}}, requester_a, requester_b]
         opts = [strategy: :one_for_one, name: :"#{__MODULE__}.Supervisor"]
