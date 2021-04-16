@@ -172,7 +172,7 @@ defmodule WeChat.SubscribeMessage do
   @spec send(WeChat.client(), WeChat.openid(), template_id, send_data, send_options) ::
           WeChat.response()
   def send(client, openid, template_id, data, options \\ %{}) do
-    data = Enum.into(data, fn {k, v} -> %{k => %{value: v}} end)
+    data = Enum.into(data, %{}, fn {k, v} -> {k, %{value: v}} end)
 
     client.post(
       "/cgi-bin/message/subscribe/send",
