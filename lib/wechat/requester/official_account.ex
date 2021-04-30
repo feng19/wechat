@@ -10,9 +10,20 @@ defmodule WeChat.Requester.OfficialAccount do
   """
   use Tesla, only: [:get, :post]
 
-  adapter(Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000)
+  adapter Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000
 
-  plug(Tesla.Middleware.BaseUrl, "https://api.weixin.qq.com")
-  plug(Tesla.Middleware.Logger)
-  plug(Tesla.Middleware.JSON, decode_content_types: ["text/plain"])
+  plug Tesla.Middleware.BaseUrl, "https://api.weixin.qq.com"
+  plug Tesla.Middleware.Logger
+
+  plug Tesla.Middleware.Retry,
+    delay: 500,
+    max_retries: 3,
+    max_delay: 2_000,
+    should_retry: fn
+      {:ok, %{status: status}} when status in [400, 500] -> true
+      {:ok, _} -> false
+      {:error, _} -> true
+    end
+
+  plug Tesla.Middleware.JSON, decode_content_types: ["text/plain"]
 end

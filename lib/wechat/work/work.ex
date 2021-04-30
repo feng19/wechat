@@ -13,7 +13,7 @@ defmodule WeChat.Work do
   ```
   """
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
-  alias WeChat.Work
+  alias WeChat.Work.Agent
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
 
@@ -34,10 +34,10 @@ defmodule WeChat.Work do
 
   在管理后台->“应用与小程序”->“应用”，点进某个应用，即可看到 agentid
   """
-  @type agent_id :: Work.Agent.agent_id()
-  @type agent_name :: Work.Agent.agent_name()
+  @type agent_id :: Agent.agent_id()
+  @type agent_name :: Agent.agent_name()
   @type agent :: agent_name | agent_id
-  @type agents :: [Work.Agent.t(), ...]
+  @type agents :: [Agent.t(), ...]
 
   @typedoc """
   secret 是企业应用里面用于保障数据安全的“钥匙” -
@@ -55,7 +55,7 @@ defmodule WeChat.Work do
   - 外部联系人管理 `secret`
     在“客户联系”栏，点开“API”小按钮，即可看到。
   """
-  @type secret :: Work.Agent.secret()
+  @type secret :: Agent.secret()
 
   @typedoc """
   参数
