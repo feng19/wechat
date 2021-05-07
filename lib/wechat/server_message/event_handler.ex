@@ -219,12 +219,30 @@ if Code.ensure_loaded?(Plug) do
     * [验证票据](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
     * [授权相关推送通知](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/authorize_event.html)
     """
-    def handle_component_message(%{"InfoType" => info_type, "AppId" => component_appid} = message) do
+    def handle_component_message(
+          %{"InfoType" => info_type, "AppId" => component_appid} = message,
+          client
+        ) do
       case info_type do
         "component_verify_ticket" ->
           # 验证票据
-          component_verify_ticket = message["ComponentVerifyTicket"]
-          Cache.put_cache(component_appid, :component_verify_ticket, component_verify_ticket)
+          ticket = message["ComponentVerifyTicket"]
+          store_id = component_appid
+          store_key = :component_verify_ticket
+          Cache.put_cache(store_id, store_key, ticket)
+
+          if storage = client.storage() do
+            result =
+              storage.store(store_id, store_key, %{
+                "value" => ticket,
+                "expired_time" => Utils.now_unix() + 600
+              })
+
+            Logger.info(
+              "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."
+            )
+          end
+
           Logger.info("#{component_appid} Received [component_verify_ticket] info.")
           :handled
 

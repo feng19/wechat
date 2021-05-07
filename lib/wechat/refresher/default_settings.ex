@@ -3,6 +3,9 @@ defmodule WeChat.Refresher.DefaultSettings do
   帮助模块： 输出刷新 `token` 的列表
   """
 
+  require Logger
+  alias WeChat.{Account, WebPage, Component, MiniProgram, Work, Utils, Storage.Cache}
+
   @type key_name :: atom
   @type token :: String.t()
   @type expires_in :: non_neg_integer
@@ -12,8 +15,6 @@ defmodule WeChat.Refresher.DefaultSettings do
   @type refresh_fun :: (WeChat.client() -> refresh_fun_result)
   @type refresh_option :: {WeChat.Storage.Adapter.store_id(), key_name, refresh_fun}
   @type refresh_options :: [refresh_option]
-
-  alias WeChat.{Account, WebPage, Component, MiniProgram, Work, Utils}
 
   @doc """
   根据不同的 `client` 的 `app_type` & `by_component?` 输出不同的 `refresh_options`
@@ -171,9 +172,39 @@ defmodule WeChat.Refresher.DefaultSettings do
   def refresh_component_access_token(client) do
     with :not_hub_client <-
            get_hub_client_token(client, client.component_appid(), :component_access_token),
-         {:ok, %{status: 200, body: data}} <- Component.get_component_token(client),
+         ticket when ticket != nil <- ensure_component_verify_ticket(client),
+         {:ok, %{status: 200, body: data}} <- Component.get_component_token(client, ticket),
          %{"component_access_token" => component_access_token, "expires_in" => expires_in} <- data do
       {:ok, component_access_token, expires_in}
+    end
+  end
+
+  defp ensure_component_verify_ticket(client) do
+    store_id = client.component_appid()
+    store_key = :component_verify_ticket
+
+    case Cache.get_cache(store_id, store_key) do
+      nil ->
+        with storage when storage != nil <- client.storage(),
+             {:ok, %{"value" => ticket, "expired_time" => expires}} <-
+               storage.restore(store_id, store_key),
+             diff <- expires - Utils.now_unix(),
+             true <- diff > 0 do
+          Cache.put_cache(store_id, store_key, ticket)
+
+          Logger.info(
+            "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{
+              diff
+            }s."
+          )
+
+          ticket
+        else
+          _ -> nil
+        end
+
+      ticket ->
+        ticket
     end
   end
 

@@ -1,51 +1,50 @@
 defmodule WeChatTest do
-  use ExUnit.Case
-  alias WeChat.Utils
-  alias WeChat.ServerMessage.{EventHandler, XmlMessage, XmlParser}
+  use ExUnit.Case, async: true
+  alias WeChat.Test.{OfficialAccount, Work, Work2}
   doctest WeChat
 
-  test "Auto generate functions" do
-    assert WxApp.app_type() == :official_account
-    assert WxApp.by_component?() == false
-    assert WxApp.server_role() == :client
-    assert WxApp.code_name() == "wxapp"
-    assert WxApp.storage() == WeChat.Storage.File
-    assert WxApp.appid() == "wx2c2769f8efd9abc2"
-    assert WxApp.appsecret() == "appsecret"
-    assert WxApp.encoding_aes_key() == "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG"
+  test "Auto generate functions(OfficialAccount)" do
+    assert OfficialAccount.app_type() == :official_account
+    assert OfficialAccount.by_component?() == false
+    assert OfficialAccount.server_role() == :client
+    assert OfficialAccount.code_name() == "officialaccount"
+    assert OfficialAccount.storage() == WeChat.Storage.File
+    assert OfficialAccount.appid() == "wx2c2769f8efd9abc2"
+    assert OfficialAccount.appsecret() == "appsecret"
+    assert OfficialAccount.encoding_aes_key() == "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG"
 
     aes_key =
       WeChat.ServerMessage.Encryptor.aes_key("abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG")
 
-    assert WxApp.aes_key() == aes_key
-    assert WxApp.token() == "spamtest"
-    assert true = Enum.all?(1..3, &function_exported?(WxApp, :get, &1))
-    assert true = Enum.all?(2..4, &function_exported?(WxApp, :post, &1))
+    assert OfficialAccount.aes_key() == aes_key
+    assert OfficialAccount.token() == "spamtest"
+    assert true = Enum.all?(1..3, &function_exported?(OfficialAccount, :get, &1))
+    assert true = Enum.all?(2..4, &function_exported?(OfficialAccount, :post, &1))
   end
 
-  test "Auto generate functions(Work)" do
-    assert WxWork.app_type() == :work
-    assert WxWork.by_component?() == false
-    assert WxWork.server_role() == :client
-    assert WxWork.storage() == WeChat.Storage.File
-    assert WxWork.appid() == "corp_id"
-    assert is_list(WxWork.agents())
-    assert WxWork.agent2cache_id(10000) == "corp_id_10000"
-    assert WxWork.agent2cache_id(:agent_name) == "corp_id_10000"
+  test "Auto generate functions(Work) - include Contacts" do
+    assert Work.app_type() == :work
+    assert Work.by_component?() == false
+    assert Work.server_role() == :client
+    assert Work.storage() == WeChat.Storage.File
+    assert Work.appid() == "corp_id"
+    assert is_list(Work.agents())
+    assert Work.agent2cache_id(10000) == "corp_id_10000"
+    assert Work.agent2cache_id(:agent_name) == "corp_id_10000"
 
-    assert true = Enum.all?(1..3, &function_exported?(WxWork, :get, &1))
-    assert true = Enum.all?(2..4, &function_exported?(WxWork, :post, &1))
-    assert Code.ensure_loaded?(WxWork.Message)
-    assert function_exported?(WxWork.Message, :send_message, 2)
-    assert Code.ensure_loaded?(WxWork.Contacts.Department)
-    assert function_exported?(WxWork.Contacts.Department, :list, 0)
+    assert true = Enum.all?(1..3, &function_exported?(Work, :get, &1))
+    assert true = Enum.all?(2..4, &function_exported?(Work, :post, &1))
+    assert Code.ensure_loaded?(Work.Message)
+    assert function_exported?(Work.Message, :send_message, 2)
+    assert Code.ensure_loaded?(Work.Contacts.Department)
+    assert function_exported?(Work.Contacts.Department, :list, 0)
   end
 
-  test "Auto generate functions(Work) - exclude" do
-    assert Code.ensure_loaded?(WxWork2.Message)
-    assert function_exported?(WxWork2.Message, :send_message, 2)
-    assert false == Code.ensure_loaded?(WxWork2.Contacts.Department)
-    assert false == function_exported?(WxWork2.Contacts.Department, :list, 0)
+  test "Auto generate functions(Work) - exclude Contacts" do
+    assert Code.ensure_loaded?(Work2.Message)
+    assert function_exported?(Work2.Message, :send_message, 2)
+    assert false == Code.ensure_loaded?(Work2.Contacts.Department)
+    assert false == function_exported?(Work2.Contacts.Department, :list, 0)
   end
 
   test "build official_account client" do
@@ -92,51 +91,5 @@ defmodule WeChatTest do
     assert apply(WxApp5, :appid, []) == "wx2c2769f8efd9abc2"
     assert false == function_exported?(WxApp5.WebPage, :code2access_token, 1)
     assert function_exported?(WxApp5.MiniProgram.Auth, :code2session, 1)
-  end
-
-  test "xml_parse" do
-    timestamp = Utils.now_unix()
-
-    {:ok, map} =
-      XmlMessage.reply_text(
-        "oia2TjjewbmiOUlr6X-1crbLOvLw",
-        "gh_7f083739789a",
-        timestamp,
-        "hello world"
-      )
-      |> XmlParser.parse()
-
-    assert map == %{
-             "Content" => "hello world",
-             "CreateTime" => to_string(timestamp),
-             "FromUserName" => "gh_7f083739789a",
-             "MsgType" => "text",
-             "ToUserName" => "oia2TjjewbmiOUlr6X-1crbLOvLw"
-           }
-  end
-
-  test "Encrypt Msg" do
-    client = WxApp
-    timestamp = Utils.now_unix()
-    to_openid = "oia2TjjewbmiOUlr6X-1crbLOvLw"
-    from_wx_no = "gh_7f083739789a"
-    content = "hello world"
-    xml_text = XmlMessage.reply_text(to_openid, from_wx_no, timestamp, content)
-
-    xml_string = EventHandler.encode_xml_msg(xml_text, timestamp, client)
-    {:ok, xml} = XmlParser.parse(xml_string)
-    encrypt_content = xml["Encrypt"]
-
-    params = %{
-      "msg_signature" => xml["MsgSignature"],
-      "nonce" => xml["Nonce"],
-      "timestamp" => timestamp
-    }
-
-    {:ok, :encrypted_xml, xml_text} = EventHandler.decode_xml_msg(encrypt_content, params, client)
-
-    assert xml_text["ToUserName"] == to_openid
-    assert xml_text["FromUserName"] == from_wx_no
-    assert xml_text["Content"] == content
   end
 end

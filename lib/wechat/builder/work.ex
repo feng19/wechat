@@ -18,11 +18,9 @@ defmodule WeChat.Builder.Work do
     opts = Macro.prewalk(options, &Macro.expand(&1, __CALLER__))
     default_opts = Keyword.merge(@default_opts, opts)
 
-    corp_id =
-      case Keyword.get(default_opts, :corp_id) do
-        corp_id when is_binary(corp_id) -> corp_id
-        _ -> raise ArgumentError, "please set corp_id option"
-      end
+    unless Keyword.get(default_opts, :corp_id) |> is_binary() do
+      raise ArgumentError, "please set corp_id option"
+    end
 
     agents =
       case Keyword.get(default_opts, :agents) do
@@ -44,6 +42,32 @@ defmodule WeChat.Builder.Work do
           raise ArgumentError, "please set :agents option"
       end
 
+    sub_modules =
+      if Keyword.get(default_opts, :gen_sub_module?, true) do
+        client = __CALLER__.module
+
+        default_opts
+        |> Keyword.get(:sub_modules, @sub_modules)
+        |> Enum.reduce([], fn
+          {agent, modules}, acc ->
+            case Enum.find(agents, &match?(^agent, &1.id)) do
+              nil -> acc
+              _ -> modules ++ acc
+            end
+
+          module, acc ->
+            [module | acc]
+        end)
+        |> Utils.gen_sub_modules(client, 2)
+      else
+        []
+      end
+
+    gen_get_functions(default_opts, agents) ++ sub_modules
+  end
+
+  defp gen_get_functions(default_opts, agents) do
+    corp_id = Keyword.get(default_opts, :corp_id)
     storage = Keyword.get(default_opts, :storage)
     requester = Keyword.get(default_opts, :requester)
     server_role = Keyword.get(default_opts, :server_role)
@@ -110,27 +134,6 @@ defmodule WeChat.Builder.Work do
       end)
       |> Enum.unzip()
 
-    sub_modules =
-      if Keyword.get(default_opts, :gen_sub_module?, true) do
-        client = __CALLER__.module
-
-        default_opts
-        |> Keyword.get(:sub_modules, @sub_modules)
-        |> Enum.reduce([], fn
-          {agent, modules}, acc ->
-            case Enum.find(agents, &match?(^agent, &1.id)) do
-              nil -> acc
-              _ -> modules ++ acc
-            end
-
-          module, acc ->
-            [module | acc]
-        end)
-        |> Utils.gen_sub_modules(client, 2)
-      else
-        []
-      end
-
-    [base | agent2cache_id_funs] ++ agent_secret_funs ++ sub_modules
+    [base | agent2cache_id_funs] ++ agent_secret_funs
   end
 end

@@ -10,10 +10,13 @@ defmodule WeChat.Requester.Work do
   """
   use Tesla, only: [:get, :post]
 
-  adapter Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000
-
-  plug Tesla.Middleware.BaseUrl, "https://qyapi.weixin.qq.com"
-  plug Tesla.Middleware.Logger
+  if Mix.env() == :test do
+    adapter Tesla.Mock
+  else
+    adapter Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000
+    plug Tesla.Middleware.BaseUrl, "https://qyapi.weixin.qq.com"
+    plug Tesla.Middleware.Logger
+  end
 
   plug Tesla.Middleware.Retry,
     delay: 500,

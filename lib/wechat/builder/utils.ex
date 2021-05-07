@@ -1,25 +1,19 @@
 defmodule WeChat.Builder.Utils do
   @moduledoc false
 
-  def gen_sub_modules(sub_modules, parent_module, drop_amount \\ 1) do
-    client_module =
-      parent_module
-      |> Module.split()
-      |> List.last()
-      |> String.to_atom()
-
+  def gen_sub_modules(sub_modules, client_module, drop_amount \\ 1) do
     {sub_module_ast_list, files} =
       sub_modules
       |> Enum.uniq()
       |> Enum.map_reduce([], fn module, acc ->
-        {file, ast} = _gen_sub_module(module, parent_module, client_module, drop_amount)
+        {file, ast} = _gen_sub_module(module, client_module, drop_amount)
         {ast, [quote(do: @external_resource(unquote(file))) | acc]}
       end)
 
     files ++ sub_module_ast_list
   end
 
-  defp _gen_sub_module(module, parent_module, client_module, drop_amount) do
+  defp _gen_sub_module(module, client_module, drop_amount) do
     file = module.__info__(:compile)[:source]
 
     {:ok, ast} =
@@ -50,7 +44,6 @@ defmodule WeChat.Builder.Utils do
               do:
                 {:__block__, [],
                  [
-                   quote(do: alias(unquote(parent_module))),
                    quote(do: @file(unquote(to_string(module))))
                    | list
                  ]}

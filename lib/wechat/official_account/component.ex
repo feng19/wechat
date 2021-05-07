@@ -91,20 +91,33 @@ defmodule WeChat.Component do
   获取令牌 -
   [官方文档](#{@doc_link}/component_access_token.html){:target="_blank"}
   """
-  @spec get_component_token(WeChat.client()) :: nil | WeChat.response()
+  @spec get_component_token(WeChat.client()) :: WeChat.response()
   def get_component_token(client) do
-    component_appid = client.component_appid()
-
-    with ticket when ticket != nil <- Cache.get_cache(component_appid, :component_verify_ticket) do
-      client.post(
-        "/cgi-bin/component/api_component_token",
-        json_map(
-          component_appid: component_appid,
-          component_appsecret: client.component_appsecret(),
-          component_verify_ticket: ticket
-        )
-      )
+    client.component_appid()
+    |> Cache.get_cache(:component_verify_ticket)
+    |> case do
+      nil -> {:error, :missing_component_verify_ticket}
+      ticket -> get_component_token(client, ticket)
     end
+  end
+
+  @doc """
+  获取令牌 -
+  [官方文档](#{@doc_link}/component_access_token.html){:target="_blank"}
+
+  ## ticket 来源
+    [验证票据](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
+  """
+  @spec get_component_token(WeChat.client(), ticket :: String.t()) :: WeChat.response()
+  def get_component_token(client, ticket) do
+    client.post(
+      "/cgi-bin/component/api_component_token",
+      json_map(
+        component_appid: client.component_appid(),
+        component_appsecret: client.component_appsecret(),
+        component_verify_ticket: ticket
+      )
+    )
   end
 
   @doc """

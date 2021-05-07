@@ -1,33 +1,4 @@
-defmodule WxOfficialAccount do
-  @moduledoc "公众号"
-  use WeChat, appid: "wx2c2769f8efd9abc2"
-end
-
-defmodule WxComponent do
-  @moduledoc "公众号 - by第三方"
-  use WeChat,
-    appid: "wx2c2769f8efd9abc2",
-    by_component?: true,
-    component_appid: "wx3c2769f8efd9abc3"
-end
-
-defmodule WxMini do
-  @moduledoc "小程序"
-  use WeChat,
-    appid: "wx2c2769f8efd9abc2",
-    app_type: :mini_program
-end
-
-defmodule WxMiniComponent do
-  @moduledoc "小程序 - by第三方"
-  use WeChat,
-    appid: "wx2c2769f8efd9abc2",
-    app_type: :mini_program,
-    by_component?: true,
-    component_appid: "wx3c2769f8efd9abc3"
-end
-
-defmodule WxApp do
+defmodule WeChat.Test.OfficialAccount do
   @moduledoc "公众号"
   use WeChat,
     appid: "wx2c2769f8efd9abc2",
@@ -37,7 +8,32 @@ defmodule WxApp do
     gen_sub_module?: false
 end
 
-defmodule WxWork do
+defmodule WeChat.Test.Component do
+  @moduledoc "公众号 - by第三方"
+  use WeChat,
+    appid: "wx2c2769f8efd9abc2",
+    by_component?: true,
+    component_appid: "wx3c2769f8efd9abc3"
+end
+
+defmodule WeChat.Test.Mini do
+  @moduledoc "小程序"
+  use WeChat,
+    appid: "wx2c2769f8efd9abc2",
+    app_type: :mini_program
+end
+
+defmodule WeChat.Test.MiniComponent do
+  @moduledoc "小程序 - by第三方"
+  use WeChat,
+    appid: "wx2c2769f8efd9abc2",
+    app_type: :mini_program,
+    by_component?: true,
+    component_appid: "wx3c2769f8efd9abc3"
+end
+
+defmodule WeChat.Test.Work do
+  @moduledoc "企业微信 - 包含通讯录"
   use WeChat.Work,
     corp_id: "corp_id",
     agents: [
@@ -46,7 +42,8 @@ defmodule WxWork do
     ]
 end
 
-defmodule WxWork2 do
+defmodule WeChat.Test.Work2 do
+  @moduledoc "企业微信"
   use WeChat.Work,
     corp_id: "corp_id",
     agents: [
