@@ -7,7 +7,7 @@ defmodule WeChat.Refresher.DefaultTest do
     WeChat.Test.Mock.mock()
   end
 
-  test "module exists" do
+  test "add client" do
     assert :ok = Default.add(OfficialAccount)
   end
 end
