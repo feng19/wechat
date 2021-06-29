@@ -2,12 +2,12 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work}
 
-  @version "0.6.6"
+  @version "0.7.0"
 
   def project do
     [
       app: :wechat,
-      description: "WeChat SDK for Elixir, 支持: 公众号/小程序/第三方应用/企业微信",
+      description: "WeChat SDK for Elixir, 支持: 公众号/小程序/第三方应用/企业微信/微信支付",
       version: @version,
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
