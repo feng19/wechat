@@ -40,6 +40,17 @@ defmodule WeChat do
   end
   ```
 
+  ### 企业微信
+
+  ```elixir
+  defmodule YourApp.WeChatAppCodeName do
+    @moduledoc "CodeName"
+    use WeChat.Work,
+      corp_id: "corp_id",
+      agents: [%Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}, ...]
+  end
+  ```
+
   ## 参数说明
 
   请看 `t:options/0`
