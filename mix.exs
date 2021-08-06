@@ -2,12 +2,12 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work}
 
-  @version "0.7.0"
+  @version "0.7.1"
+  @source_url "https://github.com/feng19/wechat"
 
   def project do
     [
       app: :wechat,
-      description: "WeChat SDK for Elixir, 支持: 公众号/小程序/第三方应用/企业微信/微信支付",
       version: @version,
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
@@ -37,15 +37,20 @@ defmodule WeChat.MixProject do
       {:jason, "~> 1.2"},
       {:saxy, "~> 1.2", optional: true},
       {:plug, "~> 1.11", optional: true},
-      {:ex_doc, "~> 0.22", only: [:docs, :dev], runtime: false}
+      {:ex_doc, ">= 0.0.0", only: [:docs, :dev], runtime: false}
     ]
   end
 
   defp docs do
     [
+      extras: [
+        "LICENSE.md": [title: "License"],
+        "README.md": [title: "Overview"]
+      ],
       main: "readme",
+      source_url: @source_url,
+      formatters: ["html"],
       formatter_opts: [gfm: true],
-      extras: ["README.md", "LICENSE"],
       groups_for_modules: groups_for_modules(),
       groups_for_functions: [Action: &(&1[:doc_group] == :action)],
       nest_modules_by_prefix: [
@@ -155,10 +160,11 @@ defmodule WeChat.MixProject do
   defp package do
     [
       name: "wechat_sdk",
-      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      description: "WeChat SDK for Elixir, 支持: 公众号/小程序/第三方应用/企业微信/微信支付",
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
       maintainers: ["feng19"],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/feng19/wechat"}
+      links: %{"GitHub" => @source_url}
     ]
   end
 end

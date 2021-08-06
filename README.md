@@ -2,9 +2,11 @@
 
 **WeChat SDK for Elixir**
 
-[![Hex.pm](https://img.shields.io/hexpm/v/wechat_sdk.svg?maxAge=2592000)](https://hex.pm/packages/wechat_sdk)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-9768d1.svg)](https://hexdocs.pm/wechat_sdk)
-[![Hex.pm](https://img.shields.io/hexpm/dt/wechat_sdk.svg?maxAge=2592000)](https://hex.pm/packages/wechat_sdk)
+[![Module Version](https://img.shields.io/hexpm/v/wechat_sdk.svg)](https://hex.pm/packages/wechat_sdk)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/wechat_sdk/)
+[![Total Download](https://img.shields.io/hexpm/dt/wechat_sdk.svg)](https://hex.pm/packages/wechat_sdk)
+[![License](https://img.shields.io/hexpm/l/wechat.svg)](https://github.com/feng19/wechat/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/feng19/wechat.svg)](https://github.com/feng19/wechat/commits/master)
 
 - 目前 `Elixir` 中支持最完善的微信SDK
 - 已支持: 公众号/小程序/第三方应用/企业微信/微信支付
@@ -100,6 +102,16 @@ WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
 
 如果有接口未覆盖到，欢迎提交 `PR`，感谢。
 
-## License
+## Copyright and License
 
-wechat source code is released under Apache 2 License. Check the [LICENSE](./LICENSE) file for more information.
+Copyright (c) 2021 feng19
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
