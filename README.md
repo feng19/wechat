@@ -1,12 +1,12 @@
 # WeChat
 
-**WeChat SDK for Elixir**
-
 [![Module Version](https://img.shields.io/hexpm/v/wechat_sdk.svg)](https://hex.pm/packages/wechat_sdk)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/wechat_sdk/)
 [![Total Download](https://img.shields.io/hexpm/dt/wechat_sdk.svg)](https://hex.pm/packages/wechat_sdk)
 [![License](https://img.shields.io/hexpm/l/wechat.svg)](https://github.com/feng19/wechat/blob/master/LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/feng19/wechat.svg)](https://github.com/feng19/wechat/commits/master)
+
+**WeChat SDK for Elixir**
 
 - 目前 `Elixir` 中支持最完善的微信SDK
 - 已支持: 公众号/小程序/第三方应用/企业微信/微信支付
