@@ -174,8 +174,11 @@ defmodule WeChat.SubscribeMessage do
   def send(client, openid, template_id, data, options \\ %{}) do
     data = Enum.into(data, %{}, fn {k, v} -> {k, %{value: v}} end)
 
-    client.post(
-      "/cgi-bin/message/subscribe/send",
+    case client.app_type() do
+      :official_account -> "/cgi-bin/message/subscribe/bizsend"
+      :mini_program -> "/cgi-bin/message/subscribe/send"
+    end
+    |> client.post(
       Map.merge(options, %{touser: openid, template_id: template_id, data: data}),
       query: [access_token: client.get_access_token()]
     )
