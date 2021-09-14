@@ -149,6 +149,8 @@ defmodule WeChat.MixProject do
        [
          Work,
          Work.Agent,
+         Work.App,
+         Work.AppChat,
          Work.Message,
          Work.Contacts.Department,
          Work.Contacts.User,

@@ -13,7 +13,7 @@ defmodule WeChat.Builder.Utils do
     files ++ sub_module_ast_list
   end
 
-  defp _gen_sub_module(module, client_module, drop_amount) do
+  defp _gen_sub_module(module, client, drop_amount) do
     file = module.__info__(:compile)[:source]
 
     {:ok, ast} =
@@ -27,72 +27,76 @@ defmodule WeChat.Builder.Utils do
       |> Enum.drop_while(&(&1 != "wechat"))
       |> Path.join()
 
-    new_module_name_alias =
+    sub_module =
       module
       |> Module.split()
       |> Enum.drop(drop_amount)
       |> Enum.map(&String.to_atom/1)
 
+    ast = Macro.prewalk(ast, &ast_transform(&1, {module, client, sub_module}))
+    {file, ast}
+  end
+
+  defp ast_transform(
+         {:defmodule, c_m, [{:__aliases__, c_a, _}, do_list]},
+         {module, _, sub_module}
+       ) do
+    [do: {:__block__, [], list}] = do_list
+
+    do_list = [
+      do:
+        {:__block__, [],
+         [
+           quote(do: @file(unquote(to_string(module))))
+           | list
+         ]}
+    ]
+
+    {:defmodule, c_m, [{:__aliases__, c_a, sub_module}, do_list]}
+  end
+
+  defp ast_transform({:spec, c_s, ast}, _acc) do
     ast =
       Macro.prewalk(
         ast,
         fn
-          {:defmodule, c_m, [{:__aliases__, c_a, _}, do_list]} ->
-            [do: {:__block__, [], list}] = do_list
+          {fun_name, context, [{{:., _, [{:__aliases__, _, _}, :client]}, _, _} | args]}
+          when is_atom(fun_name) ->
+            # call inner function, del first argument: send(client, ...) => send(...)
+            {fun_name, context, args}
 
-            do_list = [
-              do:
-                {:__block__, [],
-                 [
-                   quote(do: @file(unquote(to_string(module))))
-                   | list
-                 ]}
-            ]
-
-            {:defmodule, c_m, [{:__aliases__, c_a, new_module_name_alias}, do_list]}
-
-          {:spec, c_s, ast} ->
-            ast =
-              Macro.prewalk(
-                ast,
-                fn
-                  {fun_name, context, [{{:., _, [{:__aliases__, _, _}, :client]}, _, _} | args]}
-                  when is_atom(fun_name) ->
-                    # del first argument
-                    {fun_name, context, args}
-
-                  sub_ast ->
-                    sub_ast
-                end
-              )
-
-            {:spec, c_s, ast}
-
-          {:def, c_s, ast} ->
-            ast =
-              Macro.prewalk(
-                ast,
-                fn
-                  {:., context, [{:client, c_c, nil}, fun_name]} ->
-                    # replace client
-                    {:., context, [{:__aliases__, c_c, [client_module]}, fun_name]}
-
-                  {fun_name, context, [{:client, _, nil} | args]} when is_atom(fun_name) ->
-                    # del first argument
-                    {fun_name, context, args}
-
-                  sub_ast ->
-                    sub_ast
-                end
-              )
-
-            {:def, c_s, ast}
-
-          ast ->
-            ast
+          sub_ast ->
+            sub_ast
         end
       )
 
-    {file, ast}
+    {:spec, c_s, ast}
   end
+
+  defp ast_transform({:def, c_s, ast}, {_, client, _}) do
+    ast =
+      Macro.prewalk(
+        ast,
+        fn
+          {:., context, [{:client, c_c, nil}, fun_name]} ->
+            # replace client: client.appid() => Client.appid()
+            {:., context, [{:__aliases__, c_c, [client]}, fun_name]}
+
+          {fun_name, context, [{:client, _, nil} | args]} when is_atom(fun_name) ->
+            # call inner function, del first argument: send(client, ...) => send(...)
+            {fun_name, context, args}
+
+          {:client, c_c, nil} ->
+            # replace client: client => Client
+            {:__aliases__, c_c, [client]}
+
+          sub_ast ->
+            sub_ast
+        end
+      )
+
+    {:def, c_s, ast}
+  end
+
+  defp ast_transform(ast, _acc), do: ast
 end

@@ -266,9 +266,7 @@ defmodule WeChat.Refresher.Default do
         Cache.put_cache(store_id, store_key, value)
 
         Logger.info(
-          "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{
-            diff
-          }s."
+          "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{diff}s."
         )
 
         {true, diff}
@@ -285,9 +283,7 @@ defmodule WeChat.Refresher.Default do
 
       error ->
         Logger.warn(
-          "Call #{inspect(client.storage())}.restore(#{store_id}, #{store_key}) failed, return error: #{
-            inspect(error)
-          }."
+          "Call #{inspect(client.storage())}.restore(#{store_id}, #{store_key}) failed, return error: #{inspect(error)}."
         )
 
         false
@@ -296,9 +292,7 @@ defmodule WeChat.Refresher.Default do
 
   defp init_client_options(client, options) do
     Logger.info(
-      "Initialize WeChat Client: #{inspect(client)} by AppType: #{client.app_type()}, Storage: #{
-        inspect(client.storage())
-      }."
+      "Initialize WeChat Client: #{inspect(client)} by AppType: #{client.app_type()}, Storage: #{inspect(client.storage())}."
     )
 
     default_refresh_before_expired =
@@ -394,9 +388,7 @@ defmodule WeChat.Refresher.Default do
         refresh_retry_interval = options.refresh_retry_interval
 
         Logger.warn(
-          "Refresh appid: #{store_id}, key: #{store_key} failed, return error: #{inspect(error)}, Will be retry again #{
-            refresh_retry_interval
-          }s later."
+          "Refresh appid: #{store_id}, key: #{store_key} failed, return error: #{inspect(error)}, Will be retry again #{refresh_retry_interval}s later."
         )
 
         refresh_retry_interval

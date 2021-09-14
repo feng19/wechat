@@ -8,7 +8,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @typedoc """
   每个标签都有唯一的标签id -
-  [官方文档](#{@doc_link}/90665#tagid)
+  [官方文档](#{@doc_link}/90665#tagid){:target="_blank"}
 
   在管理后台->“通讯录”->“标签”，选中某个标签，在右上角会有“标签详情”按钮，点击即可看到
   """

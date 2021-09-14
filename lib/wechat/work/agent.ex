@@ -2,6 +2,7 @@ defmodule WeChat.Work.Agent do
   @moduledoc "应用"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  alias WeChat.Work
 
   @term_introduction_doc_link "#{work_doc_link_prefix()}/90000/90135/90665"
 
@@ -12,7 +13,7 @@ defmodule WeChat.Work.Agent do
   在管理后台->“应用与小程序”->“应用”，点进某个应用，即可看到 agentid
   """
   @type agent_id :: integer | atom
-  @type agent_name :: atom | agent_id
+  @type agent_name :: atom | String.t()
   @typedoc """
   secret 是企业应用里面用于保障数据安全的“钥匙” -
   [官方文档](#{@term_introduction_doc_link}#secret)
@@ -43,10 +44,20 @@ defmodule WeChat.Work.Agent do
   @enforce_keys [:id]
   defstruct [:name, :id, :secret, :encoding_aes_key, :token]
 
-  @doc """
-  通讯录应用
-  """
+  @spec name2id(Work.client(), agent_name) :: agent_id | nil
+  def name2id(client, name) do
+    with %{id: id} <- Enum.find(client.agents(), &match?(%{name: ^name}, &1)) do
+      id
+    end
+  end
+
+  @spec agent2id(Work.client(), Work.agent()) :: agent_id | nil
+  def agent2id(_client, id) when is_integer(id), do: id
+  def agent2id(client, name), do: name2id(client, name)
+
+  @doc "通讯录应用"
+  @spec contacts_agent(options :: Keyword.t()) :: t
   def contacts_agent(options \\ []) do
-    struct(%__MODULE__{id: :contacts, name: "address book"}, options)
+    struct(%__MODULE__{id: :contacts, name: :contacts}, options)
   end
 end

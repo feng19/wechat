@@ -78,9 +78,7 @@ if Code.ensure_loaded?(Plug) do
         rescue
           error ->
             Logger.error(
-              "call #{inspect(handle_event_fun)}.(#{inspect(client)}, #{inspect(message)}) get error: #{
-                inspect(error)
-              }"
+              "call #{inspect(handle_event_fun)}.(#{inspect(client)}, #{inspect(message)}) get error: #{inspect(error)}"
             )
 
             {500, "Internal Server Error"}
@@ -119,9 +117,7 @@ if Code.ensure_loaded?(Plug) do
         rescue
           error ->
             Logger.error(
-              "call #{inspect(handle_event_fun)}.(#{inspect(client)}, #{inspect(message)}) get error: #{
-                inspect(error)
-              }"
+              "call #{inspect(handle_event_fun)}.(#{inspect(client)}, #{inspect(message)}) get error: #{inspect(error)}"
             )
 
             {500, "Internal Server Error"}

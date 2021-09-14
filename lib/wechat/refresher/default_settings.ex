@@ -31,9 +31,7 @@ defmodule WeChat.Refresher.DefaultSettings do
     else
       if match?(:hub_client, client.server_role()) and match?(nil, client.storage()) do
         raise RuntimeError,
-              "Not accept storage: nil when server_role: :hub_client, please set a module for :storage when defining #{
-                inspect(client)
-              }."
+              "Not accept storage: nil when server_role: :hub_client, please set a module for :storage when defining #{inspect(client)}."
       end
 
       case client.app_type() do
@@ -193,9 +191,7 @@ defmodule WeChat.Refresher.DefaultSettings do
           Cache.put_cache(store_id, store_key, ticket)
 
           Logger.info(
-            "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{
-              diff
-            }s."
+            "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{diff}s."
           )
 
           ticket

@@ -10,6 +10,8 @@ defmodule WeChat.Builder.Work do
   ]
 
   @sub_modules [
+    Work.App,
+    Work.AppChat,
     Work.Message,
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]}
   ]

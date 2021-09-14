@@ -96,8 +96,6 @@ defmodule WeChat.Pay.Utils do
     nonce_str = :crypto.strong_rand_bytes(32) |> Base.url_encode64()
     signature = sign(env, timestamp, nonce_str, private_key)
 
-    "mchid=\"#{mch_id}\",nonce_str=\"#{nonce_str}\",timestamp=\"#{timestamp}\",serial_no=\"#{
-      serial_no
-    }\",signature=\"#{signature}\""
+    ~s(mchid="#{mch_id}",nonce_str="#{nonce_str}",timestamp="#{timestamp}",serial_no="#{serial_no}",signature="#{signature}")
   end
 end

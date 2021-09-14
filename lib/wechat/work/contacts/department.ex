@@ -8,7 +8,7 @@ defmodule WeChat.Work.Contacts.Department do
 
   @typedoc """
   每个部门都有唯一的id -
-  [官方文档](#{@doc_link}/90665#部门id)
+  [官方文档](#{@doc_link}/90665#部门id){:target="_blank"}
 
   在管理后台->“通讯录”->“组织架构”->点击某个部门右边的小圆点可以看到
   """
