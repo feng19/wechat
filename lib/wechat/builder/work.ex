@@ -15,8 +15,11 @@ defmodule WeChat.Builder.Work do
     Work.Message,
     Customer,
     Customer.ContactWay,
+    Customer.GroupChat,
+    Customer.Moment,
     Customer.Strategy,
     Customer.Tag,
+    Customer.Transfer,
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]}
   ]
 

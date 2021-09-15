@@ -159,8 +159,11 @@ defmodule WeChat.MixProject do
          Work.Contacts.Tag,
          Work.Customer,
          Work.Customer.ContactWay,
+         Work.Customer.GroupChat,
+         Work.Customer.Moment,
          Work.Customer.Strategy,
          Work.Customer.Tag,
+         Work.Customer.Transfer,
          Work.LinkedCorp.Message
        ]}
     ]
