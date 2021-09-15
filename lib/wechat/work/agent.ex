@@ -60,4 +60,10 @@ defmodule WeChat.Work.Agent do
   def contacts_agent(options \\ []) do
     struct(%__MODULE__{id: :contacts, name: :contacts}, options)
   end
+
+  @doc "客户联系应用"
+  @spec customer_agent(options :: Keyword.t()) :: t
+  def customer_agent(options \\ []) do
+    struct(%__MODULE__{id: :customer, name: :customer}, options)
+  end
 end

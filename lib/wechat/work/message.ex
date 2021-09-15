@@ -2,6 +2,7 @@ defmodule WeChat.Work.Message do
   @moduledoc "消息推送"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
@@ -58,7 +59,7 @@ defmodule WeChat.Work.Message do
       end
 
     to = to_value |> List.wrap() |> Enum.join("|")
-    agent_id = Work.Agent.agent2id(client, agent)
+    agent_id = agent2id(client, agent)
 
     body =
       Map.new(opts)
@@ -72,7 +73,9 @@ defmodule WeChat.Work.Message do
 
   @spec to_user(list | String.t()) :: to
   def to_user(list), do: {:user, list}
+  @spec to_party(list) :: to
   def to_party(list), do: {:party, list}
+  @spec to_tag(list) :: to
   def to_tag(list), do: {:tag, list}
 
   @doc """

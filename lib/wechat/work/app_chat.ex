@@ -5,16 +5,16 @@ defmodule WeChat.Work.AppChat do
   alias WeChat.{Work, Work.Message}
   alias Work.Contacts.User
 
+  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+
   @type chat_id :: String.t()
   @type opts :: Enumerable.t()
-
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
 
   @doc """
   创建群聊会话 -
   [官方文档](#{@doc_link}/90245){:target="_blank"}
   """
-  @spec create(Work.client(), Work.agent(), User.user_list(), opts) :: WeChat.response()
+  @spec create(Work.client(), Work.agent(), User.userid_list(), opts) :: WeChat.response()
   def create(client, agent, user_list, opts \\ []) do
     client.post(
       "/cgi-bin/appchat/create",

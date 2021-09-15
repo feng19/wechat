@@ -61,7 +61,9 @@ defmodule WeChat.MixProject do
         MiniProgram,
         MiniProgram.Live,
         Work,
-        Work.Contacts
+        Work.Contacts,
+        Work.Customer,
+        Work.LinkedCorp
       ]
     ]
   end
@@ -154,7 +156,12 @@ defmodule WeChat.MixProject do
          Work.Message,
          Work.Contacts.Department,
          Work.Contacts.User,
-         Work.Contacts.Tag
+         Work.Contacts.Tag,
+         Work.Customer,
+         Work.Customer.ContactWay,
+         Work.Customer.Strategy,
+         Work.Customer.Tag,
+         Work.LinkedCorp.Message
        ]}
     ]
   end

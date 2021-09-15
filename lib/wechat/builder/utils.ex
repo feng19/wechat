@@ -33,26 +33,43 @@ defmodule WeChat.Builder.Utils do
       |> Enum.drop(drop_amount)
       |> Enum.map(&String.to_atom/1)
 
-    ast = Macro.prewalk(ast, &ast_transform(&1, {module, client, sub_module}))
+    {_, funs} =
+      Macro.prewalk(ast, [], fn
+        sub_ast = {o, _c_s, ast}, funs when o in [:def, :defp] ->
+          fun_name =
+            case hd(ast) do
+              {:when, _, [{fun_name, _, _} | _]} -> fun_name
+              {fun_name, _, _} -> fun_name
+            end
+
+          {sub_ast, Enum.uniq([fun_name | funs])}
+
+        sub_ast, funs ->
+          {sub_ast, funs}
+      end)
+
+    ast =
+      Macro.prewalk(
+        ast,
+        &ast_transform(&1, %{module: module, client: client, sub_module: sub_module, funs: funs})
+      )
+
     {file, ast}
   end
 
-  defp ast_transform(
-         {:defmodule, c_m, [{:__aliases__, c_a, _}, do_list]},
-         {module, _, sub_module}
-       ) do
+  defp ast_transform({:defmodule, c_m, [{:__aliases__, c_a, _}, do_list]}, acc) do
     [do: {:__block__, [], list}] = do_list
 
     do_list = [
       do:
         {:__block__, [],
          [
-           quote(do: @file(unquote(to_string(module))))
+           quote(do: @file(unquote(to_string(acc.module))))
            | list
          ]}
     ]
 
-    {:defmodule, c_m, [{:__aliases__, c_a, sub_module}, do_list]}
+    {:defmodule, c_m, [{:__aliases__, c_a, acc.sub_module}, do_list]}
   end
 
   defp ast_transform({:spec, c_s, ast}, _acc) do
@@ -73,7 +90,7 @@ defmodule WeChat.Builder.Utils do
     {:spec, c_s, ast}
   end
 
-  defp ast_transform({:def, c_s, ast}, {_, client, _}) do
+  defp ast_transform({o, c_s, ast}, %{client: client, funs: funs}) when o in [:def, :defp] do
     ast =
       Macro.prewalk(
         ast,
@@ -82,9 +99,14 @@ defmodule WeChat.Builder.Utils do
             # replace client: client.appid() => Client.appid()
             {:., context, [{:__aliases__, c_c, [client]}, fun_name]}
 
-          {fun_name, context, [{:client, _, nil} | args]} when is_atom(fun_name) ->
-            # call inner function, del first argument: send(client, ...) => send(...)
-            {fun_name, context, args}
+          {fun_name, context, [{:client, c_c, nil} | args]} when is_atom(fun_name) ->
+            if fun_name in funs do
+              # call inner function, del first argument: send(client, ...) => send(...)
+              {fun_name, context, args}
+            else
+              # call external function, del first argument: send(client, ...) => send(Client, ...)
+              {fun_name, context, [{:__aliases__, c_c, [client]} | args]}
+            end
 
           {:client, c_c, nil} ->
             # replace client: client => Client

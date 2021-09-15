@@ -1,6 +1,6 @@
 defmodule WeChat.Builder.Work do
   @moduledoc false
-  alias WeChat.{Work, Work.Contacts, Builder.Utils}
+  alias WeChat.{Work, Work.Contacts, Work.Customer, Builder.Utils}
 
   @default_opts [
     server_role: :client,
@@ -13,6 +13,10 @@ defmodule WeChat.Builder.Work do
     Work.App,
     Work.AppChat,
     Work.Message,
+    Customer,
+    Customer.ContactWay,
+    Customer.Strategy,
+    Customer.Tag,
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]}
   ]
 
@@ -52,6 +56,7 @@ defmodule WeChat.Builder.Work do
         |> Keyword.get(:sub_modules, @sub_modules)
         |> Enum.reduce([], fn
           {agent, modules}, acc ->
+            # 没有定义该 应用(agent) 则不会生成对应的子模块
             case Enum.find(agents, &match?(^agent, &1.id)) do
               nil -> acc
               _ -> modules ++ acc

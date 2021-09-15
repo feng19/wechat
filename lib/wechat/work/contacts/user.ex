@@ -13,8 +13,8 @@ defmodule WeChat.Work.Contacts.User do
 
   即所谓“帐号”。在管理后台->“通讯录”->点进某个成员的详情页，可以看到。
   """
-  @type user_id :: String.t()
-  @type user_list :: [user_id]
+  @type userid :: String.t()
+  @type userid_list :: [userid]
 
   @doc """
   读取成员 -
@@ -22,10 +22,10 @@ defmodule WeChat.Work.Contacts.User do
 
   在通讯录同步助手中此接口可以读取企业通讯录的所有成员信息，而自建应用可以读取该应用设置的可见范围内的成员信息。
   """
-  @spec get_user(Work.client(), user_id) :: WeChat.response()
-  def get_user(client, user_id) do
+  @spec get_user(Work.client(), userid) :: WeChat.response()
+  def get_user(client, userid) do
     client.get("/cgi-bin/user/get",
-      query: [userid: user_id, access_token: client.get_access_token(:contacts)]
+      query: [userid: userid, access_token: client.get_access_token(:contacts)]
     )
   end
 
@@ -81,9 +81,9 @@ defmodule WeChat.Work.Contacts.User do
   注：需要成员使用微信登录企业微信或者关注微工作台（原企业号）才能转成 `openid`;
   如果是外部联系人，请使用外部联系人 `openid` 转换 `openid`
   """
-  @spec userid2openid(Work.client(), user_id) :: WeChat.response()
-  def userid2openid(client, user_id) do
-    client.post("/cgi-bin/user/convert_to_openid", %{"userid" => user_id},
+  @spec userid2openid(Work.client(), userid) :: WeChat.response()
+  def userid2openid(client, userid) do
+    client.post("/cgi-bin/user/convert_to_openid", %{"userid" => userid},
       query: [access_token: client.get_access_token(:contacts)]
     )
   end

@@ -2,6 +2,7 @@ defmodule WeChat.Work.App do
   @moduledoc "应用管理"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
@@ -17,7 +18,7 @@ defmodule WeChat.Work.App do
   def get(client, agent) do
     client.get("/cgi-bin/agent/get",
       query: [
-        agentid: Work.Agent.agent2id(client, agent),
+        agentid: agent2id(client, agent),
         access_token: client.get_access_token(agent)
       ]
     )
@@ -37,12 +38,116 @@ defmodule WeChat.Work.App do
   @doc """
   设置应用 - [官方文档](#{@doc_link}/90228){:target="_blank"}
   """
-  @spec set(Work.client(), Work.agent(), opts :: Keyword.t()) :: WeChat.response()
+  @spec set(Work.client(), Work.agent(), opts :: Enumerable.t()) :: WeChat.response()
   def set(client, agent, opts \\ []) do
     client.post(
       "/cgi-bin/agent/set",
-      Map.new(opts) |> Map.put("agentid", Work.Agent.agent2id(client, agent)),
+      Map.new(opts) |> Map.put("agentid", agent2id(client, agent)),
       query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  创建菜单 - [官方文档](#{@doc_link}/90231){:target="_blank"}
+  """
+  @spec create_menu(Work.client(), Work.agent(), opts :: Enumerable.t()) :: WeChat.response()
+  def create_menu(client, agent, opts \\ []) do
+    client.post("/cgi-bin/menu/create", Map.new(opts),
+      query: [
+        agentid: agent2id(client, agent),
+        access_token: client.get_access_token(agent)
+      ]
+    )
+  end
+
+  @doc """
+  获取菜单 - [官方文档](#{@doc_link}/90232){:target="_blank"}
+  """
+  @spec get_menu(Work.client(), Work.agent()) :: WeChat.response()
+  def get_menu(client, agent) do
+    client.get(
+      "/cgi-bin/menu/get",
+      query: [
+        agentid: agent2id(client, agent),
+        access_token: client.get_access_token(agent)
+      ]
+    )
+  end
+
+  @doc """
+  删除菜单 - [官方文档](#{@doc_link}/90233){:target="_blank"}
+  """
+  @spec delete_menu(Work.client(), Work.agent()) :: WeChat.response()
+  def delete_menu(client, agent) do
+    client.get(
+      "/cgi-bin/menu/delete",
+      query: [
+        agentid: agent2id(client, agent),
+        access_token: client.get_access_token(agent)
+      ]
+    )
+  end
+
+  @doc """
+  构造独立窗口登录二维码 - [官方文档](#{@doc_link}/91019#构造独立窗口登录二维码){:target="_blank"}
+  """
+  @spec qr_connect_url(
+          WeChat.client(),
+          Work.agent(),
+          redirect_uri :: String.t(),
+          state :: String.t(),
+          lang :: String.t()
+        ) :: url :: String.t()
+  def qr_connect_url(client, agent, redirect_uri, state \\ "", lang \\ "") do
+    [
+      "https://open.work.weixin.qq.com/wwopen/sso/qrConnect?",
+      ["appid=", client.appid()],
+      ["&agentid=", agent2id(client, agent)],
+      ["&redirect_uri=", URI.encode_www_form(redirect_uri)],
+      if match?("", state) do
+        []
+      else
+        ["&state=", state]
+      end,
+      if match?("", lang) do
+        []
+      else
+        ["&lang=", lang]
+      end
+    ]
+    |> IO.iodata_to_binary()
+  end
+
+  @doc """
+  构造内嵌登录二维码 - [官方文档](#{@doc_link}/91019#构造内嵌登录二维码){:target="_blank"}
+  """
+  @spec qr_connect_opts(
+          WeChat.client(),
+          Work.agent(),
+          redirect_uri :: String.t(),
+          opts :: Enumerable.t()
+        ) :: opts :: map
+  def qr_connect_opts(client, agent, redirect_uri, opts \\ []) do
+    Map.new(opts)
+    |> Map.merge(%{
+      "appid" => client.appid(),
+      "agentid" => agent2id(client, agent),
+      "redirect_uri" => URI.encode_www_form(redirect_uri)
+    })
+  end
+
+  @doc """
+  获取访问用户身份 - [官方文档](#{@doc_link}/91437){:target="_blank"}
+
+  该接口用于根据code获取成员信息
+
+  - 当用户为企业成员时返回：`UserId`
+  - 当用户为企业成员时返回：`OpenId`
+  """
+  @spec sso_user_info(WeChat.client(), Work.agent(), code :: String.t()) :: WeChat.response()
+  def sso_user_info(client, agent, code) do
+    client.get("/cgi-bin/user/getuserinfo",
+      query: [code: code, access_token: client.get_access_token(agent)]
     )
   end
 end
