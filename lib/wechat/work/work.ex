@@ -6,9 +6,9 @@ defmodule WeChat.Work do
   use WeChat.Work,
     corp_id: "corp_id",
     agents: [
-      contacts_agent(secret: "your_contacts_secret"),
-      customer_agent(secret: "your_customer_secret"),
-      %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"},
+      contacts_agent(secret: "contacts_secret"),
+      customer_agent(secret: "customer_secret"),
+      %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "agent_secret"},
       ...
     ]
   ```
