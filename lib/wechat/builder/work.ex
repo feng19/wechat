@@ -147,6 +147,21 @@ defmodule WeChat.Builder.Work do
       end)
       |> Enum.unzip()
 
-    [base | agent2cache_id_funs] ++ agent_secret_funs
+    [
+      base,
+      agent2cache_id_funs,
+      quote location: :keep do
+        def agent2cache_id(agent) do
+          raise "missing #{inspect(agent)}, maybe it's a wrong name or id, maybe it not set in agents."
+        end
+      end,
+      agent_secret_funs,
+      quote location: :keep do
+        def agent_secret(agent) do
+          raise "missing #{inspect(agent)}, maybe it's a wrong name or id, maybe it not set in agents."
+        end
+      end
+    ]
+    |> List.flatten()
   end
 end
