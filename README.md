@@ -81,7 +81,7 @@ end
       agents: [
         contacts_agent(secret: "contacts_secret"),
         customer_agent(secret: "customer_secret"),
-        %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "agent_secret"},
+        agent(10000, name: :agent_name, secret: "agent_secret"),
         ...
       ]
   end

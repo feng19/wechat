@@ -33,13 +33,13 @@ defmodule WeChat.Test.MiniComponent do
 end
 
 defmodule WeChat.Test.Work do
-  @moduledoc "企业微信 - 包含通讯录"
+  @moduledoc "企业微信 - 多个应用"
   use WeChat.Work,
     corp_id: "corp_id",
     agents: [
       contacts_agent(secret: "your_contacts_secret"),
       customer_agent(secret: "your_customer_secret"),
-      %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}
+      agent(10000, name: :agent_name, secret: "your_secret")
     ]
 end
 
@@ -48,6 +48,6 @@ defmodule WeChat.Test.Work2 do
   use WeChat.Work,
     corp_id: "corp_id",
     agents: [
-      %WeChat.Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}
+      agent(10000, name: :agent_name, secret: "your_secret")
     ]
 end

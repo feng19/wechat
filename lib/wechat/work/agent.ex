@@ -55,13 +55,19 @@ defmodule WeChat.Work.Agent do
   def agent2id(_client, id) when is_integer(id), do: id
   def agent2id(client, name), do: name2id(client, name)
 
-  @doc "通讯录应用"
+  @doc "构建应用(agent)"
+  @spec agent(agent_id, options :: Keyword.t()) :: t
+  def agent(id, options \\ []) do
+    struct(%__MODULE__{id: id, name: id}, options)
+  end
+
+  @doc "构建[通讯录]应用(agent)"
   @spec contacts_agent(options :: Keyword.t()) :: t
   def contacts_agent(options \\ []) do
     struct(%__MODULE__{id: :contacts, name: :contacts}, options)
   end
 
-  @doc "客户联系应用"
+  @doc "构建[客户联系]应用(agent)"
   @spec customer_agent(options :: Keyword.t()) :: t
   def customer_agent(options \\ []) do
     struct(%__MODULE__{id: :customer, name: :customer}, options)
