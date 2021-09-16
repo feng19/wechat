@@ -93,12 +93,12 @@ defmodule WeChat.Refresher.Default do
     GenServer.call(__MODULE__, {:add, client, Map.new(opts)})
   end
 
-  @spec remove(WeChat.client()) :: :ok
+  @spec remove(WeChat.client()) :: :ok | :not_found
   def remove(client) do
     GenServer.call(__MODULE__, {:remove, client})
   end
 
-  @spec refresh(WeChat.client()) :: :ok | :nofound
+  @spec refresh(WeChat.client()) :: :ok | :not_found
   def refresh(client) do
     GenServer.call(__MODULE__, {:refresh, client})
   end
@@ -174,33 +174,24 @@ defmodule WeChat.Refresher.Default do
   end
 
   def handle_call({:add, client, options}, _from, state) do
-    options =
-      if state.wait_for_signal do
-        init_client_options(client, options)
-      else
-        options = init_client_options(client, options)
-        start_monitor_client(client, options)
-      end
-
     state =
-      state
-      |> Map.put(client, options)
-      |> Map.put(:clients, [client | state.clients])
+      if client in state.clients do
+        remove_client(state, client)
+      else
+        state
+      end
+      |> add_client(client, options)
 
     {:reply, :ok, state}
   end
 
   def handle_call({:remove, client}, _from, state) do
-    {get, state} = Map.pop(state, client)
-    clients = List.delete(state.clients, client)
-
-    with {_client, opts} <- get do
-      Enum.each(opts.refresh_options, fn {_key, _fun, timer} ->
-        cancel_timer(timer)
-      end)
+    if client in state.clients do
+      state = remove_client(state, client)
+      {:reply, :ok, state}
+    else
+      {:reply, :not_found, state}
     end
-
-    {:reply, :ok, %{state | clients: clients}}
   end
 
   def handle_call({:refresh, client}, _from, state) do
@@ -210,7 +201,7 @@ defmodule WeChat.Refresher.Default do
       {:reply, :ok, state}
     else
       _ ->
-        {:reply, :nofound, state}
+        {:reply, :not_found, state}
     end
   end
 
@@ -421,5 +412,33 @@ defmodule WeChat.Refresher.Default do
     for {store_id, store_key, fun} <- refresh_options do
       {{store_id, store_key}, fun, nil}
     end
+  end
+
+  defp add_client(state, client, options) do
+    options =
+      if state.wait_for_signal do
+        init_client_options(client, options)
+      else
+        options = init_client_options(client, options)
+        start_monitor_client(client, options)
+      end
+
+    state
+    |> Map.put(client, options)
+    |> Map.put(:clients, [client | state.clients])
+  end
+
+  defp remove_client(state, client) do
+    Logger.info("Removing WeChat Client: #{inspect(client)}.")
+    {get, state} = Map.pop(state, client)
+    clients = List.delete(state.clients, client)
+
+    with {_client, opts} <- get do
+      Enum.each(opts.refresh_options, fn {_key, _fun, timer} ->
+        cancel_timer(timer)
+      end)
+    end
+
+    %{state | clients: clients}
   end
 end
