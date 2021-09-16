@@ -4,6 +4,7 @@ defmodule WeChat.Work.Customer.GroupChat do
   import Jason.Helpers
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
+  alias WeChat.Work.Contacts.User
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
 
@@ -65,6 +66,48 @@ defmodule WeChat.Work.Customer.GroupChat do
     client.post(
       "/cgi-bin/externalcontact/groupchat/opengid_to_chatid",
       json_map(opengid: open_gid),
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  分配离职成员的客户群 -
+  [官方文档](#{@doc_link}/92127){:target="_blank"}
+
+  企业可通过此接口，将已离职成员为群主的群，分配给另一个客服成员。
+  """
+  @spec resigned_transfer(Work.client(), Work.agent(), chat_id_list, User.userid()) ::
+          WeChat.response()
+  def resigned_transfer(client, agent, chat_id_list, new_owner) do
+    client.post(
+      "/cgi-bin/externalcontact/groupchat/transfer",
+      json_map(chat_id_list: List.wrap(chat_id_list), new_owner: new_owner),
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  获取「群聊数据统计」数据(按群主聚合的方式) -
+  [官方文档](#{@doc_link}/92133#按群主聚合的方式){:target="_blank"}
+
+  获取指定日期的统计数据。注意，企业微信仅存储180天的数据。
+  """
+  @spec statistic(Work.client(), Work.agent(), body :: map) :: WeChat.response()
+  def statistic(client, agent, body) do
+    client.post("/cgi-bin/externalcontact/groupchat/statistic", body,
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  获取「群聊数据统计」数据(按自然日聚合的方式) -
+  [官方文档](#{@doc_link}/92133#按自然日聚合的方式){:target="_blank"}
+
+  获取指定日期的统计数据。注意，企业微信仅存储180天的数据。
+  """
+  @spec statistic_by_day(Work.client(), Work.agent(), body :: map) :: WeChat.response()
+  def statistic_by_day(client, agent, body) do
+    client.post("/cgi-bin/externalcontact/groupchat/statistic_group_by_day", body,
       query: [access_token: client.get_access_token(agent)]
     )
   end

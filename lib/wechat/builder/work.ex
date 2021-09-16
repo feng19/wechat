@@ -12,14 +12,17 @@ defmodule WeChat.Builder.Work do
   @sub_modules [
     Work.App,
     Work.AppChat,
+    Work.Material,
     Work.Message,
     Customer,
     Customer.ContactWay,
     Customer.GroupChat,
+    Customer.GroupMsg,
     Customer.Moment,
     Customer.Strategy,
     Customer.Tag,
     Customer.Transfer,
+    Customer.Welcome,
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]}
   ]
 

@@ -167,10 +167,6 @@ defmodule WeChat.Work.Customer.Transfer do
           User.userid()
         ) :: WeChat.response()
   def resigned_transfer_group_chat(client, agent, chat_id_list, new_owner) do
-    client.post(
-      "/cgi-bin/externalcontact/groupchat/transfer",
-      json_map(chat_id_list: List.wrap(chat_id_list), new_owner: new_owner),
-      query: [access_token: client.get_access_token(agent)]
-    )
+    Customer.GroupChat.resigned_transfer(client, agent, chat_id_list, new_owner)
   end
 end

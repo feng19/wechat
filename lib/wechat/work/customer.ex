@@ -3,12 +3,14 @@ defmodule WeChat.Work.Customer do
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
-  alias Work.Contacts.User
+  alias Work.Contacts.{User, Department}
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
 
   @type external_userid :: String.t()
   @type external_userid_list :: [external_userid]
+  @typep opts :: Enumerable.t()
+  @typep time :: integer
 
   @doc """
   获取配置了客户联系功能的成员列表 -
@@ -69,12 +71,8 @@ defmodule WeChat.Work.Customer do
 
   企业/第三方可通过此接口获取指定成员添加的客户信息列表。
   """
-  @spec get_customer_info_by_user(
-          Work.client(),
-          Work.agent(),
-          User.userid_list(),
-          opts :: Enumerable.t()
-        ) :: WeChat.response()
+  @spec get_customer_info_by_user(Work.client(), Work.agent(), User.userid_list(), opts) ::
+          WeChat.response()
   def get_customer_info_by_user(client, agent, userid_list, opts \\ []) do
     client.post(
       "/cgi-bin/externalcontact/batch/get_by_user",
@@ -89,17 +87,37 @@ defmodule WeChat.Work.Customer do
 
   企业可通过此接口修改指定用户添加的客户的备注信息。
   """
-  @spec remark_customer(
-          Work.client(),
-          Work.agent(),
-          User.userid(),
-          external_userid,
-          opts :: Enumerable.t()
-        ) :: WeChat.response()
+  @spec remark_customer(Work.client(), Work.agent(), User.userid(), external_userid, opts) ::
+          WeChat.response()
   def remark_customer(client, agent, userid, external_userid, opts \\ []) do
     client.post(
       "/cgi-bin/externalcontact/remark",
       Map.new(opts) |> Map.merge(%{"userid" => userid, "external_userid" => external_userid}),
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  获取「联系客户统计」数据 -
+  [官方文档](#{@doc_link}/92132){:target="_blank"}
+
+  企业可通过此接口获取成员联系客户的数据，包括发起申请数、新增客户数、聊天数、发送消息数和删除/拉黑成员的客户数等指标。
+  """
+  @spec get_user_behavior_data(
+          Work.client(),
+          Work.agent(),
+          time,
+          time,
+          nil | User.userid_list(),
+          nil | Department.party_id_list()
+        ) :: WeChat.response()
+  def get_user_behavior_data(client, agent, start_time, end_time, userid_list, party_id_list) do
+    body =
+      [userid: List.wrap(userid_list), partyid: List.wrap(party_id_list)]
+      |> Enum.reject(&Enum.empty?(elem(&1, 1)))
+      |> Enum.into(%{start_time: start_time, end_time: end_time})
+
+    client.post("/cgi-bin/externalcontact/get_user_behavior_data", body,
       query: [access_token: client.get_access_token(agent)]
     )
   end

@@ -2,7 +2,7 @@ defmodule WeChat.Work.AppChat do
   @moduledoc "群聊会话"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
-  alias WeChat.{Work, Work.Message}
+  alias WeChat.{Work, Work.Message, Work.Material}
   alias Work.Contacts.User
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
@@ -84,7 +84,7 @@ defmodule WeChat.Work.AppChat do
   @doc """
   发送图片消息 - [官方文档](#{@doc_link}/90248#图片消息){:target="_blank"}
   """
-  @spec send_image(Work.client(), Work.agent(), chat_id, Message.media_id(), opts) ::
+  @spec send_image(Work.client(), Work.agent(), chat_id, Material.media_id(), opts) ::
           WeChat.response()
   def send_image(client, agent, chat_id, media_id, opts \\ []) do
     send(client, agent, chat_id, "image", %{"media_id" => media_id}, opts)
@@ -93,7 +93,7 @@ defmodule WeChat.Work.AppChat do
   @doc """
   发送语音消息 - [官方文档](#{@doc_link}/90248#语音消息){:target="_blank"}
   """
-  @spec send_voice(Work.client(), Work.agent(), chat_id, Message.media_id(), opts) ::
+  @spec send_voice(Work.client(), Work.agent(), chat_id, Material.media_id(), opts) ::
           WeChat.response()
   def send_voice(client, agent, chat_id, media_id, opts \\ []) do
     send(client, agent, chat_id, "voice", %{"media_id" => media_id}, opts)
@@ -106,7 +106,7 @@ defmodule WeChat.Work.AppChat do
           Work.client(),
           Work.agent(),
           chat_id,
-          Message.media_id(),
+          Material.media_id(),
           title :: String.t(),
           description :: String.t(),
           opts
@@ -125,7 +125,7 @@ defmodule WeChat.Work.AppChat do
   @doc """
   发送文件消息 - [官方文档](#{@doc_link}/90248#文件消息){:target="_blank"}
   """
-  @spec send_file(Work.client(), Work.agent(), chat_id, Message.media_id(), opts) ::
+  @spec send_file(Work.client(), Work.agent(), chat_id, Material.media_id(), opts) ::
           WeChat.response()
   def send_file(client, agent, chat_id, media_id, opts \\ []) do
     send(client, agent, chat_id, "file", %{"media_id" => media_id}, opts)

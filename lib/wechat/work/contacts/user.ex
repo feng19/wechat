@@ -39,7 +39,7 @@ defmodule WeChat.Work.Contacts.User do
   - `1`: 递归获取
   - `0`: 只获取本部门
   """
-  @spec get_department_users(Work.client(), Department.department_id()) :: WeChat.response()
+  @spec get_department_users(Work.client(), Department.party_id()) :: WeChat.response()
   def get_department_users(client, department_id, fetch_child \\ 0) do
     client.get("/cgi-bin/user/simplelist",
       query: [
@@ -60,8 +60,7 @@ defmodule WeChat.Work.Contacts.User do
   - `1`: 递归获取
   - `0`: 只获取本部门
   """
-  @spec get_department_users_detail(Work.client(), Department.department_id()) ::
-          WeChat.response()
+  @spec get_department_users_detail(Work.client(), Department.party_id()) :: WeChat.response()
   def get_department_users_detail(client, department_id, fetch_child \\ 0) do
     client.get("/cgi-bin/user/list",
       query: [

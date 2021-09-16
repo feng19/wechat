@@ -3,7 +3,7 @@ defmodule WeChat.Work.Message do
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   import WeChat.Work.Agent, only: [agent2id: 2]
-  alias WeChat.Work
+  alias WeChat.{Work, Work.Material}
 
   @doc_link "#{work_doc_link_prefix()}/90000/90135"
 
@@ -23,13 +23,13 @@ defmodule WeChat.Work.Message do
   - `template_card`: 模板卡片消息
   """
   @type msg_type :: String.t()
+  @typedoc "消息ID"
   @type msg_id :: String.t()
 
   @type to :: {:user | :party | :tag, list | String.t()}
   @type msg :: map
   @type opts :: Enumerable.t()
   @type content :: String.t()
-  @type media_id :: String.t()
 
   @doc """
   发送应用消息 - [官方文档](#{@doc_link}/90236){:target="_blank"}
@@ -89,7 +89,8 @@ defmodule WeChat.Work.Message do
   @doc """
   发送图片消息 - [官方文档](#{@doc_link}/90236#图片消息){:target="_blank"}
   """
-  @spec send_image(Work.client(), Work.agent(), to, media_id, opts) :: WeChat.response()
+  @spec send_image(Work.client(), Work.agent(), to, Material.media_id(), opts) ::
+          WeChat.response()
   def send_image(client, agent, to, media_id, opts \\ []) do
     send(client, agent, to, "image", %{"media_id" => media_id}, opts)
   end
@@ -97,7 +98,8 @@ defmodule WeChat.Work.Message do
   @doc """
   发送语音消息 - [官方文档](#{@doc_link}/90236#语音消息){:target="_blank"}
   """
-  @spec send_voice(Work.client(), Work.agent(), to, media_id, opts) :: WeChat.response()
+  @spec send_voice(Work.client(), Work.agent(), to, Material.media_id(), opts) ::
+          WeChat.response()
   def send_voice(client, agent, to, media_id, opts \\ []) do
     send(client, agent, to, "voice", %{"media_id" => media_id}, opts)
   end
@@ -109,7 +111,7 @@ defmodule WeChat.Work.Message do
           Work.client(),
           Work.agent(),
           to,
-          media_id,
+          Material.media_id(),
           title :: String.t(),
           description :: String.t(),
           opts
@@ -127,7 +129,7 @@ defmodule WeChat.Work.Message do
   @doc """
   发送文件消息 - [官方文档](#{@doc_link}/90236#文件消息){:target="_blank"}
   """
-  @spec send_file(Work.client(), Work.agent(), to, media_id, opts) :: WeChat.response()
+  @spec send_file(Work.client(), Work.agent(), to, Material.media_id(), opts) :: WeChat.response()
   def send_file(client, agent, to, media_id, opts \\ []) do
     send(client, agent, to, "file", %{"media_id" => media_id}, opts)
   end
@@ -194,6 +196,23 @@ defmodule WeChat.Work.Message do
   @spec send_template_card(Work.client(), Work.agent(), to, msg, opts) :: WeChat.response()
   def send_template_card(client, agent, to, msg, opts \\ []) do
     send(client, agent, to, "template_card", msg, opts)
+  end
+
+  @doc """
+  更新模版卡片消息 - [官方文档](#{@doc_link}/94888){:target="_blank"}
+
+  应用可以发送模板卡片消息，发送之后可再通过接口更新可回调的用户任务卡片消息的替换文案信息
+  （仅原卡片为 按钮交互型、投票选择型、多项选择型的卡片可以调用本接口更新）。
+
+  请注意，当应用调用发送模版卡片消息后，接口会返回一个 `response_code`，通过 `response_code` 用户可以调用本接口一次。
+  后续如果有用户点击任务卡片，回调接口也会带上 `response_code`，开发者通过该 `code` 也可以调用本接口一次，
+  注意 `response_code` 的有效期是24小时，超过24小时后将无法使用。
+  """
+  @spec update_template_card(Work.client(), Work.agent(), body :: map) :: WeChat.response()
+  def update_template_card(client, agent, body) do
+    client.post("/cgi-bin/message/update_template_card", body,
+      query: [access_token: client.get_access_token(agent)]
+    )
   end
 
   @doc """

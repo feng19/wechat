@@ -35,7 +35,7 @@ defmodule WeChat.Material do
   @typep introduction :: String.t()
 
   @doc """
-  新增临时素材 - 文件 -
+  新增临时素材(文件路径) -
   [官方文档](#{@doc_link}/New_temporary_materials.html){:target="_blank"}
 
   公众号经常有需要用到一些临时性的多媒体素材的场景，例如在使用接口特别是发送消息时，对多媒体文件、多媒体消息的获取和调用等操作，
@@ -53,7 +53,7 @@ defmodule WeChat.Material do
   end
 
   @doc """
-  新增临时素材(binary) -
+  新增临时素材(文件内容) -
   [官方文档](#{@doc_link}/New_temporary_materials.html){:target="_blank"}
 
   公众号经常有需要用到一些临时性的多媒体素材的场景，例如在使用接口特别是发送消息时，对多媒体文件、多媒体消息的获取和调用等操作，
