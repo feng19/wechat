@@ -41,7 +41,8 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp check_msg_signature?(encrypt_content, params, token) do
+    @spec check_msg_signature?(encrypt_content, params, WeChat.token()) :: boolean()
+    def check_msg_signature?(encrypt_content, params, token) do
       with signature when signature != nil <- params["msg_signature"],
            nonce when nonce != nil <- params["nonce"],
            timestamp when timestamp != nil <- params["timestamp"] do
