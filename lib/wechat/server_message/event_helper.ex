@@ -75,17 +75,12 @@ if Code.ensure_loaded?(Plug) do
     @spec parse_work_xml_event(params, body :: String.t() | map, WeChat.client(), Work.Agent.t()) ::
             {:ok, data_type, xml} | {:error, String.t()}
     def parse_work_xml_event(params, body, client, agent) do
-      case XmlParser.parse(body) do
-        # 安全模式
-        {:ok, %{"Encrypt" => encrypt_content}} ->
-          decrypt_xml_msg(encrypt_content, params, client.appid(), agent.token, agent.aes_key)
-
-        # 明文模式
-        {:ok, xml} when is_map(xml) ->
-          {:ok, :plaqin_text, xml}
-
-        _error ->
-          {:error, "invalid"}
+      with {:ok, %{"Encrypt" => encrypt_content}} <- XmlParser.parse(body),
+           token when token != nil <- agent.token,
+           true <- check_msg_signature?(encrypt_content, params, token) do
+        decrypt_xml_msg(encrypt_content, params, client.appid(), token, agent.aes_key)
+      else
+        _error -> {:error, "invalid"}
       end
     end
 
@@ -97,7 +92,8 @@ if Code.ensure_loaded?(Plug) do
         # 安全模式
         %{"Encrypt" => encrypt_content} -> decrypt_json_msg(encrypt_content, params, client)
         # 明文模式
-        json -> {:ok, :plaqin_text, json}
+        json when is_map(json) -> {:ok, :plaqin_text, json}
+        _error -> {:error, "invalid"}
       end
     end
 

@@ -124,7 +124,6 @@ if Code.ensure_loaded?(Plug) do
           event_handler
         ) do
       with {:ok, body, conn} <- check_and_read_body(conn),
-           true <- EventHelper.check_msg_signature?(body, query_params, agent.token),
            {:ok, reply_type, message} <- event_parser.(query_params, body, client, agent) do
         try do
           event_handler.(conn, client, agent, message)
