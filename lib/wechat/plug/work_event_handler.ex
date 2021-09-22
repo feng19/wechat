@@ -98,8 +98,8 @@ if Code.ensure_loaded?(Plug) do
             Encryptor.aes_key()
           ) :: Plug.Conn.t()
     def validate_encrypted_request(conn = %{query_params: query_params}, id, token, aes_key) do
-      with true <- EventHelper.check_signature?(query_params, token),
-           echo_str when echo_str != nil <- query_params["echostr"],
+      with echo_str when echo_str != nil <- query_params["echostr"],
+           true <- EventHelper.check_msg_signature?(echo_str, query_params, token),
            {^id, message} <- Encryptor.decrypt(echo_str, aes_key) do
         send_resp(conn, 200, message)
       else
