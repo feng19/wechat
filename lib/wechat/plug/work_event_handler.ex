@@ -8,7 +8,7 @@ if Code.ensure_loaded?(Plug) do
     请将入口路径设置为如下格式 `/*xxx/:app/:agent` 并将代码加到 `router` 里面：
 
         scope "/wx/event/:app/:agent" do
-          forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/2
+          forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/4
         end
 
     ## Options

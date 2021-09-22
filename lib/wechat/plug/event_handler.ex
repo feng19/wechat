@@ -11,14 +11,14 @@ if Code.ensure_loaded?(Plug) do
 
           forward "/wx/event", #{inspect(__MODULE__)},
             client: WxOfficialAccount,
-            event_handler: &Module.handle_event/2
+            event_handler: &YourModule.handle_event/3
 
     - 多个应用的情况：
 
       请将入口路径设置为如下格式: `/*xxx/:app`
 
           scope "/wx/event/:app" do
-            forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/2
+            forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/3
           end
 
     ## Options
@@ -72,7 +72,7 @@ if Code.ensure_loaded?(Plug) do
 
       event_handler =
         with {:ok, handler} <- Map.fetch(opts, :event_handler),
-             true <- is_function(handler, 4) do
+             true <- is_function(handler, 3) do
           handler
         else
           :error ->
