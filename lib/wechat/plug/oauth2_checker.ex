@@ -73,7 +73,7 @@ if Code.ensure_loaded?(Plug) do
           fun
         else
           :error ->
-            &oauth2_callback/5
+            &__MODULE__.oauth2_callback/5
 
           false ->
             raise ArgumentError,
@@ -86,7 +86,7 @@ if Code.ensure_loaded?(Plug) do
           fun
         else
           :error ->
-            &authorize_url_by_server_role/4
+            &__MODULE__.authorize_url_by_server_role/4
 
           false ->
             raise ArgumentError,
