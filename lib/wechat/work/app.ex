@@ -102,7 +102,7 @@ defmodule WeChat.Work.App do
     [
       "https://open.work.weixin.qq.com/wwopen/sso/qrConnect?",
       ["appid=", client.appid()],
-      ["&agentid=", agent2id(client, agent)],
+      ["&agentid=", to_string(agent2id(client, agent))],
       ["&redirect_uri=", URI.encode_www_form(redirect_uri)],
       if match?("", state) do
         []
