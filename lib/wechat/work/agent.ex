@@ -3,6 +3,7 @@ defmodule WeChat.Work.Agent do
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
+  alias WeChat.ServerMessage.Encryptor
 
   @term_introduction_doc_link "#{work_doc_link_prefix()}/90000/90135/90665"
 
@@ -27,7 +28,7 @@ defmodule WeChat.Work.Agent do
     某些基础应用（如“审批”“打卡”应用），支持通过API进行操作。在管理后台->“应用与小程序”->“应用->”“基础”，点进某个应用，点开“API”小按钮，即可看到。
   - 通讯录管理 `secret`
     在“管理工具”-“通讯录同步”里面查看（需开启“API接口同步”）；
-  - 外部联系人管理 `secret`
+  - 客户联系管理 `secret`
     在“客户联系”栏，点开“API”小按钮，即可看到。
   """
   @type secret :: String.t()
@@ -37,12 +38,22 @@ defmodule WeChat.Work.Agent do
           id: agent_id,
           name: agent_name,
           secret: secret,
-          encoding_aes_key: WeChat.ServerMessage.Encryptor.encoding_aes_key(),
-          token: WeChat.token()
+          token: WeChat.token(),
+          encoding_aes_key: Encryptor.encoding_aes_key(),
+          aes_key: Encryptor.aes_key()
         }
 
   @enforce_keys [:id]
-  defstruct [:name, :id, :secret, :encoding_aes_key, :token]
+  defstruct [:name, :id, :secret, :token, :encoding_aes_key, :aes_key]
+
+  @spec find_agent(Work.client(), Work.agent()) :: t | nil
+  def find_agent(client, id) when is_integer(id) do
+    Enum.find(client.agents(), &match?(%{id: ^id}, &1))
+  end
+
+  def find_agent(client, name) do
+    Enum.find(client.agents(), &match?(%{name: ^name}, &1))
+  end
 
   @spec name2id(Work.client(), agent_name) :: agent_id | nil
   def name2id(client, name) do
@@ -59,17 +70,29 @@ defmodule WeChat.Work.Agent do
   @spec agent(agent_id, options :: Keyword.t()) :: t
   def agent(id, options \\ []) do
     struct(%__MODULE__{id: id, name: id}, options)
+    |> transfer_aes_key()
   end
 
   @doc "构建[通讯录]应用(agent)"
   @spec contacts_agent(options :: Keyword.t()) :: t
   def contacts_agent(options \\ []) do
     struct(%__MODULE__{id: :contacts, name: :contacts}, options)
+    |> transfer_aes_key()
   end
 
   @doc "构建[客户联系]应用(agent)"
   @spec customer_agent(options :: Keyword.t()) :: t
   def customer_agent(options \\ []) do
     struct(%__MODULE__{id: :customer, name: :customer}, options)
+    |> transfer_aes_key()
+  end
+
+  defp transfer_aes_key(agent) do
+    if is_nil(agent.aes_key) and agent.encoding_aes_key do
+      aes_key = Encryptor.aes_key(agent.encoding_aes_key)
+      %{agent | aes_key: aes_key}
+    else
+      agent
+    end
   end
 end

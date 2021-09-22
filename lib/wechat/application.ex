@@ -36,13 +36,31 @@ defmodule WeChat.Application do
 
   defp setup_clients(clients) do
     for {client, settings} <- clients, is_atom(client) do
-      if hub_url = settings[:hub_url] do
-        WeChat.set_hub_url(client, hub_url)
+      if match?(:work, client.app_type()) do
+        setup_work_client(client, _agents = settings)
+      else
+        if hub_springboard_url = settings[:hub_springboard_url] do
+          WeChat.set_hub_springboard_url(client, hub_springboard_url)
+        end
+
+        if oauth2_callbacks = settings[:oauth2_callbacks] do
+          for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
+            WeChat.set_oauth2_env_url(client, env, url)
+          end
+        end
+      end
+    end
+  end
+
+  defp setup_work_client(client, agents) do
+    for {agent, settings} <- agents do
+      if hub_springboard_url = settings[:hub_springboard_url] do
+        WeChat.set_hub_springboard_url(client, agent, hub_springboard_url)
       end
 
       if oauth2_callbacks = settings[:oauth2_callbacks] do
-        for {env, callback} <- oauth2_callbacks, is_binary(env) and is_binary(callback) do
-          WeChat.set_oauth2_env_url(client, env, callback)
+        for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
+          WeChat.set_oauth2_env_url(client, agent, env, url)
         end
       end
     end

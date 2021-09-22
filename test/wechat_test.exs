@@ -23,6 +23,7 @@ defmodule WeChatTest do
   end
 
   test "Auto generate functions(Work) - include Contacts" do
+    assert Work.code_name() == "work"
     assert Work.app_type() == :work
     assert Work.by_component?() == false
     assert Work.server_role() == :client

@@ -69,7 +69,7 @@ defmodule WeChat do
 
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.Storage.Cache
+  alias WeChat.{Work, Storage.Cache}
 
   @typedoc """
   OpenID 普通用户的标识，对当前公众号唯一
@@ -179,10 +179,16 @@ defmodule WeChat do
   end
 
   @doc """
-  根据 `appid` 获取 `client`
+  通过 `appid` 或者 `code_name` 获取 `client`
   """
-  @spec get_client_by_appid(appid) :: nil | client
-  defdelegate get_client_by_appid(appid), to: WeChat.Storage.Cache, as: :search_client
+  @spec get_client(appid | code_name) :: nil | client
+  defdelegate get_client(app_flag), to: WeChat.Storage.Cache, as: :search_client
+
+  @spec get_client_agent(appid | code_name, WeChat.Work.agent() | String.t()) ::
+          nil | {client, Work.Agent.t()}
+  defdelegate get_client_agent(app_flag, agent_flag),
+    to: WeChat.Storage.Cache,
+    as: :search_client_agent
 
   @doc "动态构建 client"
   @spec build_client(client, options) :: {:ok, client}
@@ -202,14 +208,26 @@ defmodule WeChat do
 
   # hub_url
 
-  @spec set_hub_url(client, url) :: true
-  def set_hub_url(client, url) when is_binary(url) do
-    Cache.put_cache(client.appid(), :hub_url, url)
+  @spec set_hub_springboard_url(client, url) :: true
+  def set_hub_springboard_url(client, url) when is_binary(url) do
+    Cache.put_cache(client.appid(), :hub_springboard_url, url)
   end
 
-  @spec get_hub_url(client) :: nil | url
-  def get_hub_url(client) do
-    Cache.get_cache(client.appid(), :hub_url)
+  @spec set_hub_springboard_url(client, Work.agent(), url) :: true
+  def set_hub_springboard_url(client, agent, url) when is_binary(url) do
+    client.agent2cache_id(agent)
+    |> Cache.put_cache(:hub_springboard_url, url)
+  end
+
+  @spec get_hub_springboard_url(client) :: nil | url
+  def get_hub_springboard_url(client) do
+    Cache.get_cache(client.appid(), :hub_springboard_url)
+  end
+
+  @spec get_hub_springboard_url(client, Work.agent()) :: nil | url
+  def get_hub_springboard_url(client, agent) do
+    client.agent2cache_id(agent)
+    |> Cache.get_cache(:hub_springboard_url)
   end
 
   # oauth2_env_url
@@ -219,9 +237,21 @@ defmodule WeChat do
     Cache.put_cache(client.appid(), {:oauth2_env, env}, url)
   end
 
+  @spec set_oauth2_env_url(client, Work.agent(), env, url) :: true
+  def set_oauth2_env_url(client, agent, env, url) when is_binary(env) and is_binary(url) do
+    client.agent2cache_id(agent)
+    |> Cache.put_cache({:oauth2_env, env}, url)
+  end
+
   @spec get_oauth2_env_url(client, env) :: nil | url
   def get_oauth2_env_url(client, env) do
     Cache.get_cache(client.appid(), {:oauth2_env, env})
+  end
+
+  @spec get_oauth2_env_url(client, Work.agent(), env) :: nil | url
+  def get_oauth2_env_url(client, agent, env) do
+    client.agent2cache_id(agent)
+    |> Cache.get_cache({:oauth2_env, env})
   end
 
   def get_refresher do

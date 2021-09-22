@@ -2,11 +2,13 @@ defmodule WeChat.Storage.Cache do
   @moduledoc "缓存存储器"
 
   @type cache_id :: WeChat.appid()
-  @type cache_sub_key :: atom
+  @type cache_sub_key :: term
   @type cache_key :: {cache_id, cache_sub_key}
-  @type cache_value :: String.t() | integer
+  @type cache_value :: term
 
   @compile {:inline, put_cache: 2, get_cache: 1, del_cache: 1}
+
+  alias WeChat.Work
 
   def init_table() do
     :ets.new(:wechat, [:named_table, :set, :public, read_concurrency: true])
@@ -14,20 +16,33 @@ defmodule WeChat.Storage.Cache do
 
   @spec set_client(WeChat.client()) :: true
   def set_client(client) do
-    if client.app_type() == :work do
-      put_cache(client.appid(), :client, client)
-    else
-      put_cache(client.appid(), :client, client)
-      put_cache(client.code_name(), :client, client)
+    appid = client.appid()
+    code_name = client.code_name()
+    Enum.uniq([appid, code_name]) |> Enum.map(&{{&1, :client}, client}) |> put_caches()
+
+    if match?(:work, client.app_type()) do
+      app_list = [appid, code_name]
+
+      Enum.flat_map(client.agents(), fn agent ->
+        agent_id = agent.id
+        name = agent.name
+        agent_list = Enum.uniq([agent_id, to_string(agent_id), name, to_string(name)])
+        value = {client, agent}
+
+        for app_flag <- app_list, agent_flag <- agent_list do
+          {{app_flag, agent_flag}, value}
+        end
+      end)
+      |> put_caches()
     end
   end
 
-  @spec search_client(WeChat.appid()) :: nil | WeChat.client()
-  def search_client(appid), do: get_cache(appid, :client)
+  @spec search_client(WeChat.appid() | WeChat.code_name()) :: nil | WeChat.client()
+  def search_client(app_flag), do: get_cache(app_flag, :client)
 
-  @spec search_client_by_name(WeChat.code_name()) :: nil | WeChat.client()
-  def search_client_by_name(code_name) when is_binary(code_name),
-    do: code_name |> String.downcase() |> get_cache(:client)
+  @spec search_client_agent(WeChat.appid() | WeChat.code_name(), Work.agent()) ::
+          nil | {WeChat.client(), Work.Agent.t()}
+  def search_client_agent(app_flag, agent_flag), do: get_cache(app_flag, agent_flag)
 
   @spec put_cache(cache_id(), cache_sub_key(), cache_value()) :: true
   def put_cache(id, sub_key, value) do
@@ -37,6 +52,11 @@ defmodule WeChat.Storage.Cache do
   @spec put_cache(cache_key(), cache_value()) :: true
   def put_cache(key, value) do
     :ets.insert(:wechat, {key, value})
+  end
+
+  @spec put_caches([{cache_key(), cache_value()}]) :: true
+  def put_caches(list) when is_list(list) do
+    :ets.insert(:wechat, list)
   end
 
   @spec get_cache(cache_id(), cache_sub_key()) :: nil | cache_value()

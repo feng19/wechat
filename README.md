@@ -87,9 +87,22 @@ end
   end
   ```
 
+### 自动刷新 `token`
+
+在 `config.exs` 中设置:
+```elixir
+config :wechat, :refresh_settings, [ClientA, ClientB, ClientC]
+```
+
+手动添加 `client`:
+
+```elixir
+WeChat.Refresher.Default.add(YourApp.WeChatAppCodeName)
+```
+
 ### 调用接口
 
-所有类型的 `client`，都同时支持两种方式调用：
+所有类型的 `client`，都同时支持以下两种形式调用:
 
 ```elixir
 YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)

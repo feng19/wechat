@@ -54,10 +54,10 @@ defmodule WeChat.Builder.Work do
           raise ArgumentError, "please set :agents option"
       end
 
+    client = __CALLER__.module
+
     sub_modules =
       if Keyword.get(default_opts, :gen_sub_module?, true) do
-        client = __CALLER__.module
-
         default_opts
         |> Keyword.get(:sub_modules, @sub_modules)
         |> Enum.reduce([], fn
@@ -76,11 +76,17 @@ defmodule WeChat.Builder.Work do
         []
       end
 
-    gen_get_functions(default_opts, agents) ++ sub_modules
+    gen_get_functions(client, default_opts, agents) ++ sub_modules
   end
 
-  defp gen_get_functions(default_opts, agents) do
+  defp gen_get_functions(client, default_opts, agents) do
     corp_id = Keyword.get(default_opts, :corp_id)
+
+    code_name =
+      Keyword.get_lazy(default_opts, :code_name, fn ->
+        client |> to_string() |> String.split(".") |> List.last() |> String.downcase()
+      end)
+
     storage = Keyword.get(default_opts, :storage)
     requester = Keyword.get(default_opts, :requester)
     server_role = Keyword.get(default_opts, :server_role)
@@ -89,6 +95,7 @@ defmodule WeChat.Builder.Work do
     base =
       quote location: :keep do
         def appid, do: unquote(corp_id)
+        def code_name, do: unquote(code_name)
         def app_type, do: :work
         def storage, do: unquote(storage)
         def server_role, do: unquote(server_role)
@@ -111,9 +118,11 @@ defmodule WeChat.Builder.Work do
 
     {agent2cache_id_funs, agent_secret_funs} =
       agents
-      |> Enum.map(fn agent ->
+      |> Enum.reverse()
+      |> Enum.reduce({[], []}, fn agent, {cache_id_funs, secret_funs} ->
         name = agent.name
         id = agent.id
+        secret = agent.secret
 
         agent2cache_id =
           if name == id or name == nil do
@@ -126,8 +135,6 @@ defmodule WeChat.Builder.Work do
               def agent2cache_id(unquote(id)), do: unquote("#{corp_id}_#{id}")
             end
           end
-
-        secret = agent.secret
 
         agent_secret =
           if secret do
@@ -143,9 +150,11 @@ defmodule WeChat.Builder.Work do
             end
           end
 
-        {agent2cache_id, agent_secret}
+        {
+          [agent2cache_id | cache_id_funs],
+          [agent_secret | secret_funs]
+        }
       end)
-      |> Enum.unzip()
 
     [
       base,

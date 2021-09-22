@@ -133,7 +133,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   """
   @spec work_refresh_options(WeChat.client()) :: refresh_options
   def work_refresh_options(client) do
-    Enum.map(client.agents, fn %{id: agent_id, secret: secret} ->
+    Enum.map(client.agents(), fn %{id: agent_id, secret: secret} ->
       unless secret do
         raise RuntimeError,
               "Please set :secret for agent:#{agent_id} when defining #{inspect(client)}."

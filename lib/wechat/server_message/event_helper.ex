@@ -1,5 +1,5 @@
 if Code.ensure_loaded?(Plug) do
-  defmodule WeChat.ServerMessage.EventHandler do
+  defmodule WeChat.ServerMessage.EventHelper do
     @moduledoc """
     微信推送消息处理
 
@@ -8,9 +8,9 @@ if Code.ensure_loaded?(Plug) do
       * [接入指引](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html){:target="_blank"}
       * [接入技术方案](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Technical_Plan.html){:target="_blank"}
     """
-    require Logger
     import WeChat.Utils, only: [doc_link_prefix: 0]
-    alias WeChat.{Utils, Component, Storage.Cache}
+    require Logger
+    alias WeChat.{Work, Utils, Component, Storage.Cache}
     alias WeChat.ServerMessage.{Encryptor, XmlParser, XmlMessage}
 
     @type data_type :: :plaqin_text | :encrypted_xml | :encrypted_json
@@ -24,149 +24,42 @@ if Code.ensure_loaded?(Plug) do
     @type status :: Plug.Conn.status()
     @typep timestamp :: non_neg_integer
     @typep params :: map
-    @typedoc """
-    事件处理回调返回值
-
-    返回值说明：
-    - `{:reply, xml_string, timestamp}`: 被动回复消息，仅限于公众号/第三方平台
-    - `{:reply, json_string}`: 被动回复消息，仅限小程序推送消息
-    - `:ok`: 成功
-    - `:ignore`: 成功
-    - `:retry`: 选择重试，微信服务器会重试三次
-    - `:error`: 返回错误，微信服务器会重试三次
-    - `{:error, any}`: 返回错误，微信服务器会重试三次
-    """
-    @type handle_event_fun_return ::
-            {:reply, reply_msg :: xml_string, timestamp}
-            | {:reply, reply_msg :: json_string}
-            | :ok
-            | :ignore
-            | :retry
-            | :error
-            | {:error, any}
-    @typedoc "事件处理回调方法"
-    @type handle_event_fun :: (WeChat.client(), message :: map -> handle_event_fun_return)
-
-    @doc """
-    验证消息的确来自微信服务器
-    """
-    @spec handle_get(params, WeChat.client()) :: {status, String.t()}
-    def handle_get(query_params, client) do
-      if check_signature?(query_params, client) do
-        {200, query_params["echostr"]}
-      else
-        {400, "Bad Request"}
-      end
-    end
-
-    @doc """
-    接受事件推送
-    """
-    @spec handle_post(Plug.Conn.t(), WeChat.client(), handle_event_fun) :: {status, String.t()}
-    def handle_post(
-          %{body_params: body_params, query_params: query_params} = conn,
-          client,
-          handle_event_fun
-        )
-        when is_struct(body_params) do
-      # xml data for official_account
-      with true <- check_signature?(query_params, client),
-           {:ok, body, _conn} <- Plug.Conn.read_body(conn),
-           {:ok, reply_type, message} <- handle_event_xml(query_params, body, client) do
-        try do
-          handle_event_fun.(client, message)
-        rescue
-          error ->
-            Logger.error(
-              "call #{inspect(handle_event_fun)}.(#{inspect(client)}, #{inspect(message)}) get error: #{inspect(error)}"
-            )
-
-            {500, "Internal Server Error"}
-        else
-          # 被动回复推送消息
-          {:reply, xml_string, timestamp} ->
-            {200, reply_msg(reply_type, xml_string, timestamp, client)}
-
-          :retry ->
-            {500, "please retry"}
-
-          :error ->
-            {500, "error, please retry"}
-
-          {:error, _} ->
-            {500, "error, please retry"}
-
-          _ ->
-            {200, "success"}
-        end
-      else
-        _ -> {400, "Bad Request"}
-      end
-    end
-
-    def handle_post(
-          %{body_params: body_params, query_params: query_params},
-          client,
-          handle_event_fun
-        ) do
-      # json data for mini_program
-      with true <- check_signature?(query_params, client),
-           {:ok, _reply_type, message} <- handle_event_json(query_params, body_params, client) do
-        try do
-          handle_event_fun.(client, message)
-        rescue
-          error ->
-            Logger.error(
-              "call #{inspect(handle_event_fun)}.(#{inspect(client)}, #{inspect(message)}) get error: #{inspect(error)}"
-            )
-
-            {500, "Internal Server Error"}
-        else
-          {:reply, json_string} when is_binary(json_string) -> {200, json_string}
-          :retry -> {500, "please retry"}
-          :error -> {500, "error, please retry"}
-          {:error, _} -> {500, "error, please retry"}
-          _ -> {200, "success"}
-        end
-      else
-        _ -> {400, "Bad Request"}
-      end
-    end
 
     @doc "验证消息的确来自微信服务器"
-    @spec check_signature?(params, WeChat.client()) :: boolean()
-    def check_signature?(params, client) do
+    @spec check_signature?(params, WeChat.token()) :: boolean()
+    def check_signature?(params, token) do
       with signature when signature != nil <- params["signature"],
            nonce when nonce != nil <- params["nonce"],
            timestamp when timestamp != nil <- params["timestamp"],
            {timestamp, ""} <- Integer.parse(timestamp),
            now_timestamp <- Utils.now_unix(),
            true <- now_timestamp >= timestamp and now_timestamp - timestamp <= 5 do
-        challenge = Utils.sha1([client.token(), nonce, to_string(timestamp)])
+        challenge = Utils.sha1([token, nonce, to_string(timestamp)])
         Plug.Crypto.secure_compare(challenge, signature)
       else
         _ -> false
       end
     end
 
-    defp check_msg_signature?(encrypt_content, params, client) do
+    defp check_msg_signature?(encrypt_content, params, token) do
       with signature when signature != nil <- params["msg_signature"],
            nonce when nonce != nil <- params["nonce"],
            timestamp when timestamp != nil <- params["timestamp"] do
-        challenge = Utils.sha1([client.token(), encrypt_content, nonce, to_string(timestamp)])
+        challenge = Utils.sha1([token, encrypt_content, nonce, to_string(timestamp)])
         Plug.Crypto.secure_compare(challenge, signature)
       else
         _ -> false
       end
     end
 
-    @spec handle_event_xml(params, body :: String.t() | map, WeChat.client()) ::
+    @doc "parse xml format event message for official_account"
+    @spec parse_xml_event(params, body :: String.t() | map, WeChat.client()) ::
             {:ok, data_type, xml} | {:error, String.t()}
-    def handle_event_xml(params, body, client) do
+    def parse_xml_event(params, body, client) do
       case XmlParser.parse(body) do
         # 安全模式
         {:ok, %{"Encrypt" => encrypt_content}} ->
-          decode_xml_msg(encrypt_content, params, client)
+          decrypt_xml_msg(encrypt_content, params, client)
 
         # 明文模式
         {:ok, xml} when is_map(xml) ->
@@ -177,35 +70,40 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    @spec handle_event_json(params, body :: String.t(), WeChat.client()) ::
-            {:ok, data_type, json} | {:error, String.t()}
-    def handle_event_json(params, body, client) when is_map(body) do
-      case body do
+    @doc "parse xml format event message for work"
+    @spec parse_work_xml_event(params, body :: String.t() | map, WeChat.client(), Work.Agent.t()) ::
+            {:ok, data_type, xml} | {:error, String.t()}
+    def parse_work_xml_event(params, body, client, agent) do
+      case XmlParser.parse(body) do
         # 安全模式
-        %{"Encrypt" => encrypt_content} ->
-          decode_json_msg(encrypt_content, params, client)
+        {:ok, %{"Encrypt" => encrypt_content}} ->
+          decrypt_xml_msg(encrypt_content, params, client.appid(), agent.token, agent.aes_key)
 
         # 明文模式
-        {:ok, json} when is_map(json) ->
-          {:ok, :plaqin_text, json}
+        {:ok, xml} when is_map(xml) ->
+          {:ok, :plaqin_text, xml}
 
         _error ->
           {:error, "invalid"}
       end
     end
 
-    def handle_event_json(params, body, client) do
-      case Jason.decode(body) do
+    # json format event message for mini_program
+    @spec parse_json_event(params, body :: String.t(), WeChat.client()) ::
+            {:ok, data_type, json} | {:error, String.t()}
+    def parse_json_event(params, body, client) when is_map(body) do
+      case body do
         # 安全模式
-        {:ok, %{"Encrypt" => encrypt_content}} ->
-          decode_json_msg(encrypt_content, params, client)
-
+        %{"Encrypt" => encrypt_content} -> decrypt_json_msg(encrypt_content, params, client)
         # 明文模式
-        {:ok, json} when is_map(json) ->
-          {:ok, :plaqin_text, json}
+        json -> {:ok, :plaqin_text, json}
+      end
+    end
 
-        _error ->
-          {:error, "invalid"}
+    def parse_json_event(params, body, client) when is_binary(body) do
+      case Jason.decode(body) do
+        {:ok, body} -> parse_json_event(params, body, client)
+        _ -> {:error, "invalid"}
       end
     end
 
@@ -215,11 +113,8 @@ if Code.ensure_loaded?(Plug) do
     * [验证票据](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
     * [授权相关推送通知](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/authorize_event.html)
     """
-    def handle_component_message(
-          %{"InfoType" => info_type, "AppId" => component_appid} = message,
-          client
-        ) do
-      case info_type do
+    def handle_component_event(%{"AppId" => component_appid} = message, client) do
+      case info_type = message["InfoType"] do
         "component_verify_ticket" ->
           # 验证票据
           ticket = message["ComponentVerifyTicket"]
@@ -266,8 +161,6 @@ if Code.ensure_loaded?(Plug) do
           :ignore
       end
     end
-
-    def handle_component_message(_message), do: :ignore
 
     defp authorized_message(component_appid, info_type, message) do
       authorizer_appid = message["AuthorizerAppid"]
@@ -322,22 +215,27 @@ if Code.ensure_loaded?(Plug) do
     @spec reply_msg(data_type, xml_string, timestamp, WeChat.client()) :: String.t()
     def reply_msg(:plaqin_text, xml_string, _timestamp, _client), do: xml_string
 
-    def reply_msg(:encrypted_xml, xml_string, timestamp, client) do
-      encode_xml_msg(xml_string, timestamp, client)
-    end
+    def reply_msg(:encrypted_xml, xml_string, timestamp, client),
+      do: encrypt_xml_msg(xml_string, timestamp, client)
 
-    def reply_msg(_, _reply_msg, _timestamp, _client) do
-      "success"
-    end
+    def reply_msg(_, _reply_msg, _timestamp, _client), do: "success"
 
-    @compile {:inline, decode_xml_msg: 3, decode_json_msg: 3, encode_xml_msg: 3}
-
-    @spec decode_xml_msg(encrypt_content, params, WeChat.client()) ::
+    @spec decrypt_xml_msg(encrypt_content, params, WeChat.client()) ::
             {:ok, :encrypted, xml_string} | {:error, String.t()}
-    def decode_xml_msg(encrypt_content, params, client) do
-      with true <- check_msg_signature?(encrypt_content, params, client),
-           appid <- client.appid(),
-           {^appid, xml_string} <- Encryptor.decrypt(encrypt_content, client.aes_key()),
+    def decrypt_xml_msg(encrypt_content, params, client) do
+      decrypt_xml_msg(encrypt_content, params, client.appid(), client.token(), client.aes_key())
+    end
+
+    @spec decrypt_xml_msg(
+            encrypt_content,
+            params,
+            WeChat.appid(),
+            WeChat.token(),
+            Encryptor.aes_key()
+          ) :: {:ok, :encrypted, xml_string} | {:error, String.t()}
+    def decrypt_xml_msg(encrypt_content, params, appid, token, aes_key) do
+      with true <- check_msg_signature?(encrypt_content, params, token),
+           {^appid, xml_string} <- Encryptor.decrypt(encrypt_content, aes_key),
            {:ok, xml} <- XmlParser.parse(xml_string) do
         {:ok, :encrypted_xml, xml}
       else
@@ -345,12 +243,22 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    @spec decode_json_msg(encrypt_content, params, WeChat.client()) ::
+    @spec decrypt_json_msg(encrypt_content, params, WeChat.client()) ::
             {:ok, :encrypted, json_string} | {:error, String.t()}
-    def decode_json_msg(encrypt_content, params, client) do
-      with true <- check_msg_signature?(encrypt_content, params, client),
-           appid <- client.appid(),
-           {^appid, json_string} <- Encryptor.decrypt(encrypt_content, client.aes_key()),
+    def decrypt_json_msg(encrypt_content, params, client) do
+      decrypt_json_msg(encrypt_content, params, client.appid(), client.token(), client.aes_key())
+    end
+
+    @spec decrypt_json_msg(
+            encrypt_content,
+            params,
+            WeChat.appid(),
+            WeChat.token(),
+            Encryptor.aes_key()
+          ) :: {:ok, :encrypted, json_string} | {:error, String.t()}
+    def decrypt_json_msg(encrypt_content, params, appid, token, aes_key) do
+      with true <- check_msg_signature?(encrypt_content, params, token),
+           {^appid, json_string} <- Encryptor.decrypt(encrypt_content, aes_key),
            {:ok, json} <- Jason.decode(json_string) do
         {:ok, :encrypted_json, json}
       else
@@ -358,12 +266,23 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    @spec encode_xml_msg(xml_string, timestamp, WeChat.client()) :: String.t()
-    def encode_xml_msg(xml_string, timestamp, client) do
-      encrypt_content = Encryptor.encrypt(xml_string, client.appid(), client.aes_key())
+    @spec encrypt_xml_msg(xml_string, timestamp, WeChat.client()) :: String.t()
+    def encrypt_xml_msg(xml_string, timestamp, client) do
+      encrypt_xml_msg(xml_string, timestamp, client.appid(), client.token(), client.aes_key())
+    end
+
+    @spec encrypt_xml_msg(
+            xml_string,
+            timestamp,
+            WeChat.appid(),
+            WeChat.token(),
+            Encryptor.aes_key()
+          ) :: String.t()
+    def encrypt_xml_msg(xml_string, timestamp, appid, token, aes_key) do
+      encrypt_content = Encryptor.encrypt(xml_string, appid, aes_key)
       nonce = Utils.random_string(10)
 
-      Utils.sha1([client.token(), to_string(timestamp), nonce, encrypt_content])
+      Utils.sha1([token, to_string(timestamp), nonce, encrypt_content])
       |> XmlMessage.reply_msg(nonce, timestamp, encrypt_content)
     end
   end
