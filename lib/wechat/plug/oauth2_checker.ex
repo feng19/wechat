@@ -5,19 +5,16 @@ if Code.ensure_loaded?(Plug) do
 
     [官方文档](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html){:target="_blank"}
 
-    工作流程:
+    工作流程
+
     1. 检查 `session`, 判断是否已经有授权，有则继续执行后续的 plug, 没有则跳到步骤 2;
     2. 检查 `query` 是否有 `code`, 有则执行 `oauth2_callback_fun` 函数, 没有则跳到步骤 3;
     3. 执行 `authorize_url_fun` 函数，跳转到 `authorize_url`.
 
-    ## Usage
-
-        plug #{inspect(__MODULE__)}, clients: [Client]
-
     可选参数:
 
-    - `:oauth2_callback_fun`: `t:__MODULE__.oauth2_callback_fun/5`
-    - `:authorize_url_fun`: `t:__MODULE__.authorize_url_fun/4`
+    - `:oauth2_callback_fun`: `t:#{inspect(__MODULE__)}.oauth2_callback_fun/0`, 默认: `#{inspect(__MODULE__)}.oauth2_callback/5`
+    - `:authorize_url_fun`: `t:#{inspect(__MODULE__)}.authorize_url_fun/0`, 默认: `#{inspect(__MODULE__)}.authorize_url_by_server_role/4`
 
     ** 注意 **: 服务器角色为 `hub_client` 时，请确保已经配置 `hub_springboard_url`:
 
@@ -27,23 +24,21 @@ if Code.ensure_loaded?(Plug) do
 
     将下面的代码加到 `router` 里面：
 
-      ```elixir
-      pipeline :oauth2_checker do
-        plug #{inspect(__MODULE__)}, clients: [Client, ...]
-      end
+        pipeline :oauth2_checker do
+          plug #{inspect(__MODULE__)}, clients: [Client, ...]
+        end
 
-      # for normal
-      scope "/:app" do
-        pipe_through :oauth2_checker
-        get "/path", YourController, :your_action
-      end
+        # for normal
+        scope "/:app" do
+          pipe_through :oauth2_checker
+          get "/path", YourController, :your_action
+        end
 
-      # for work
-      scope "/:app/:agent" do
-        pipe_through :oauth2_checker
-        get "/path", YourController, :your_action
-      end
-      ```
+        # for work
+        scope "/:app/:agent" do
+          pipe_through :oauth2_checker
+          get "/path", YourController, :your_action
+        end
     """
 
     import Plug.Conn
@@ -106,11 +101,16 @@ if Code.ensure_loaded?(Plug) do
       }
     end
 
-    defp transfer_client(client, acc) when is_atom(client),
-      do: transfer_client({client, :all}, acc)
+    defp transfer_client(client, acc) when is_atom(client) do
+      if match?(:work, client.app_type()) do
+        transfer_client({client, :all}, acc)
+      else
+        transfer_client({client, nil}, acc)
+      end
+    end
 
     defp transfer_client({client, :all}, acc) do
-      agents = Enum.map(client.agents, & &1.id)
+      agents = Enum.map(client.agents(), & &1.id)
       transfer_client({client, agents}, acc)
     end
 
@@ -200,7 +200,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp oauth2_callback(:normal, conn, code, client, _) do
+    def oauth2_callback(:normal, conn, code, client, _) do
       with {:ok, %{status: 200, body: info}} <- WebPage.code2access_token(client, code),
            access_token when access_token != nil <- info["access_token"] do
         auth_success(conn, client, info)
@@ -211,7 +211,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp oauth2_callback(:work, conn, code, client, agent) do
+    def oauth2_callback(:work, conn, code, client, agent) do
       with {:ok, %{status: 200, body: info}} <- Work.App.sso_user_info(client, agent.id, code),
            0 <- info["errcode"] do
         auth_success(conn, client, info)
@@ -271,8 +271,8 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp authorize_url_by_server_role(type, conn, client, agent) do
-      if match?(:hub_client, client.server_role) do
+    def authorize_url_by_server_role(type, conn, client, agent) do
+      if match?(:hub_client, client.server_role()) do
         hub_springboard_authorize_url(type, conn, client, agent)
       else
         authorize_url(type, conn, client, agent)

@@ -56,6 +56,7 @@ defmodule WeChat.MixProject do
       nest_modules_by_prefix: [
         Requester,
         Refresher,
+        WeChat.Plug,
         ServerMessage,
         Storage,
         MiniProgram,
@@ -111,7 +112,10 @@ defmodule WeChat.MixProject do
       {"事件推送",
        [
          WeChat.Plug.EventHandler,
-         ServerMessage.EventHandler,
+         WeChat.Plug.WorkEventHandler,
+         WeChat.Plug.OAuth2Checker,
+         WeChat.Plug.HubSpringboard,
+         ServerMessage.EventHelper,
          ServerMessage.Encryptor,
          ServerMessage.XmlMessage,
          ServerMessage.XmlParser

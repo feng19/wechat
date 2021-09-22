@@ -9,24 +9,22 @@ if Code.ensure_loaded?(Plug) do
 
     - 单一应用的情况：
 
-      ```elixir
-      forward "/wx/event", #{inspect(__MODULE__)}, client: WxOfficialAccount, event_handler: &Module.handle_event/2
-      ```
+          forward "/wx/event", #{inspect(__MODULE__)},
+            client: WxOfficialAccount,
+            event_handler: &Module.handle_event/2
 
     - 多个应用的情况：
 
       请将入口路径设置为如下格式: `/*xxx/:app`
 
-      ```elixir
-      scope "/wx/event/:app" do
-        forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/2
-      end
-      ```
+          scope "/wx/event/:app" do
+            forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/2
+          end
 
     ## Options
 
-    - `event_handler`: 必填， `t:__MODULE__.event_handler/0`
-    - `event_parser`: 可选, `t:__MODULE__.event_parser/0`
+    - `event_handler`: 必填， `t:#{inspect(__MODULE__)}.event_handler/0`
+    - `event_parser`: 可选, `t:#{inspect(__MODULE__)}.event_parser/0`
     - `client`: 可选， `t:WeChat.client/0`
     """
 

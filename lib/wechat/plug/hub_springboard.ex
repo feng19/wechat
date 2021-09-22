@@ -4,6 +4,16 @@ if Code.ensure_loaded?(Plug) do
     OAuth2 跳板 - 用于 Hub Server
 
     由于微信对于网页授权有域名校验，需要在除指定域名外的域名也支持网页授权，可以使用此跳板
+
+    ## Usage
+
+    将下面的代码加到 `router` 里面：
+
+        # for normal
+        get "/:app/:env/cb/*callback_path", #{inspect(__MODULE__)}, []
+
+        # for work
+        get "/:app/:agent/:env/cb/*callback_path", #{inspect(__MODULE__)}, []
     """
     alias WeChat.Plug.{Helper, OAuth2Checker}
 

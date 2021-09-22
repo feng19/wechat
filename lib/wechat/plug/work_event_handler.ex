@@ -7,16 +7,14 @@ if Code.ensure_loaded?(Plug) do
 
     请将入口路径设置为如下格式 `/*xxx/:app/:agent` 并将代码加到 `router` 里面：
 
-      ```elixir
-      scope "/wx/event/:app/:agent" do
-        forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/2
-      end
-      ```
+        scope "/wx/event/:app/:agent" do
+          forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/2
+        end
 
     ## Options
 
-    - `event_handler`: 必填, `t:__MODULE__.event_handler/0`
-    - `event_parser`: 可选, `t:__MODULE__.event_parser/0`
+    - `event_handler`: 必填, `t:#{inspect(__MODULE__)}.event_handler/0`
+    - `event_parser`: 可选, `t:#{inspect(__MODULE__)}.event_parser/0`, 默认: `WeChat.ServerMessage.EventHelper.parse_work_xml_event/4`
     """
 
     import Plug.Conn
