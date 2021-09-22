@@ -204,7 +204,7 @@ if Code.ensure_loaded?(Plug) do
     def oauth2_callback(:work, conn, code, client, agent) do
       with {:ok, %{status: 200, body: info}} <- Work.App.sso_user_info(client, agent.id, code),
            0 <- info["errcode"] do
-        auth_success(conn, client, info)
+        auth_success(conn, client, agent, info)
       else
         error ->
           Logger.info("oauth2_callback failed, #{inspect(error)}")
@@ -219,6 +219,17 @@ if Code.ensure_loaded?(Plug) do
       conn
       |> fetch_session()
       |> put_session(:appid, client.appid())
+      |> put_session(:access_info, info)
+    end
+
+    def auth_success(conn, client, agent, info) do
+      timestamp = Utils.now_unix()
+      info = Map.put(info, "timestamp", timestamp)
+
+      conn
+      |> fetch_session()
+      |> put_session(:appid, client.appid())
+      |> put_session(:agent_id, agent.id)
       |> put_session(:access_info, info)
     end
 
