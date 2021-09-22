@@ -23,16 +23,14 @@ if Code.ensure_loaded?(Plug) do
     @doc false
     def call(
           %{
-            query_params: %{"code" => code},
+            query_params: %{"code" => _code},
             path_params: %{"env" => env, "callback_path" => callback_path}
           } = conn,
-          opts
+          options
         ) do
-      oauth2_callback_fun = fn _type, conn, _code, client, agent ->
+      with {_type, client, agent} <- OAuth2Checker.get_client_agent_by_path(conn, options) do
         oauth2_callback(conn, client, agent, env, callback_path)
       end
-
-      OAuth2Checker.check_code(conn, code, %{opts | oauth2_callback_fun: oauth2_callback_fun})
     end
 
     def call(conn, _opts), do: Helper.not_found(conn)

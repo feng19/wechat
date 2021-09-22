@@ -58,14 +58,14 @@ if Code.ensure_loaded?(Plug) do
     def init(opts) do
       opts = Map.new(opts)
 
-      {app_ids, clients} =
+      clients =
         Map.get(opts, :clients)
         |> List.wrap()
         |> case do
           [] -> raise "please set clients when using #{inspect(__MODULE__)}"
           list -> list
         end
-        |> Enum.map_reduce(%{}, &transfer_client/2)
+        |> Enum.reduce(%{}, &transfer_client/2)
 
       oauth2_callback_fun =
         with {:ok, fun} <- Map.fetch(opts, :oauth2_callback_fun),
@@ -94,7 +94,6 @@ if Code.ensure_loaded?(Plug) do
         end
 
       %{
-        app_ids: app_ids,
         clients: clients,
         oauth2_callback_fun: oauth2_callback_fun,
         authorize_url_fun: authorize_url_fun
@@ -115,8 +114,6 @@ if Code.ensure_loaded?(Plug) do
     end
 
     defp transfer_client({client, agents}, acc) do
-      appid = client.appid()
-
       value =
         if match?(:work, client.app_type()) do
           agent_flag_list = transfer_agents(client, agents)
@@ -125,8 +122,7 @@ if Code.ensure_loaded?(Plug) do
           client
         end
 
-      acc = Enum.into([{appid, value}, {client.code_name(), value}], acc)
-      {appid, acc}
+      Enum.into([{client.appid(), value}, {client.code_name(), value}], acc)
     end
 
     defp transfer_agents(client, agents) when is_list(agents) do
@@ -153,57 +149,46 @@ if Code.ensure_loaded?(Plug) do
     # 2. check code
     # 3. redirect to authorize_url
     def call(conn, options) do
-      conn = fetch_session(conn)
+      case get_client_agent_by_path(conn, options) do
+        {:work, client, agent} ->
+          conn = fetch_session(conn)
 
-      with appid when appid != nil <- get_session(conn, "appid"),
-           true <- appid in options.app_ids do
-        case Map.get(options.clients, appid) do
-          {_client, agent_flag_list} ->
-            with agent_id when agent_id != nil <- get_session(conn, "agent_id"),
-                 true <- agent_id in agent_flag_list do
-              conn
-            else
-              _ -> Helper.not_found(conn)
-            end
-
-          _client ->
+          with appid <- client.appid(),
+               ^appid <- get_session(conn, "appid"),
+               agent_id <- agent.id,
+               ^agent_id <- get_session(conn, "agent_id") do
             conn
-        end
-      else
-        _ -> check_code(conn, options)
-      end
-    end
-
-    def check_code(conn, options) do
-      case conn.query_params do
-        %{"code" => code} -> check_code(conn, code, options)
-        _ -> redirect2auth(conn, options)
-      end
-    end
-
-    def check_code(conn, code, %{clients: clients, oauth2_callback_fun: oauth2_callback_fun}) do
-      case conn.path_params do
-        %{"app" => app} -> Map.get(clients, app)
-        _ -> nil
-      end
-      |> case do
-        nil ->
-          Helper.not_found(conn)
-
-        client when is_atom(client) ->
-          oauth2_callback_fun.(:normal, conn, code, client, nil)
-
-        # for work
-        {client, agent_flag_list} ->
-          with agent_flag when agent_flag != nil <- Map.get(conn.path_params, "agent"),
-               true <- agent_flag in agent_flag_list,
-               {_, agent} <- WeChat.get_client_agent(client.appid(), agent_flag) do
-            oauth2_callback_fun.(:work, conn, code, client, agent)
           else
-            _ -> Helper.not_found(conn)
+            _ -> check_code(conn, options, :work, client, agent)
           end
+
+        {type, client, agent} ->
+          conn = fetch_session(conn)
+
+          with appid <- client.appid(),
+               ^appid <- get_session(conn, "appid") do
+            conn
+          else
+            _ -> check_code(conn, options, type, client, agent)
+          end
+
+        conn ->
+          conn
       end
     end
+
+    def check_code(
+          %{query_params: %{"code" => code}} = conn,
+          %{oauth2_callback_fun: oauth2_callback_fun},
+          type,
+          client,
+          agent
+        ) do
+      oauth2_callback_fun.(type, conn, code, client, agent)
+    end
+
+    def check_code(conn, options, type, client, agent),
+      do: redirect2auth(conn, options, type, client, agent)
 
     def oauth2_callback(:normal, conn, code, client, _) do
       with {:ok, %{status: 200, body: info}} <- WebPage.code2access_token(client, code),
@@ -244,36 +229,20 @@ if Code.ensure_loaded?(Plug) do
       )
     end
 
-    defp redirect2auth(conn, %{clients: clients, authorize_url_fun: authorize_url_fun}) do
-      case conn.path_params do
-        %{"app" => app} -> Map.get(clients, app)
-        _ -> nil
+    defp redirect2auth(conn, %{authorize_url_fun: authorize_url_fun}, :normal, client, agent) do
+      url = authorize_url_fun.(:normal, conn, client, agent)
+      Helper.redirect(conn, url)
+    end
+
+    defp redirect2auth(conn, %{authorize_url_fun: authorize_url_fun}, :work, client, agent) do
+      case Map.get(conn.path_params, "qr") do
+        nil -> :work
+        _ -> :work_qr
       end
+      |> authorize_url_fun.(conn, client, agent)
       |> case do
-        nil ->
-          Helper.not_found(conn)
-
-        client when is_atom(client) ->
-          url = authorize_url_fun.(:normal, conn, client, nil)
-          Helper.redirect(conn, url)
-
-        # for work
-        {client, agent_flag_list} ->
-          with agent_flag when agent_flag != nil <- Map.get(conn.path_params, "agent"),
-               true <- agent_flag in agent_flag_list,
-               {_client, agent} <- WeChat.get_client_agent(client.appid(), agent_flag) do
-            case Map.get(conn.path_params, "qr") do
-              nil -> :work
-              _ -> :work_qr
-            end
-            |> authorize_url_fun.(conn, client, agent)
-            |> case do
-              :not_found -> Helper.not_found(conn)
-              url -> Helper.redirect(conn, url)
-            end
-          else
-            _ -> Helper.not_found(conn)
-          end
+        :not_found -> Helper.not_found(conn)
+        url -> Helper.redirect(conn, url)
       end
     end
 
@@ -356,5 +325,27 @@ if Code.ensure_loaded?(Plug) do
         url <> "?" <> query_string
       end
     end
+
+    def get_client_agent_by_path(%{path_params: %{"app" => app} = path_params} = conn, options) do
+      case Map.get(options.clients, app) do
+        nil ->
+          Helper.not_found(conn)
+
+        client when is_atom(client) ->
+          {:normal, client, nil}
+
+        # for work
+        {client, agent_flag_list} ->
+          with agent_flag when agent_flag != nil <- Map.get(path_params, "agent"),
+               true <- agent_flag in agent_flag_list,
+               {_, agent} <- WeChat.get_client_agent(client.appid(), agent_flag) do
+            {:work, client, agent}
+          else
+            _ -> Helper.not_found(conn)
+          end
+      end
+    end
+
+    def get_client_agent_by_path(conn, _options), do: Helper.not_found(conn)
   end
 end
