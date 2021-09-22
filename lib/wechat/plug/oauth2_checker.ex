@@ -162,17 +162,22 @@ if Code.ensure_loaded?(Plug) do
             with agent_id when agent_id != nil <- get_session(conn, "agent_id"),
                  true <- agent_id in agent_flag_list do
               conn
+            else
+              _ -> Helper.not_found(conn)
             end
 
           _client ->
             conn
         end
       else
-        _ ->
-          case conn.query_params do
-            %{"code" => code} -> check_code(conn, code, options)
-            _ -> redirect2auth(conn, options)
-          end
+        _ -> check_code(conn, options)
+      end
+    end
+
+    def check_code(conn, options) do
+      case conn.query_params do
+        %{"code" => code} -> check_code(conn, code, options)
+        _ -> redirect2auth(conn, options)
       end
     end
 
@@ -257,14 +262,15 @@ if Code.ensure_loaded?(Plug) do
           with agent_flag when agent_flag != nil <- Map.get(conn.path_params, "agent"),
                true <- agent_flag in agent_flag_list,
                {_client, agent} <- WeChat.get_client_agent(client.appid(), agent_flag) do
-            url =
-              case Map.get(conn.path_params, "qr") do
-                nil -> :work
-                _ -> :work_qr
-              end
-              |> authorize_url_fun.(conn, client, agent)
-
-            Helper.redirect(conn, url)
+            case Map.get(conn.path_params, "qr") do
+              nil -> :work
+              _ -> :work_qr
+            end
+            |> authorize_url_fun.(conn, client, agent)
+            |> case do
+              :not_found -> Helper.not_found(conn)
+              url -> Helper.redirect(conn, url)
+            end
           else
             _ -> Helper.not_found(conn)
           end
@@ -311,7 +317,7 @@ if Code.ensure_loaded?(Plug) do
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
         WebPage.oauth2_authorize_url(client, callback_uri, scope, state)
       else
-        Helper.not_found(conn)
+        :not_found
       end
     end
 
@@ -321,7 +327,7 @@ if Code.ensure_loaded?(Plug) do
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
         WebPage.oauth2_authorize_url(client, callback_uri, "snsapi_base", state)
       else
-        Helper.not_found(conn)
+        :not_found
       end
     end
 
@@ -331,7 +337,7 @@ if Code.ensure_loaded?(Plug) do
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
         Work.App.qr_connect_url(client, agent, callback_uri, state)
       else
-        Helper.not_found(conn)
+        :not_found
       end
     end
 
