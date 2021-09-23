@@ -46,7 +46,7 @@ defmodule WeChat.Application do
 
   defp setup_client(client, settings) do
     %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks} =
-      replace_app(client, settings)
+      replace_app(settings, client)
 
     # hub_springboard_url set for hub client
     if hub_springboard_url do
