@@ -1,0 +1,172 @@
+defmodule WeChat.Work.KF.Message do
+  @moduledoc "客服消息"
+
+  import WeChat.Utils, only: [work_kf_doc_link_prefix: 0]
+  alias WeChat.Work
+  alias WeChat.Work.Message, as: Msg
+  alias Work.KF.Account
+
+  @doc_link work_kf_doc_link_prefix()
+  @typedoc """
+  消息类型
+
+  - `text`: 文本消息
+  - `image`: 图片消息
+  - `voice`: 语音消息
+  - `video`: 视频消息
+  - `file`: 文件消息
+  - `link`: 图文链接消息
+  - `miniprogram`: 小程序消息
+  - `msgmenu`: 菜单消息
+  - `location`: 地理位置消息
+  """
+  @type msg_type :: String.t()
+  @type content :: String.t()
+  @type msg :: map
+  @type opts :: Enumerable.t()
+
+  @doc """
+  获取消息 -
+  [官方文档](#{@doc_link}/94745){:target="_blank"}
+
+  客户主动发给微信客服的消息、发送消息接口发送失败事件（如被用户拒收）、客户点击菜单消息的回复消息，可以通过该接口获取具体的消息内容和事件。不支持获取通过接口发送的消息。
+  支持的消息类型：文本、图片、语音、视频、文件、位置、事件。
+  """
+  @spec sync_msg(Work.client(), opts :: Enumerable.t()) :: WeChat.response()
+  def sync_msg(client, opts) do
+    client.post("/cgi-bin/kf/sync_msg", Map.new(opts),
+      query: [access_token: client.get_access_token(:kf)]
+    )
+  end
+
+  @doc """
+  发送消息 - [官方文档](#{@doc_link}/94744#接口定义){:target="_blank"}
+
+  当用户在主动发送消息给微信客服时，企业可在48小时内调用该接口发送消息给用户，最多可发送5条消息给客户；若用户继续发送消息，企业可再次下发消息。
+  支持发送消息类型：文本、图片、语音、视频、文件、图文、小程序、菜单消息、地理位置。
+  目前该接口允许下发消息条数和下发时限如下：
+
+  | 用户动作     | 允许下发条数限制 | 下发时限 |
+  | ------------ | ---------------- | -------- |
+  | 用户发送消息 | 5条              | 48 小时  |
+  """
+  @spec send_message(Work.client(), body :: map) :: WeChat.response()
+  def send_message(client, body) do
+    client.post("/cgi-bin/kf/send_msg", body, query: [access_token: client.get_access_token(:kf)])
+  end
+
+  @spec send_message(
+          Work.client(),
+          WeChat.openid(),
+          Account.open_kfid(),
+          Msg.msg_type(),
+          Msg.msg(),
+          opts
+        ) :: WeChat.response()
+  def send_message(client, to_openid, open_kfid, msg_type, msg, opts \\ []) do
+    body =
+      Map.new(opts)
+      |> Map.merge(%{
+        "touser" => to_openid,
+        "open_kfid" => open_kfid,
+        "msgtype" => msg_type,
+        msg_type => msg
+      })
+
+    send_message(client, body)
+  end
+
+  @doc """
+  发送文本消息 - [官方文档](#{@doc_link}/94744#文本消息){:target="_blank"}
+  """
+  @spec send_text(Work.client(), WeChat.openid(), Account.open_kfid(), content, opts) ::
+          WeChat.response()
+  def send_text(client, to_openid, open_kfid, content, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "text", %{"content" => content}, opts)
+  end
+
+  @doc """
+  发送图片消息 - [官方文档](#{@doc_link}/94744#图片消息){:target="_blank"}
+  """
+  @spec send_image(Work.client(), WeChat.openid(), Account.open_kfid(), Material.media_id(), opts) ::
+          WeChat.response()
+  def send_image(client, to_openid, open_kfid, media_id, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "image", %{"media_id" => media_id}, opts)
+  end
+
+  @doc """
+  发送语音消息 - [官方文档](#{@doc_link}/94744#语音消息){:target="_blank"}
+  """
+  @spec send_voice(Work.client(), WeChat.openid(), Account.open_kfid(), Material.media_id(), opts) ::
+          WeChat.response()
+  def send_voice(client, to_openid, open_kfid, media_id, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "voice", %{"media_id" => media_id}, opts)
+  end
+
+  @doc """
+  发送视频消息 - [官方文档](#{@doc_link}/94744#视频消息){:target="_blank"}
+  """
+  @spec send_video(
+          Work.client(),
+          WeChat.openid(),
+          Account.open_kfid(),
+          Material.media_id(),
+          title :: String.t(),
+          description :: String.t(),
+          opts
+        ) :: WeChat.response()
+  def send_video(client, to_openid, open_kfid, media_id, title, description, opts \\ []) do
+    msg = %{
+      "media_id" => media_id,
+      "title" => title,
+      "description" => description
+    }
+
+    send_message(client, to_openid, open_kfid, "video", msg, opts)
+  end
+
+  @doc """
+  发送文件消息 - [官方文档](#{@doc_link}/94744#文件消息){:target="_blank"}
+  """
+  @spec send_file(Work.client(), WeChat.openid(), Account.open_kfid(), Material.media_id(), opts) ::
+          WeChat.response()
+  def send_file(client, to_openid, open_kfid, media_id, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "file", %{"media_id" => media_id}, opts)
+  end
+
+  @doc """
+  图文链接消息 - [官方文档](#{@doc_link}/94744#图文链接消息){:target="_blank"}
+  """
+  @spec send_link(Work.client(), WeChat.openid(), Account.open_kfid(), msg, opts) ::
+          WeChat.response()
+  def send_link(client, to_openid, open_kfid, msg, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "link", msg, opts)
+  end
+
+  @doc """
+  小程序消息 - [官方文档](#{@doc_link}/94744#小程序消息){:target="_blank"}
+  """
+  @spec send_mini_program(Work.client(), WeChat.openid(), Account.open_kfid(), msg, opts) ::
+          WeChat.response()
+  def send_mini_program(client, to_openid, open_kfid, msg, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "miniprogram", msg, opts)
+  end
+
+  @doc """
+  菜单消息 - [官方文档](#{@doc_link}/94744#菜单消息){:target="_blank"}
+  """
+  @spec send_menu(Work.client(), WeChat.openid(), Account.open_kfid(), msg, opts) ::
+          WeChat.response()
+  def send_menu(client, to_openid, open_kfid, msg, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "msgmenu", msg, opts)
+  end
+
+  @doc """
+  地理位置消息 - [官方文档](#{@doc_link}/94744#地理位置消息){:target="_blank"}
+  """
+  @spec send_location(Work.client(), WeChat.openid(), Account.open_kfid(), msg, opts) ::
+          WeChat.response()
+  def send_location(client, to_openid, open_kfid, msg, opts \\ []) do
+    send_message(client, to_openid, open_kfid, "location", msg, opts)
+  end
+end

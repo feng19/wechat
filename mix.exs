@@ -64,6 +64,7 @@ defmodule WeChat.MixProject do
         Work,
         Work.Contacts,
         Work.Customer,
+        Work.KF,
         Work.LinkedCorp
       ]
     ]
@@ -169,6 +170,8 @@ defmodule WeChat.MixProject do
          Work.Customer.Tag,
          Work.Customer.Transfer,
          Work.Customer.Welcome,
+         Work.KF.Account,
+         Work.KF.Message,
          Work.LinkedCorp.Message
        ]}
     ]
