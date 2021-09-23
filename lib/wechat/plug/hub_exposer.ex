@@ -29,7 +29,7 @@ defmodule WeChat.Plug.HubExposer do
   defp transfer_client({client, :all}, acc) do
     if match?(:work, client.app_type()) do
       Enum.into(client.agents(), acc, fn agent ->
-        {client.agent2cache_id(agent), :all}
+        {client.agent2cache_id(agent.id), :all}
       end)
     else
       Map.put(acc, client.appid(), :all)
