@@ -12,7 +12,8 @@ defmodule WeChat.Plug.HubExposer do
 
   @doc false
   def init(opts) do
-    Map.get(opts, :clients)
+    Map.new(opts)
+    |> Map.get(:clients)
     |> List.wrap()
     |> case do
       [] -> raise "please set clients when using #{inspect(__MODULE__)}"
