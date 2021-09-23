@@ -305,8 +305,8 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp hub_springboard_authorize_url(:work, conn, client, agent) do
-      if hub_springboard_url = WeChat.get_hub_springboard_url(client, agent.id) do
+    defp hub_springboard_authorize_url(:work, conn, client, _agent = %{id: agent_id}) do
+      if hub_springboard_url = WeChat.get_hub_springboard_url(client, agent_id) do
         state = Map.get(conn.query_params, "state", "")
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
         WebPage.oauth2_authorize_url(client, callback_uri, "snsapi_base", state)
@@ -315,11 +315,11 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp hub_springboard_authorize_url(:work_qr, conn, client, agent) do
-      if hub_springboard_url = WeChat.get_hub_springboard_url(client, agent.id) do
+    defp hub_springboard_authorize_url(:work_qr, conn, client, _agent = %{id: agent_id}) do
+      if hub_springboard_url = WeChat.get_hub_springboard_url(client, agent_id) do
         state = Map.get(conn.query_params, "state", "")
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
-        Work.App.qr_connect_url(client, agent, callback_uri, state)
+        Work.App.qr_connect_url(client, agent_id, callback_uri, state)
       else
         :not_found
       end
