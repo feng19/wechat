@@ -90,41 +90,46 @@ defmodule WeChat.Application do
   end
 
   defp replace_app(settings, client) do
-    app = client.code_name()
+    env = Application.get_env(@app, :env, "") |> to_string()
 
+    settings
+    |> Map.new()
+    |> Enum.into(%{hub_springboard_url: nil, oauth2_callbacks: nil})
+    |> replace(":app", client.code_name())
+    |> replace_hub_springboard_url(":env", env)
+  end
+
+  defp replace_agent(settings, agent), do: replace(settings, ":agent", to_string(agent))
+
+  defp replace(
+         %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks},
+         match,
+         replacement
+       ) do
     hub_springboard_url =
-      if hub_springboard_url = settings[:hub_springboard_url] do
-        String.replace(hub_springboard_url, ":app", app)
+      if hub_springboard_url do
+        String.replace(hub_springboard_url, match, replacement)
       end
 
     oauth2_callbacks =
-      if oauth2_callbacks = settings[:oauth2_callbacks] do
-        for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
-          {env, String.replace(url, ":app", app)}
+      if oauth2_callbacks do
+        for {env, url} <- oauth2_callbacks do
+          {env, String.replace(url, match, replacement)}
         end
       end
 
     %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks}
   end
 
-  defp replace_agent(
-         %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks},
-         agent
+  defp replace_hub_springboard_url(
+         %{hub_springboard_url: hub_springboard_url} = settings,
+         match,
+         replacement
        ) do
-    agent = to_string(agent)
-
-    hub_springboard_url =
-      if hub_springboard_url do
-        String.replace(hub_springboard_url, ":agent", agent)
-      end
-
-    oauth2_callbacks =
-      if oauth2_callbacks do
-        for {env, url} <- oauth2_callbacks do
-          {env, String.replace(url, ":agent", agent)}
-        end
-      end
-
-    %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks}
+    if hub_springboard_url do
+      %{settings | hub_springboard_url: String.replace(hub_springboard_url, match, replacement)}
+    else
+      settings
+    end
   end
 end
