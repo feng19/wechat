@@ -66,11 +66,7 @@ defmodule WeChat.Application do
   end
 
   defp setup_work_client(client, all: settings) do
-    agents =
-      Enum.map(client.agents(), fn %{id: id, name: name} ->
-        {to_string(name || id), settings}
-      end)
-
+    agents = Enum.map(client.agents(), fn %{id: id, name: name} -> {name || id, settings} end)
     setup_work_client(client, agents)
   end
 
@@ -115,6 +111,8 @@ defmodule WeChat.Application do
          %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks},
          agent
        ) do
+    agent = to_string(agent)
+
     hub_springboard_url =
       if hub_springboard_url do
         String.replace(hub_springboard_url, ":agent", agent)
