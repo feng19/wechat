@@ -127,6 +127,6 @@ defmodule WeChat.Application do
         end
       end
 
-    {agent, %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks}}
+    %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks}
   end
 end
