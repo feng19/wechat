@@ -32,6 +32,7 @@ defmodule WeChat.Work.Agent do
     在“客户联系”栏，点开“API”小按钮，即可看到。
   """
   @type secret :: String.t()
+  @type options :: Keyword.t()
 
   @typedoc "应用配置"
   @type t :: %__MODULE__{
@@ -67,23 +68,30 @@ defmodule WeChat.Work.Agent do
   def agent2id(client, name), do: name2id(client, name)
 
   @doc "构建应用(agent)"
-  @spec agent(agent_id, options :: Keyword.t()) :: t
+  @spec agent(agent_id, options) :: t
   def agent(id, options \\ []) do
     struct(%__MODULE__{id: id, name: id}, options)
     |> transfer_aes_key()
   end
 
   @doc "构建[通讯录]应用(agent)"
-  @spec contacts_agent(options :: Keyword.t()) :: t
+  @spec contacts_agent(options) :: t
   def contacts_agent(options \\ []) do
     struct(%__MODULE__{id: :contacts, name: :contacts}, options)
     |> transfer_aes_key()
   end
 
   @doc "构建[客户联系]应用(agent)"
-  @spec customer_agent(options :: Keyword.t()) :: t
+  @spec customer_agent(options) :: t
   def customer_agent(options \\ []) do
     struct(%__MODULE__{id: :customer, name: :customer}, options)
+    |> transfer_aes_key()
+  end
+
+  @doc "构建[微信客服]应用(agent)"
+  @spec kf_agent(options) :: t
+  def kf_agent(options \\ []) do
+    struct(%__MODULE__{id: :kf, name: :kf}, options)
     |> transfer_aes_key()
   end
 
