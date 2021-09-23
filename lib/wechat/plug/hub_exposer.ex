@@ -62,7 +62,8 @@ defmodule WeChat.Plug.HubExposer do
     json =
       with true <- in_scope?,
            store_key <- String.to_existing_atom(store_key),
-           value when value != nil <- WeChat.Storage.Cache.get_cache(store_id, store_key) do
+           value when value != nil <-
+             WeChat.Storage.Cache.get_cache({:store_map, store_id}, store_key) do
         %{error: 0, msg: "success", value: value}
       else
         _ -> %{error: 404, msg: "not found"}

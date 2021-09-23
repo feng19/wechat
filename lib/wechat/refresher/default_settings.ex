@@ -184,11 +184,12 @@ defmodule WeChat.Refresher.DefaultSettings do
     case Cache.get_cache(store_id, store_key) do
       nil ->
         with storage when storage != nil <- client.storage(),
-             {:ok, %{"value" => ticket, "expired_time" => expires}} <-
+             {:ok, %{"value" => ticket, "expired_time" => expires} = store_map} <-
                storage.restore(store_id, store_key),
              diff <- expires - Utils.now_unix(),
              true <- diff > 0 do
           Cache.put_cache(store_id, store_key, ticket)
+          Cache.put_cache({:store_map, store_id}, store_key, store_map)
 
           Logger.info(
             "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{diff}s."

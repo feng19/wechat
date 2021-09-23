@@ -117,14 +117,12 @@ if Code.ensure_loaded?(Plug) do
           ticket = message["ComponentVerifyTicket"]
           store_id = component_appid
           store_key = :component_verify_ticket
+          store_map = %{"value" => ticket, "expired_time" => Utils.now_unix() + 600}
           Cache.put_cache(store_id, store_key, ticket)
+          Cache.put_cache({:store_map, store_id}, store_key, store_map)
 
           if storage = client.storage() do
-            result =
-              storage.store(store_id, store_key, %{
-                "value" => ticket,
-                "expired_time" => Utils.now_unix() + 600
-              })
+            result = storage.store(store_id, store_key, store_map)
 
             Logger.info(
               "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."

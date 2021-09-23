@@ -234,12 +234,14 @@ defmodule WeChat.Refresher.Default do
   end
 
   defp cache_and_store(store_id, store_key, value, expires, client) do
+    store_map = %{"value" => value, "expired_time" => expires}
     Cache.put_cache(store_id, store_key, value)
+    Cache.put_cache({:store_map, store_id}, store_key, store_map)
 
     with storage when storage != nil <- client.storage(),
          # 因为 hub_client 是从 storage 中读取 token 的，因此不需要再做写入操作
          true <- client.server_role() != :hub_client do
-      result = storage.store(store_id, store_key, %{"value" => value, "expired_time" => expires})
+      result = storage.store(store_id, store_key, store_map)
 
       Logger.info(
         "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."
@@ -249,12 +251,13 @@ defmodule WeChat.Refresher.Default do
 
   defp restore_and_cache(store_id, store_key, client) do
     with storage when storage != nil <- client.storage(),
-         {:ok, %{"value" => value, "expired_time" => expires}} <-
+         {:ok, %{"value" => value, "expired_time" => expires} = store_map} <-
            storage.restore(store_id, store_key) do
       diff = expires - Utils.now_unix()
 
       if diff > 0 do
         Cache.put_cache(store_id, store_key, value)
+        Cache.put_cache({:store_map, store_id}, store_key, store_map)
 
         Logger.info(
           "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) succeed, the expires_in is: #{diff}s."
