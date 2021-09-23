@@ -7,6 +7,6 @@ defmodule WeChat.Storage.Adapter do
   @type store_key :: atom | String.t()
   @type value :: map
 
-  @callback store(store_id, store_key, value) :: :ok
-  @callback restore(store_id, store_key) :: {:ok, value}
+  @callback store(store_id, store_key, value) :: :ok | any
+  @callback restore(store_id, store_key) :: {:ok, value} | any
 end

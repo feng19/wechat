@@ -37,13 +37,17 @@ if Code.ensure_loaded?(Plug) do
         # for work
         scope "/:app/:agent" do
           pipe_through :oauth2_checker
-          get "/path", YourController, :your_action
+          # 在PC端授权访问网页
+          get "/:qr/your_path", YourController, :your_action
+          # 在企业微信内授权访问网页
+          get "/your_path", YourController, :your_action
         end
     """
 
     import Plug.Conn
+    import WeChat.Plug.Helper
     require Logger
-    alias WeChat.{Utils, WebPage, Work, Plug.Helper}
+    alias WeChat.{Utils, WebPage, Work}
 
     @typedoc "授权回调处理函数"
     @type oauth2_callback_fun ::
@@ -234,7 +238,7 @@ if Code.ensure_loaded?(Plug) do
     end
 
     def auth_fail(conn) do
-      Helper.html(
+      html(
         conn,
         ~s(<div style="margin-top: 50%;font-size: 60px; text-align: center;">抱歉，授权失败！</div>)
       )
@@ -242,7 +246,7 @@ if Code.ensure_loaded?(Plug) do
 
     defp redirect2auth(conn, %{authorize_url_fun: authorize_url_fun}, :normal, client, agent) do
       url = authorize_url_fun.(:normal, conn, client, agent)
-      Helper.redirect(conn, url)
+      redirect(conn, url)
     end
 
     defp redirect2auth(conn, %{authorize_url_fun: authorize_url_fun}, :work, client, agent) do
@@ -252,8 +256,8 @@ if Code.ensure_loaded?(Plug) do
       end
       |> authorize_url_fun.(conn, client, agent)
       |> case do
-        :not_found -> Helper.not_found(conn)
-        url -> Helper.redirect(conn, url)
+        :not_found -> not_found(conn)
+        url -> redirect(conn, url)
       end
     end
 
@@ -340,7 +344,7 @@ if Code.ensure_loaded?(Plug) do
     def get_client_agent_by_path(%{path_params: %{"app" => app} = path_params} = conn, options) do
       case Map.get(options.clients, app) do
         nil ->
-          Helper.not_found(conn)
+          not_found(conn)
 
         client when is_atom(client) ->
           {:normal, client, nil}
@@ -352,11 +356,11 @@ if Code.ensure_loaded?(Plug) do
                {_, agent} <- WeChat.get_client_agent(client.appid(), agent_flag) do
             {:work, client, agent}
           else
-            _ -> Helper.not_found(conn)
+            _ -> not_found(conn)
           end
       end
     end
 
-    def get_client_agent_by_path(conn, _options), do: Helper.not_found(conn)
+    def get_client_agent_by_path(conn, _options), do: not_found(conn)
   end
 end

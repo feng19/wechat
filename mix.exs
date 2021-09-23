@@ -113,8 +113,6 @@ defmodule WeChat.MixProject do
        [
          WeChat.Plug.EventHandler,
          WeChat.Plug.WorkEventHandler,
-         WeChat.Plug.OAuth2Checker,
-         WeChat.Plug.HubSpringboard,
          ServerMessage.EventHelper,
          ServerMessage.Encryptor,
          ServerMessage.XmlMessage,
@@ -123,8 +121,8 @@ defmodule WeChat.MixProject do
       {"网页开发",
        [
          WeChat.WebPage,
-         WeChat.Plug.WebPageOAuth2,
-         WeChat.Plug.CheckOauth2
+         WeChat.Plug.OAuth2Checker,
+         WeChat.Plug.HubSpringboard
        ]},
       {"Other APIs",
        [

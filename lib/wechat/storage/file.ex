@@ -11,7 +11,7 @@ defmodule WeChat.Storage.File do
   @store_file "wechat_app_tokens.json"
 
   @impl true
-  @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any()
+  @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any
   def store(store_id, store_key, value) do
     file = get_file_name()
     store_key = to_string(store_key)
@@ -38,7 +38,7 @@ defmodule WeChat.Storage.File do
   end
 
   @impl true
-  @spec restore(Adapter.store_id(), Adapter.store_key()) :: {:ok, Adapter.value()}
+  @spec restore(Adapter.store_id(), Adapter.store_key()) :: {:ok, Adapter.value()} | any
   def restore(store_id, store_key) do
     file = get_file_name()
     store_key = to_string(store_key)
