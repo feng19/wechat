@@ -1,6 +1,4 @@
 defmodule WeChat.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -16,10 +14,7 @@ defmodule WeChat.Application do
       {config[:refresher], config[:refresh_settings]}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: WeChat.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(children, strategy: :one_for_one, name: WeChat.Supervisor)
   end
 
   defp normalize(config) do
@@ -90,7 +85,7 @@ defmodule WeChat.Application do
   end
 
   defp replace_app(settings, client) do
-    env = Application.get_env(@app, :env, "") |> to_string()
+    env = Application.get_env(@app, :env, "dev") |> to_string()
 
     settings
     |> Map.new()
