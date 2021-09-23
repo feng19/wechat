@@ -10,10 +10,10 @@ if Code.ensure_loaded?(Plug) do
     将下面的代码加到 `router` 里面：
 
         # for normal
-        get "/:app/:env/cb/*callback_path", #{inspect(__MODULE__)}, []
+        get "/:app/:env/cb/*callback_path", #{inspect(__MODULE__)}, clients: [Client, ...]
 
         # for work
-        get "/:app/:agent/:env/cb/*callback_path", #{inspect(__MODULE__)}, []
+        get "/:app/:agent/:env/cb/*callback_path", #{inspect(__MODULE__)}, clients: [Client, ...]
     """
     alias WeChat.Plug.{Helper, OAuth2Checker}
 
