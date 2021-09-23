@@ -39,7 +39,7 @@ defmodule WeChat.Storage.HttpForHubClient do
     )
     |> Tesla.get("/#{store_id}/#{store_key}")
     |> case do
-      {:ok, %{status: 200, body: %{"error" => 0, "value" => value}}} -> {:ok, value}
+      {:ok, %{status: 200, body: %{"error" => 0, "store_map" => store_map}}} -> {:ok, store_map}
       {:ok, %{status: 200, body: %{"msg" => error_msg}}} -> {:error, error_msg}
       _ -> {:error, "request error"}
     end
