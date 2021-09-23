@@ -4,11 +4,10 @@ defmodule WeChat.Storage.HttpForHubClient do
 
   此模块使用 basic_auth 鉴权，如果需要其他鉴权方式，请参照自行实现
 
-      config :wechat, #{inspect(__MODULE__)}, [
+      config :wechat, #{inspect(__MODULE__)},
         hub_base_url: "http://hub.example.com",
         username: "username",
         password: "password"
-      ]
   """
   alias WeChat.Storage.Adapter
   @behaviour WeChat.Storage.Adapter

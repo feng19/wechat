@@ -39,30 +39,94 @@ defmodule WeChat.Application do
       if match?(:work, client.app_type()) do
         setup_work_client(client, _agents = settings)
       else
-        if hub_springboard_url = settings[:hub_springboard_url] do
-          WeChat.set_hub_springboard_url(client, hub_springboard_url)
-        end
-
-        if oauth2_callbacks = settings[:oauth2_callbacks] do
-          for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
-            WeChat.set_oauth2_env_url(client, env, url)
-          end
-        end
+        setup_client(client, settings)
       end
     end
   end
 
+  defp setup_client(client, settings) do
+    %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks} =
+      replace_app(client, settings)
+
+    # hub_springboard_url set for hub client
+    if hub_springboard_url do
+      WeChat.set_hub_springboard_url(client, hub_springboard_url)
+    end
+
+    # oauth2_callbacks set for hub server
+    if oauth2_callbacks do
+      for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
+        WeChat.set_oauth2_env_url(client, env, url)
+      end
+    end
+  end
+
+  defp setup_work_client(client, %{all: settings}) do
+    setup_work_client(client, all: settings)
+  end
+
+  defp setup_work_client(client, all: settings) do
+    agents =
+      Enum.map(client.agents(), fn %{id: id, name: name} ->
+        {to_string(name || id), settings}
+      end)
+
+    setup_work_client(client, agents)
+  end
+
   defp setup_work_client(client, agents) do
     for {agent, settings} <- agents do
-      if hub_springboard_url = settings[:hub_springboard_url] do
+      %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks} =
+        settings |> replace_app(client) |> replace_agent(agent)
+
+      # hub_springboard_url set for hub client
+      if hub_springboard_url do
         WeChat.set_hub_springboard_url(client, agent, hub_springboard_url)
       end
 
-      if oauth2_callbacks = settings[:oauth2_callbacks] do
+      # oauth2_callbacks set for hub server
+      if oauth2_callbacks do
         for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
           WeChat.set_oauth2_env_url(client, agent, env, url)
         end
       end
     end
+  end
+
+  defp replace_app(settings, client) do
+    app = client.code_name()
+
+    hub_springboard_url =
+      if hub_springboard_url = settings[:hub_springboard_url] do
+        String.replace(hub_springboard_url, ":app", app)
+      end
+
+    oauth2_callbacks =
+      if oauth2_callbacks = settings[:oauth2_callbacks] do
+        for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
+          {env, String.replace(url, ":app", app)}
+        end
+      end
+
+    %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks}
+  end
+
+  defp replace_agent(
+         %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks},
+         agent
+       ) do
+    hub_springboard_url =
+      if hub_springboard_url do
+        String.replace(hub_springboard_url, ":agent", agent)
+      end
+
+    oauth2_callbacks =
+      if oauth2_callbacks do
+        for {env, url} <- oauth2_callbacks do
+          {env, String.replace(url, ":agent", agent)}
+        end
+      end
+
+    {agent, %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks}}
   end
 end

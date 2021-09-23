@@ -208,11 +208,13 @@ defmodule WeChat do
 
   # hub_url
 
+  @doc "set hub_springboard_url for hub client"
   @spec set_hub_springboard_url(client, url) :: true
   def set_hub_springboard_url(client, url) when is_binary(url) do
     Cache.put_cache(client.appid(), :hub_springboard_url, url)
   end
 
+  @doc "set hub_springboard_url for hub client"
   @spec set_hub_springboard_url(client, Work.agent(), url) :: true
   def set_hub_springboard_url(client, agent, url) when is_binary(url) do
     client.agent2cache_id(agent)
@@ -232,26 +234,28 @@ defmodule WeChat do
 
   # oauth2_env_url
 
+  @doc "set oauth2_env_url for hub server"
   @spec set_oauth2_env_url(client, env, url) :: true
   def set_oauth2_env_url(client, env, url) when is_binary(env) and is_binary(url) do
-    Cache.put_cache(client.appid(), {:oauth2_env, env}, url)
+    Cache.put_cache(client.appid(), {:oauth2_env_url, env}, url)
   end
 
+  @doc "set oauth2_env_url for hub server"
   @spec set_oauth2_env_url(client, Work.agent(), env, url) :: true
   def set_oauth2_env_url(client, agent, env, url) when is_binary(env) and is_binary(url) do
     client.agent2cache_id(agent)
-    |> Cache.put_cache({:oauth2_env, env}, url)
+    |> Cache.put_cache({:oauth2_env_url, env}, url)
   end
 
   @spec get_oauth2_env_url(client, env) :: nil | url
   def get_oauth2_env_url(client, env) do
-    Cache.get_cache(client.appid(), {:oauth2_env, env})
+    Cache.get_cache(client.appid(), {:oauth2_env_url, env})
   end
 
   @spec get_oauth2_env_url(client, Work.agent(), env) :: nil | url
   def get_oauth2_env_url(client, agent, env) do
     client.agent2cache_id(agent)
-    |> Cache.get_cache({:oauth2_env, env})
+    |> Cache.get_cache({:oauth2_env_url, env})
   end
 
   def get_refresher do
