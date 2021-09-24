@@ -13,7 +13,7 @@ defmodule WeChat.Work.LinkedCorp.Message do
   alias WeChat.{Work, Work.Material}
   alias WeChat.Work.Message, as: Msg
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135/90249"
+  @doc_link "#{work_doc_link_prefix()}/90135/90249"
 
   @type to :: {:user | :party | :tag, list | String.t()} | {:all, integer}
   @type opts :: Enumerable.t()

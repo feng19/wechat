@@ -4,7 +4,7 @@ defmodule WeChat.Work.Contacts.Tag do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @typedoc """
   每个标签都有唯一的标签id -

@@ -16,7 +16,7 @@ defmodule WeChat.Work do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work.Agent
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @type client :: module()
 

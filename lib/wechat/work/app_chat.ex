@@ -5,7 +5,7 @@ defmodule WeChat.Work.AppChat do
   alias WeChat.{Work, Work.Message, Work.Material}
   alias Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @type chat_id :: String.t()
   @type opts :: Enumerable.t()

@@ -24,7 +24,7 @@ defmodule WeChat.Builder.Work do
     Customer.Transfer,
     Customer.Welcome,
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]},
-    {:kf, [KF.Account, KF.Message]}
+    {:kf, [KF.Account, KF.Customer, KF.Message]}
   ]
 
   defmacro __using__(options \\ []) do

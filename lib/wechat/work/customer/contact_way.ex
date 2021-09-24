@@ -5,7 +5,7 @@ defmodule WeChat.Work.Customer.ContactWay do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.{Work, Work.Customer, Work.Contacts.User}
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135/92572"
+  @doc_link "#{work_doc_link_prefix()}/90135/92572"
 
   @type config_id :: String.t()
 

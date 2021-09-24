@@ -13,7 +13,7 @@ defmodule WeChat.Work.Customer.GroupMsg do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @typedoc "企业群发消息的id，可用于获取群发消息发送结果"
   @type msg_id :: String.t()

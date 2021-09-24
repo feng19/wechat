@@ -5,7 +5,7 @@ defmodule WeChat.Work.Agent do
   alias WeChat.Work
   alias WeChat.ServerMessage.Encryptor
 
-  @term_introduction_doc_link "#{work_doc_link_prefix()}/90000/90135/90665"
+  @term_introduction_doc_link "#{work_doc_link_prefix()}/90135/90665"
 
   @typedoc """
   每个应用都有唯一的 agentid -

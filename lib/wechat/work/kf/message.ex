@@ -1,6 +1,7 @@
 defmodule WeChat.Work.KF.Message do
   @moduledoc "客服消息"
 
+  import Jason.Helpers
   import WeChat.Utils, only: [work_kf_doc_link_prefix: 0]
   alias WeChat.Work
   alias WeChat.Work.Message, as: Msg
@@ -21,16 +22,38 @@ defmodule WeChat.Work.KF.Message do
   - `location`: 地理位置消息
   """
   @type msg_type :: String.t()
+  @typedoc """
+  事件响应消息类型
+
+  目前支持文本与菜单消息
+
+  - `text`: 文本消息
+  - `msgmenu`: 菜单消息
+  """
+  @type on_event_msg_type :: String.t()
+  @typedoc """
+  事件响应消息对应的code。
+
+  通过事件回调下发，仅可使用一次。
+  """
+  @type code :: String.t()
   @type content :: String.t()
   @type msg :: map
   @type opts :: Enumerable.t()
+  @typedoc """
+  消息ID。如果请求参数指定了msgid，则原样返回，否则系统自动生成并返回。
+  不多于32字节
+  字符串取值范围(正则表达式)：[0-9a-zA-Z_-]*
+  """
+  @type msg_id :: String.t()
 
   @doc """
   获取消息 -
   [官方文档](#{@doc_link}/94745){:target="_blank"}
 
   客户主动发给微信客服的消息、发送消息接口发送失败事件（如被用户拒收）、客户点击菜单消息的回复消息，可以通过该接口获取具体的消息内容和事件。不支持获取通过接口发送的消息。
-  支持的消息类型：文本、图片、语音、视频、文件、位置、事件。
+
+  **支持的消息类型**：文本、图片、语音、视频、文件、位置、事件。
   """
   @spec sync_msg(Work.client(), opts :: Enumerable.t()) :: WeChat.response()
   def sync_msg(client, opts) do
@@ -168,5 +191,46 @@ defmodule WeChat.Work.KF.Message do
           WeChat.response()
   def send_location(client, to_openid, open_kfid, msg, opts \\ []) do
     send_message(client, to_openid, open_kfid, "location", msg, opts)
+  end
+
+  @doc """
+  发送事件响应消息 -
+  [官方文档](#{@doc_link}/95123){:target="_blank"}
+
+  当特定的事件回调消息包含code字段，可以此code为凭证，调用该接口给用户发送相应事件场景下的消息，如客服欢迎语。
+
+  **支持发送消息类型**：文本、菜单消息。
+  """
+  @spec send_msg_on_event(Work.client(), code, on_event_msg_type, msg, msg_id) ::
+          WeChat.response()
+  def send_msg_on_event(client, code, on_event_msg_type, msg, msg_id \\ nil) do
+    json =
+      if msg_id do
+        json_map(code: code, on_event_msg_type: on_event_msg_type, msg: msg, msg_id: msg_id)
+      else
+        json_map(code: code, on_event_msg_type: on_event_msg_type, msg: msg)
+      end
+
+    client.post("/cgi-bin/kf/send_msg_on_event", json,
+      query: [access_token: client.get_access_token(:kf)]
+    )
+  end
+
+  @doc """
+  发送事件响应消息[文本消息] -
+  [官方文档](#{@doc_link}/95123#文本消息){:target="_blank"}
+  """
+  @spec send_text_on_event(Work.client(), code, content, msg_id) :: WeChat.response()
+  def send_text_on_event(client, code, content, msg_id \\ nil) do
+    send_msg_on_event(client, code, "text", %{"content" => content}, msg_id)
+  end
+
+  @doc """
+  发送事件响应消息[菜单消息] -
+  [官方文档](#{@doc_link}/95123#菜单消息){:target="_blank"}
+  """
+  @spec send_menu_on_event(Work.client(), code, msg, msg_id) :: WeChat.response()
+  def send_menu_on_event(client, code, msg, msg_id \\ nil) do
+    send_msg_on_event(client, code, "msgmenu", msg, msg_id)
   end
 end

@@ -5,7 +5,7 @@ defmodule WeChat.Work.Customer.Transfer do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.{Work, Work.User, Work.Customer}
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @doc """
   分配在职成员的客户 -

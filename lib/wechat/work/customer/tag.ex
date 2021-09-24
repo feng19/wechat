@@ -8,7 +8,7 @@ defmodule WeChat.Work.Customer.Tag do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.{Work, Work.Customer, Work.Customer.Strategy}
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @typedoc "标签的id 或 标签组的id"
   @type id :: tag_id | group_id

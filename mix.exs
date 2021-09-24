@@ -156,6 +156,7 @@ defmodule WeChat.MixProject do
          Work.Agent,
          Work.App,
          Work.AppChat,
+         Work.ChatRobot,
          Work.Material,
          Work.Message,
          Work.Contacts.Department,
@@ -171,6 +172,7 @@ defmodule WeChat.MixProject do
          Work.Customer.Transfer,
          Work.Customer.Welcome,
          Work.KF.Account,
+         Work.KF.Customer,
          Work.KF.Message,
          Work.LinkedCorp.Message
        ]}

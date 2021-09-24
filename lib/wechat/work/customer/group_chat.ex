@@ -6,7 +6,7 @@ defmodule WeChat.Work.Customer.GroupChat do
   alias WeChat.Work
   alias WeChat.Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @typedoc "客户群ID"
   @type chat_id :: String.t()

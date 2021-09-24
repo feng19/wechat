@@ -5,7 +5,7 @@ defmodule WeChat.Work.Customer do
   alias WeChat.Work
   alias Work.Contacts.{User, Department}
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @type external_userid :: String.t()
   @type external_userid_list :: [external_userid]

@@ -5,7 +5,7 @@ defmodule WeChat.Work.Customer.Strategy do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135/94883"
+  @doc_link "#{work_doc_link_prefix()}/90135/94883"
 
   @typedoc "客户联系规则组ID"
   @type strategy_id :: integer

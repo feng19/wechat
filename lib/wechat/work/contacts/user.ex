@@ -5,7 +5,7 @@ defmodule WeChat.Work.Contacts.User do
   alias WeChat.Work
   alias Work.Contacts.Department
 
-  @doc_link "#{work_doc_link_prefix()}/90000/90135"
+  @doc_link "#{work_doc_link_prefix()}/90135"
 
   @typedoc """
   每个成员都有唯一的 userid -
