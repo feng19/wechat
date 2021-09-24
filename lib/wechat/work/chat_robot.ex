@@ -12,7 +12,7 @@ defmodule WeChat.Work.ChatRobot do
   消息发送频率限制: 每个机器人发送的消息不能超过20条/分钟。
   """
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [work_doc_link_prefix: 0, default_adapter: 0]
   alias Tesla.Multipart
 
   @doc_link "#{work_doc_link_prefix()}/90136/91770"
@@ -46,10 +46,7 @@ defmodule WeChat.Work.ChatRobot do
   """
   @spec send(webhook_url, msg_type, msg) :: Tesla.Env.result()
   def send(webhook_url, msg_type, msg) do
-    Tesla.client(
-      [Tesla.Middleware.JSON, Tesla.Middleware.Logger],
-      {Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000}
-    )
+    Tesla.client([Tesla.Middleware.JSON, Tesla.Middleware.Logger], default_adapter())
     |> Tesla.post(webhook_url, %{"msgtype" => msg_type, msg_type => msg})
   end
 
@@ -136,10 +133,7 @@ defmodule WeChat.Work.ChatRobot do
   end
 
   defp _upload_file(multipart, key) do
-    Tesla.client(
-      [Tesla.Middleware.DecodeJson, Tesla.Middleware.Logger],
-      {Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000}
-    )
+    Tesla.client([Tesla.Middleware.DecodeJson, Tesla.Middleware.Logger], default_adapter())
     |> Tesla.post("https://qyapi.weixin.qq.com/cgi-bin/webhook/upload_media", multipart,
       query: [key: key, type: "file"]
     )

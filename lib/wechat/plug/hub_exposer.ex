@@ -3,13 +3,31 @@ if Code.ensure_loaded?(Plug) do
     @moduledoc """
     用于 Hub 暴露 token 等
 
-    将下面的代码加到 `router` 里面：
+    使用 Phoenix 时，将下面的代码加到 `router` 里面：
 
+        get "/hub/expose/:store_id/:store_key", #{inspect(__MODULE__)}, clients: [ClientsA, ...]
+
+    使用 PlugCowboy 时，将下面的代码加到 `router` 里面：
+
+        forward "/hub/expose/:store_id/:store_key",
+          to: #{inspect(__MODULE__)},
+          init_opts: [clients: [ClientsA, ...]]
+
+    在暴露接口的同时，请注意安全合规使用，建议在使用前增加安全防护，例如：
+
+        import Plug.BasicAuth
         plug :basic_auth, username: "hello", password: "secret"
 
         get "/hub/expose/:store_id/:store_key", #{inspect(__MODULE__)}, clients: [ClientsA, ...]
     """
     import WeChat.Plug.Helper
+
+    @valid_keys [
+      "access_token",
+      "js_api_ticket",
+      "wx_card_ticket",
+      "component_access_token"
+    ]
 
     @doc false
     def init(opts) do
@@ -17,7 +35,7 @@ if Code.ensure_loaded?(Plug) do
       |> Map.get(:clients)
       |> List.wrap()
       |> case do
-        [] -> raise "please set clients when using #{inspect(__MODULE__)}"
+        [] -> raise ArgumentError, "please set clients when using #{inspect(__MODULE__)}"
         list -> list
       end
       |> Enum.reduce(%{}, &transfer_client/2)
@@ -55,13 +73,14 @@ if Code.ensure_loaded?(Plug) do
     def call(%{path_params: %{"store_id" => store_id, "store_key" => store_key}} = conn, opts) do
       in_scope? =
         case Map.fetch(opts, store_id) do
-          {:ok, scope_list} when is_list(scope_list) -> store_key in scope_list
           {:ok, :all} -> true
+          {:ok, scope_list} when is_list(scope_list) -> store_key in scope_list
           _ -> false
         end
 
       json =
         with true <- in_scope?,
+             true <- store_key in @valid_keys,
              store_key <- String.to_existing_atom(store_key),
              store_map when store_map != nil <-
                WeChat.Storage.Cache.get_cache({:store_map, store_id}, store_key) do

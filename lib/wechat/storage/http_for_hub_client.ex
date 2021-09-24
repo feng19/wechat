@@ -9,6 +9,7 @@ defmodule WeChat.Storage.HttpForHubClient do
         username: "username",
         password: "password"
   """
+  import WeChat.Utils, only: [default_adapter: 0]
   alias WeChat.Storage.Adapter
   @behaviour WeChat.Storage.Adapter
 
@@ -35,7 +36,7 @@ defmodule WeChat.Storage.HttpForHubClient do
         Tesla.Middleware.DecodeJson,
         Tesla.Middleware.Logger
       ],
-      {Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000}
+      default_adapter()
     )
     |> Tesla.get("/#{store_id}/#{store_key}")
     |> case do

@@ -4,6 +4,13 @@ defmodule WeChat.Utils do
   @random_alphanumeric Enum.concat([?a..?z, ?A..?Z, 48..57])
   @type timestamp :: integer
 
+  if Mix.env() == :test do
+    def default_adapter, do: Tesla.Mock
+  else
+    def default_adapter,
+      do: {Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000}
+  end
+
   @spec random_string(length :: integer()) :: String.t()
   def random_string(length) when length > 0 do
     @random_alphanumeric
