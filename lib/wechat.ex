@@ -135,6 +135,7 @@ defmodule WeChat do
 
   - `appid`: `t:appid/0` - 必填
   - `app_type`: `t:app_type/0`
+  - `code_name`: `t:code_name/0`, 默认为模块名最后一个名称的全小写格式
   - `by_component?`: `t:by_component?/0`
   - `server_role`: `t:server_role/0`
   - `storage`: `t:WeChat.Storage.Adapter.t()`
@@ -144,6 +145,8 @@ defmodule WeChat do
   - `encoding_aes_key`: `t:WeChat.ServerMessage.Encryptor.encoding_aes_key/0` - 在编译时会自动将 `encoding_aes_key` 转换为 `aes_key`
   - `token`: `t:token/0`
   - `requester`: 请求客户端 - `t:module/0`
+  - `gen_sub_module?`: 是否生成子模块，默认生成
+  - `sub_modules`: 指定生成子模块的列表
 
   ## 默认参数:
 
@@ -152,6 +155,7 @@ defmodule WeChat do
   - `app_type`: `:official_account`
   - `storage`: `WeChat.Storage.File`
   - `requester`: `WeChat.Requester`
+  - `gen_sub_module?`: true
   - 其余参数皆为可选
   """
   @type options :: [
