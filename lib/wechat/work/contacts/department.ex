@@ -1,6 +1,7 @@
 defmodule WeChat.Work.Contacts.Department do
   @moduledoc "通讯录管理-部门管理"
 
+  import Jason.Helpers
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
@@ -32,6 +33,43 @@ defmodule WeChat.Work.Contacts.Department do
   def list(client, party_id) do
     client.get("/cgi-bin/department/list",
       query: [id: party_id, access_token: client.get_access_token(:contacts)]
+    )
+  end
+
+  @doc """
+  创建部门 -
+  [官方文档](#{@doc_link}/90205){:target="_blank"}
+
+  注意，部门的最大层级为15层；部门总数不能超过3万个；每个部门下的节点不能超过3万个。建议保证创建的部门和对应部门成员是串行化处理。
+  """
+  @spec create(Work.client(), body :: map) :: WeChat.response()
+  def create(client, body) do
+    client.post("/cgi-bin/department/create", body,
+      query: [access_token: client.get_access_token(:contacts)]
+    )
+  end
+
+  @doc """
+  更新部门 -
+  [官方文档](#{@doc_link}/90206){:target="_blank"}
+  """
+  @spec update(Work.client(), body :: map) :: WeChat.response()
+  def update(client, body) do
+    client.post("/cgi-bin/department/update", body,
+      query: [access_token: client.get_access_token(:contacts)]
+    )
+  end
+
+  @doc """
+  删除部门 -
+  [官方文档](#{@doc_link}/90207){:target="_blank"}
+
+  **注：不能删除根部门；不能删除含有子部门、成员的部门**
+  """
+  @spec delete(Work.client(), party_id) :: WeChat.response()
+  def delete(client, party_id) do
+    client.post("/cgi-bin/department/delete", json_map(id: party_id),
+      query: [access_token: client.get_access_token(:contacts)]
     )
   end
 end
