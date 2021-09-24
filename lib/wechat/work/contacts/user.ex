@@ -167,7 +167,7 @@ defmodule WeChat.Work.Contacts.User do
 
   当成员登录企业微信或关注微工作台（原企业号）进入企业时，会自动跳转到企业的验证页面。在跳转到企业的验证页面时，会带上如下参数：code=CODE。
 
-  企业收到code后，使用 “通讯录同步助手” 调用接口 “[根据code获取成员信息](Work.App.sso_user_info/3)” 获取成员的userid。
+  企业收到code后，使用 “通讯录同步助手” 调用接口 “[根据code获取成员信息](`WeChat.Work.App.sso_user_info/3`)” 获取成员的userid。
 
   如果成员是首次加入企业，企业获取到userid，并验证了成员信息后，调用如下接口即可让成员成功加入企业。
   """

@@ -1,4 +1,4 @@
-defmodule WeChat.Work.AppChat do
+defmodule WeChat.Work.App.Chat do
   @moduledoc "群聊会话"
 
   import WeChat.Utils, only: [work_doc_link_prefix: 0]

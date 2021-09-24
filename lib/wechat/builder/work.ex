@@ -11,7 +11,8 @@ defmodule WeChat.Builder.Work do
 
   @sub_modules [
     Work.App,
-    Work.AppChat,
+    Work.App.Chat,
+    Work.App.Workbench,
     Work.Material,
     Work.Message,
     Customer,
