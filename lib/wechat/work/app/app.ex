@@ -48,47 +48,6 @@ defmodule WeChat.Work.App do
   end
 
   @doc """
-  创建菜单 - [官方文档](#{@doc_link}/90231){:target="_blank"}
-  """
-  @spec create_menu(Work.client(), Work.agent(), opts :: Enumerable.t()) :: WeChat.response()
-  def create_menu(client, agent, opts \\ []) do
-    client.post("/cgi-bin/menu/create", Map.new(opts),
-      query: [
-        agentid: agent2id(client, agent),
-        access_token: client.get_access_token(agent)
-      ]
-    )
-  end
-
-  @doc """
-  获取菜单 - [官方文档](#{@doc_link}/90232){:target="_blank"}
-  """
-  @spec get_menu(Work.client(), Work.agent()) :: WeChat.response()
-  def get_menu(client, agent) do
-    client.get(
-      "/cgi-bin/menu/get",
-      query: [
-        agentid: agent2id(client, agent),
-        access_token: client.get_access_token(agent)
-      ]
-    )
-  end
-
-  @doc """
-  删除菜单 - [官方文档](#{@doc_link}/90233){:target="_blank"}
-  """
-  @spec delete_menu(Work.client(), Work.agent()) :: WeChat.response()
-  def delete_menu(client, agent) do
-    client.get(
-      "/cgi-bin/menu/delete",
-      query: [
-        agentid: agent2id(client, agent),
-        access_token: client.get_access_token(agent)
-      ]
-    )
-  end
-
-  @doc """
   构造独立窗口登录二维码 - [官方文档](#{@doc_link}/91019#构造独立窗口登录二维码){:target="_blank"}
   """
   @spec qr_connect_url(

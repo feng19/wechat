@@ -157,6 +157,7 @@ defmodule WeChat.MixProject do
          Work.Agent,
          Work.App,
          Work.App.Chat,
+         Work.App.Menu,
          Work.App.Workbench,
          Work.ChatRobot,
          Work.Material,
