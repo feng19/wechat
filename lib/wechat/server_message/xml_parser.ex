@@ -20,11 +20,8 @@ if Code.ensure_loaded?(Saxy) do
 
     def handle_event(:characters, chars, [{element, content} | stack] = old) do
       case String.trim(chars) do
-        "" ->
-          {:ok, old}
-
-        chars ->
-          {:ok, [{element, [chars | content]} | stack]}
+        "" -> {:ok, old}
+        chars -> {:ok, [{element, [chars | content]} | stack]}
       end
     end
 
@@ -43,11 +40,7 @@ if Code.ensure_loaded?(Saxy) do
     end
 
     def handle_event(:end_document, _data, stack) do
-      state =
-        stack
-        |> stack_to_map()
-        |> Map.get("xml")
-
+      state = stack |> stack_to_map() |> Map.get("xml")
       {:ok, state}
     end
 

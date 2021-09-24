@@ -6,37 +6,27 @@ defmodule WeChat.Refresher.Default do
 
   需要修改为自定义的刷新器，可以这样配置：
 
-  ```elixir
-  config :wechat, :refresher, YourRefresher
-  ```
+      config :wechat, :refresher, YourRefresher
 
   修改刷新器的配置，支持多种配置方式：
   ### 方式1
 
-  ```elixir
-  config :wechat, :refresh_settings, [ClientA, ClientB, ClientC]
-  ```
+      config :wechat, :refresh_settings, [ClientA, ClientB, ClientC]
 
   以上配置会自动为三个 `Client` 定时刷新 `token` ，默认会在 `token` 过期前 `30` 分钟刷新，`token` 刷新失败的重试间隔为 `1` 分钟，
   默认的 `token` 刷新列表为：`WeChat.Refresher.DefaultSettings.get_refresh_options_by_client/1` 输出的结果
 
   ### 方式2
 
-  ```elixir
-  config :wechat, :refresh_settings, [{ClientA, client_setting}, ClientB, ClientC]
-
-  # or
-
-  config :wechat, :refresh_settings, %{ClientA => client_setting, ClientB => client_setting, ClientC => client_setting}
-  ```
+      config :wechat, :refresh_settings, [{ClientA, client_setting}, ClientB, ClientC]
+      # or
+      config :wechat, :refresh_settings, %{ClientA => client_setting, ClientB => client_setting, ClientC => client_setting}
 
   `client_setting` 配置说明见：`t:client_setting/0`
 
   为了适应 `Storage` 在 `Refresher` 启动之后才启动，可以开启延时启动刷新:
 
-  ```elixir
-  config :wechat, WeChat.Refresher.Default, wait_for_signal: true
-  ```
+      config :wechat, WeChat.Refresher.Default, wait_for_signal: true
 
   当所有的 `Storage` 都已经完成，可以即可通过 `WeChat.Refresher.Default.start_monitor/0` 方法刷新 `token`
 
