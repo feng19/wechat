@@ -7,18 +7,34 @@ if Code.ensure_loaded?(Plug) do
 
     ## Usage
 
-    将下面的代码加到 `router` 里面：
+    使用 Phoenix 时，将下面的代码加到 `router` 里面：
 
         # for normal
         get "/:app/:env/cb/*callback_path", #{inspect(__MODULE__)}, clients: [Client, ...]
 
         # for work
         get "/:app/:agent/:env/cb/*callback_path", #{inspect(__MODULE__)}, clients: [Client, ...]
+
+    使用 PlugCowboy 时，将下面的代码加到 `router` 里面：
+
+        # for normal
+        get "/:app/:env/cb/*callback_path",
+          to: #{inspect(__MODULE__)},
+          init_opts: [clients: [Client, ...]]
+
+        # for work
+        get "/:app/:agent/:env/cb/*callback_path",
+          to: #{inspect(__MODULE__)},
+          init_opts: [clients: [Client, ...]]
     """
-    alias WeChat.Plug.{Helper, OAuth2Checker}
+    import WeChat.Plug.Helper
+    alias WeChat.Plug.OAuth2Checker
 
     @doc false
-    def init(opts), do: OAuth2Checker.init(opts)
+    def init(opts) do
+      clients = opts |> Map.new() |> WeChat.Utils.transfer_clients(__MODULE__)
+      %{clients: clients}
+    end
 
     @doc false
     def call(
@@ -33,7 +49,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    def call(conn, _opts), do: Helper.not_found(conn)
+    def call(conn, _opts), do: not_found(conn)
 
     def oauth2_callback(conn, client, agent, env, callback_path) do
       env_url =
@@ -45,9 +61,9 @@ if Code.ensure_loaded?(Plug) do
 
       if env_url do
         callback_url = [env_url | List.wrap(callback_path)] |> Path.join()
-        Helper.redirect(conn, callback_url <> "?" <> conn.query_string)
+        redirect(conn, callback_url <> "?" <> conn.query_string)
       else
-        Helper.not_found(conn)
+        not_found(conn)
       end
     end
   end

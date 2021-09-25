@@ -61,15 +61,7 @@ if Code.ensure_loaded?(Plug) do
     @doc false
     def init(opts) do
       opts = Map.new(opts)
-
-      clients =
-        Map.get(opts, :clients)
-        |> List.wrap()
-        |> case do
-          [] -> raise "please set clients when using #{inspect(__MODULE__)}"
-          list -> list
-        end
-        |> Enum.reduce(%{}, &transfer_client/2)
+      clients = Utils.transfer_clients(opts, __MODULE__)
 
       oauth2_callback_fun =
         with {:ok, fun} <- Map.fetch(opts, :oauth2_callback_fun),
@@ -102,49 +94,6 @@ if Code.ensure_loaded?(Plug) do
         oauth2_callback_fun: oauth2_callback_fun,
         authorize_url_fun: authorize_url_fun
       }
-    end
-
-    defp transfer_client(client, acc) when is_atom(client) do
-      if match?(:work, client.app_type()) do
-        transfer_client({client, :all}, acc)
-      else
-        transfer_client({client, nil}, acc)
-      end
-    end
-
-    defp transfer_client({client, :all}, acc) do
-      agents = Enum.map(client.agents(), & &1.id)
-      transfer_client({client, agents}, acc)
-    end
-
-    defp transfer_client({client, agents}, acc) do
-      value =
-        if match?(:work, client.app_type()) do
-          agent_flag_list = transfer_agents(client, agents)
-          {client, agent_flag_list}
-        else
-          client
-        end
-
-      Enum.into([{client.appid(), value}, {client.code_name(), value}], acc)
-    end
-
-    defp transfer_agents(client, agents) when is_list(agents) do
-      Enum.reduce(client.agents(), %{}, fn agent, acc ->
-        agent_id = agent.id
-        name = agent.name
-
-        if agent_id in agents or name in agents do
-          Enum.uniq([agent_id, name, to_string(agent_id), to_string(name)]) ++ acc
-        else
-          acc
-        end
-      end)
-    end
-
-    defp transfer_agents(client, agents) do
-      raise ArgumentError,
-            "error agents: #{inspect(agents)} for client: #{inspect(client)} when using #{inspect(__MODULE__)}"
     end
 
     @doc false

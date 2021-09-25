@@ -9,7 +9,7 @@ if Code.ensure_loaded?(Plug) do
 
     使用 PlugCowboy 时，将下面的代码加到 `router` 里面：
 
-        forward "/hub/expose/:store_id/:store_key",
+        get "/hub/expose/:store_id/:store_key",
           to: #{inspect(__MODULE__)},
           init_opts: [clients: [ClientsA, ...]]
 

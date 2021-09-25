@@ -11,23 +11,25 @@ defmodule WeChat.Plug.HubExposerTest do
   end
 
   test "init - ok for official_account" do
-    store_id = WeChat.Test.OfficialAccount.appid()
+    client = WeChat.Test.OfficialAccount
+    store_id = client.appid()
     opts = %{store_id => :all}
-    assert opts == HubExposer.init(clients: [WeChat.Test.OfficialAccount])
-    assert opts == HubExposer.init(clients: [{WeChat.Test.OfficialAccount, :all}])
+    assert opts == HubExposer.init(clients: [client])
+    assert opts == HubExposer.init(clients: [{client, :all}])
 
     opts = %{store_id => ["access_token"]}
-    assert opts == HubExposer.init(clients: [{WeChat.Test.OfficialAccount, ["access_token"]}])
+    assert opts == HubExposer.init(clients: [{client, ["access_token"]}])
   end
 
   test "init - ok for work" do
-    store_id = WeChat.Test.Work2.agent2cache_id(10000)
+    client = WeChat.Test.Work2
+    store_id = client.agent2cache_id(10000)
     opts = %{store_id => :all}
-    assert opts == HubExposer.init(clients: [WeChat.Test.Work2])
-    assert opts == HubExposer.init(clients: [{WeChat.Test.Work2, :all}])
-    assert opts == HubExposer.init(clients: [{WeChat.Test.Work2, [{10000, :all}]}])
+    assert opts == HubExposer.init(clients: [client])
+    assert opts == HubExposer.init(clients: [{client, :all}])
+    assert opts == HubExposer.init(clients: [{client, [{10000, :all}]}])
     opts = %{store_id => ["access_token"]}
-    assert opts == HubExposer.init(clients: [{WeChat.Test.Work2, [{10000, ["access_token"]}]}])
+    assert opts == HubExposer.init(clients: [{client, [{10000, ["access_token"]}]}])
   end
 
   @opts HubExposerRouter.init([])
