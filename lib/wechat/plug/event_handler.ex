@@ -23,9 +23,9 @@ if Code.ensure_loaded?(Plug) do
 
     ## Options
 
-    - `event_handler`: 必填， `t:#{inspect(__MODULE__)}.event_handler/0`
-    - `event_parser`: 可选, `t:#{inspect(__MODULE__)}.event_parser/0`
-    - `client`: 可选， `t:WeChat.client/0`
+    - `event_handler`: 必填, [定义](`t:#{inspect(__MODULE__)}.event_handler/0`)
+    - `event_parser`: 可选, [定义](`t:#{inspect(__MODULE__)}.event_parser/0`)
+    - `client`: 可选, [定义](`t:WeChat.client/0`)
     """
 
     import Plug.Conn
