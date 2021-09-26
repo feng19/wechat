@@ -16,6 +16,7 @@ defmodule WeChat.Builder.Work do
     Work.App.Workbench,
     Work.Material,
     Work.Message,
+    Work.MiniProgram,
     Customer,
     Customer.ContactWay,
     Customer.GroupChat,

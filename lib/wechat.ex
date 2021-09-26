@@ -6,50 +6,42 @@ defmodule WeChat do
 
   ### 公众号(默认):
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    appid: "wx-appid",
-    appsecret: "appsecret"
-  end
-  ```
+      defmodule YourApp.WeChatAppCodeName do
+        @moduledoc "CodeName"
+        use WeChat,
+          appid: "wx-appid",
+          appsecret: "appsecret"
+      end
 
   ### 小程序:
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    app_type: :mini_program,
-    appid: "wx-appid",
-    appsecret: "appsecret"
-  end
-  ```
+      defmodule YourApp.WeChatAppCodeName do
+        @moduledoc "CodeName"
+        use WeChat,
+          app_type: :mini_program,
+          appid: "wx-appid",
+          appsecret: "appsecret"
+      end
 
   ### 第三方应用:
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-  @moduledoc "CodeName"
-  use WeChat,
-    by_component?: true,
-    app_type: :official_account | :mini_program, # 默认为 :official_account
-    appid: "wx-appid",
-    component_appid: "wx-third-appid", # 第三方 appid
-  end
-  ```
+      defmodule YourApp.WeChatAppCodeName do
+        @moduledoc "CodeName"
+        use WeChat,
+          by_component?: true,
+          app_type: :official_account | :mini_program, # 默认为 :official_account
+          appid: "wx-appid",
+          component_appid: "wx-third-appid", # 第三方 appid
+      end
 
   ### 企业微信
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-    @moduledoc "CodeName"
-    use WeChat.Work,
-      corp_id: "corp_id",
-      agents: [%Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}, ...]
-  end
-  ```
+      defmodule YourApp.WeChatAppCodeName do
+        @moduledoc "CodeName"
+        use WeChat.Work,
+          corp_id: "corp_id",
+          agents: [%Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}, ...]
+      end
 
   ## 参数说明
 
@@ -59,13 +51,13 @@ defmodule WeChat do
 
   支持两种方式调用:
 
-  - 调用 `client` 方法
+  - 调用 `client` 方法:
 
-      `YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)`
+    `YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)`
 
   - 原生调用方法
 
-      `WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)`
+    `WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)`
 
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]

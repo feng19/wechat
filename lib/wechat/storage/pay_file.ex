@@ -1,5 +1,6 @@
 defmodule WeChat.Storage.PayFile do
   @moduledoc false
+  import WeChat.Storage.File, only: [store_to_file: 4, restore_from_file: 3]
   alias WeChat.Storage.Adapter
   @behaviour WeChat.Storage.Adapter
 
@@ -9,44 +10,13 @@ defmodule WeChat.Storage.PayFile do
   @impl true
   @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any
   def store(store_id, store_key, value) do
-    file = get_file_name(store_id)
-    store_key = to_string(store_key)
-
-    case File.read(file) do
-      {:ok, string} ->
-        content =
-          string
-          |> Jason.decode!()
-          |> Map.update(store_id, %{store_key => value}, &Map.put(&1, store_key, value))
-          |> Jason.encode!()
-
-        File.write(file, content)
-
-      {:error, :enoent} ->
-        with :ok <- Path.dirname(file) |> File.mkdir_p() do
-          content = Jason.encode!(%{store_id => %{store_key => value}})
-          File.write(file, content)
-        end
-
-      error ->
-        error
-    end
+    get_file_name(store_id) |> store_to_file(store_id, store_key, value)
   end
 
   @impl true
   @spec restore(Adapter.store_id(), Adapter.store_key()) :: {:ok, Adapter.value()} | any
   def restore(store_id, store_key) do
-    file = get_file_name(store_id)
-    store_key = to_string(store_key)
-
-    with {:ok, string} <- File.read(file) do
-      value =
-        string
-        |> Jason.decode!()
-        |> get_in([store_id, store_key])
-
-      {:ok, value}
-    end
+    get_file_name(store_id) |> restore_from_file(store_id, store_key)
   end
 
   defp get_file_name(store_id) do

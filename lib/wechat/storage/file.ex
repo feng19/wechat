@@ -13,7 +13,19 @@ defmodule WeChat.Storage.File do
   @impl true
   @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any
   def store(store_id, store_key, value) do
-    file = get_file_name()
+    get_file_name() |> store_to_file(store_id, store_key, value)
+  end
+
+  @impl true
+  @spec restore(Adapter.store_id(), Adapter.store_key()) :: {:ok, Adapter.value()} | any
+  def restore(store_id, store_key) do
+    get_file_name() |> restore_from_file(store_id, store_key)
+  end
+
+  defp get_file_name, do: Path.join([:code.priv_dir(@app), @store_file])
+
+  @doc false
+  def store_to_file(file, store_id, store_key, value) do
     store_key = to_string(store_key)
 
     case File.read(file) do
@@ -22,13 +34,13 @@ defmodule WeChat.Storage.File do
           string
           |> Jason.decode!()
           |> Map.update(store_id, %{store_key => value}, &Map.put(&1, store_key, value))
-          |> Jason.encode!()
+          |> Jason.encode!(pretty: true)
 
         File.write(file, content)
 
       {:error, :enoent} ->
         with :ok <- Path.dirname(file) |> File.mkdir_p() do
-          content = Jason.encode!(%{store_id => %{store_key => value}})
+          content = Jason.encode!(%{store_id => %{store_key => value}}, pretty: true)
           File.write(file, content)
         end
 
@@ -37,13 +49,10 @@ defmodule WeChat.Storage.File do
     end
   end
 
-  @impl true
-  @spec restore(Adapter.store_id(), Adapter.store_key()) :: {:ok, Adapter.value()} | any
-  def restore(store_id, store_key) do
-    file = get_file_name()
-    store_key = to_string(store_key)
-
+  def restore_from_file(file, store_id, store_key) do
     with {:ok, string} <- File.read(file) do
+      store_key = to_string(store_key)
+
       value =
         string
         |> Jason.decode!()
@@ -52,6 +61,4 @@ defmodule WeChat.Storage.File do
       {:ok, value}
     end
   end
-
-  defp get_file_name, do: Path.join([:code.priv_dir(@app), @store_file])
 end

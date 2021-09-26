@@ -2,16 +2,15 @@ defmodule WeChat.Work do
   @moduledoc """
   企业微信
 
-  ```elixir
-  use WeChat.Work,
-    corp_id: "corp_id",
-    agents: [
-      contacts_agent(secret: "contacts_secret"),
-      customer_agent(secret: "customer_secret"),
-      agent(10000, name: :agent_name, secret: "agent_secret"),
-      ...
-    ]
-  ```
+      use WeChat.Work,
+        corp_id: "corp_id",
+        agents: [
+          contacts_agent(secret: "contacts_secret"),
+          customer_agent(secret: "customer_secret"),
+          kf_agent(secret: "customer_secret"),
+          agent(10000, name: :agent_name, secret: "agent_secret"),
+          ...
+        ]
   """
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work.Agent

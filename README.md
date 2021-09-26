@@ -26,7 +26,7 @@ You can use wechat in your projects by adding it to your `mix.exs` dependencies:
 ```elixir
 def deps do
   [
-    {:wechat, "~> 0.8", hex: :wechat_sdk}
+    {:wechat, "~> 0.9", hex: :wechat_sdk}
   ]
 end
 ```
@@ -37,55 +37,56 @@ end
 
 #### 公众号(默认)
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-    @moduledoc "CodeName"
-    use WeChat,
-      appid: "wx-appid",
-      appsecret: "appsecret"
-  end
-  ```
+```elixir
+defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat,
+    appid: "wx-appid",
+    appsecret: "appsecret"
+end
+```
 
 #### 小程序
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-    @moduledoc "CodeName"
-    use WeChat,
-      app_type: :mini_program,
-      appid: "wx-appid",
-      appsecret: "appsecret"
-  end
-  ```
+```elixir
+defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat,
+    app_type: :mini_program,
+    appid: "wx-appid",
+    appsecret: "appsecret"
+end
+```
 
 #### 第三方应用
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-    @moduledoc "CodeName"
-    use WeChat,
-      by_component?: true,
-      app_type: :official_account | :mini_program, # 默认为 :official_account
-      appid: "wx-appid",
-      component_appid: "wx-third-appid", # 第三方 appid
-  end
-  ```
+```elixir
+defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat,
+    by_component?: true,
+    app_type: :official_account | :mini_program, # 默认为 :official_account
+    appid: "wx-appid",
+    component_appid: "wx-third-appid", # 第三方 appid
+end
+```
 
 #### 企业微信
 
-  ```elixir
-  defmodule YourApp.WeChatAppCodeName do
-    @moduledoc "CodeName"
-    use WeChat.Work,
-      corp_id: "corp_id",
-      agents: [
-        contacts_agent(secret: "contacts_secret"),
-        customer_agent(secret: "customer_secret"),
-        agent(10000, name: :agent_name, secret: "agent_secret"),
-        ...
-      ]
-  end
-  ```
+```elixir
+defmodule YourApp.WeChatAppCodeName do
+  @moduledoc "CodeName"
+  use WeChat.Work,
+    corp_id: "corp_id",
+    agents: [
+      contacts_agent(secret: "contacts_secret"),
+      customer_agent(secret: "customer_secret"),
+      kf_agent(secret: "customer_secret"),
+      agent(10000, name: :agent_name, secret: "agent_secret"),
+      ...
+    ]
+end
+```
 
 ### 自动刷新 `token`
 
@@ -104,13 +105,13 @@ WeChat.Refresher.Default.add(YourApp.WeChatAppCodeName)
 
 所有类型的 `client`，都同时支持以下两种形式调用:
 
-```elixir
-YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)
+- 调用 `client` 方法:
 
-# or
+  `YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)`
 
-WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)
-```
+- 原生调用方法
+
+  `WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)`
 
 更多详情请见：[WeChat模块](https://hexdocs.pm/wechat_sdk/WeChat.html)
 

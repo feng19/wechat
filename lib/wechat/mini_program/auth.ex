@@ -12,7 +12,7 @@ defmodule WeChat.MiniProgram.Auth do
   服务端获取开放数据 -
   [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
 
-  [小程序登录](#{@open_ability_doc_link}/login.html)
+  [登录流程](#{@open_ability_doc_link}/login.html)
   """
   @spec decode_user_info(
           session_key :: String.t(),
@@ -53,6 +53,8 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   小程序登录
+
+  [登录流程](#{@open_ability_doc_link}/login.html)
 
   官方文档:
     * [Mini Program](#{@doc_link}/login/auth.code2Session.html){:target="_blank"}

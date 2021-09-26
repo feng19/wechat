@@ -162,6 +162,7 @@ defmodule WeChat.MixProject do
          Work.ChatRobot,
          Work.Material,
          Work.Message,
+         Work.MiniProgram,
          Work.Contacts.Department,
          Work.Contacts.User,
          Work.Contacts.Tag,
