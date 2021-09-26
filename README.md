@@ -10,14 +10,15 @@
 
 - 目前 `Elixir` 中支持最完善的微信SDK
 - 已支持: 
-  - 公众号
-  - 小程序
-  - 第三方应用
-  - 企业微信
+  - [公众号](#公众号)
+  - [小程序](#小程序)
+  - [第三方应用](#第三方应用)
+  - [企业微信](#企业微信)
   - 微信支付
 - WIP: 企业微信服务商
 
-[在线文档](http://hexdocs.pm/wechat_sdk/)
+[在线文档](https://hex.pm/packages/wechat_sdk) | 
+[使用示例](https://github.com/feng19/wechat_demo)
 
 ## Installation
 
@@ -35,7 +36,7 @@ end
 
 ### 定义 `Client` 模块
 
-#### 公众号(默认)
+#### 公众号
 
 ```elixir
 defmodule YourApp.WeChatAppCodeName do
