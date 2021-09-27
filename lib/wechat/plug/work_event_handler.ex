@@ -139,7 +139,7 @@ if Code.ensure_loaded?(Plug) do
         else
           # 被动回复推送消息
           {:reply, xml_string, timestamp} ->
-            body = EventHelper.reply_msg(reply_type, xml_string, timestamp, client)
+            body = EventHelper.reply_msg(reply_type, xml_string, timestamp, client, agent)
             send_resp(conn, 200, body)
 
           {:reply, body} ->

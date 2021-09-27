@@ -215,6 +215,15 @@ if Code.ensure_loaded?(Plug) do
 
     def reply_msg(_, _reply_msg, _timestamp, _client), do: "success"
 
+    @spec reply_msg(data_type, xml_string, timestamp, WeChat.client(), Work.Agent.t()) ::
+            String.t()
+    def reply_msg(:plaqin_text, xml_string, _timestamp, _client, _agent), do: xml_string
+
+    def reply_msg(:encrypted_xml, xml_string, timestamp, client, agent),
+      do: encrypt_xml_msg(xml_string, timestamp, client, agent)
+
+    def reply_msg(_, _reply_msg, _timestamp, _client, _agent), do: "success"
+
     @spec decrypt_xml_msg(encrypt_content, params, WeChat.client()) ::
             {:ok, :encrypted, xml_string} | {:error, String.t()}
     def decrypt_xml_msg(encrypt_content, params, client) do
@@ -264,6 +273,11 @@ if Code.ensure_loaded?(Plug) do
     @spec encrypt_xml_msg(xml_string, timestamp, WeChat.client()) :: String.t()
     def encrypt_xml_msg(xml_string, timestamp, client) do
       encrypt_xml_msg(xml_string, timestamp, client.appid(), client.token(), client.aes_key())
+    end
+
+    @spec encrypt_xml_msg(xml_string, timestamp, WeChat.client(), Work.Agent.t()) :: String.t()
+    def encrypt_xml_msg(xml_string, timestamp, client, agent) do
+      encrypt_xml_msg(xml_string, timestamp, client.appid(), agent.token, agent.aes_key)
     end
 
     @spec encrypt_xml_msg(

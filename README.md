@@ -22,7 +22,7 @@
 
 ## Installation
 
-You can use wechat in your projects by adding it to your `mix.exs` dependencies:
+You can use `wechat` in your projects by adding it to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
