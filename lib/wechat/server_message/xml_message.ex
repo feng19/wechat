@@ -1,10 +1,10 @@
 defmodule WeChat.ServerMessage.XmlMessage do
   @moduledoc """
-  回复推送消息
+  被动回复消息
 
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html){:target="_blank"}
   """
-  import WeChat.Utils, only: [doc_link_prefix: 0, def_eex: 2]
+  import WeChat.Utils, only: [doc_link_prefix: 0, work_doc_link_prefix: 0, def_eex: 2]
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Passive_user_reply_message.html"
 
@@ -293,6 +293,62 @@ defmodule WeChat.ServerMessage.XmlMessage do
       <TransInfo>
         <KfAccount><![CDATA[<%= kf_account %>]]></KfAccount>
       </TransInfo>
+    </xml>
+    """
+  end
+
+  @doc """
+  模板卡片更新消息(更新点击用户的按钮点击文案) -
+  [官方文档](#{work_doc_link_prefix()}/90135/90241#模板卡片更新消息){:target="_blank"}
+
+  ```xml
+  <xml>
+    <ToUserName><![CDATA[toUser]]></ToUserName>
+    <FromUserName><![CDATA[fromUser]]></FromUserName>
+    <CreateTime>1357290913</CreateTime>
+    <MsgType>update_button</MsgType>
+    <Button>
+        <ReplaceName><![CDATA[ReplaceName]]></ReplaceName>
+    </Button>
+  </xml>
+  ```
+  """
+  def_eex update_template_card_button(to_user, from_user, timestamp, replace_name) do
+    """
+    <xml>
+    <ToUserName><![CDATA[<%= to_user %>]]></ToUserName>
+    <FromUserName><![CDATA[<%= from_user %>]]></FromUserName>
+    <CreateTime><%= timestamp %></CreateTime>
+    <MsgType>update_button</MsgType>
+    <Button>
+        <ReplaceName><![CDATA[<%= replace_name %>]]></ReplaceName>
+    </Button>
+    </xml>
+    """
+  end
+
+  @doc """
+  模板卡片更新消息(更新点击用户的整张卡片) -
+  [官方文档](#{work_doc_link_prefix()}/90135/90241#更新点击用户的整张卡片){:target="_blank"}
+
+  ```xml
+  <xml>
+    <ToUserName><![CDATA[toUser]]></ToUserName>
+    <FromUserName><![CDATA[fromUser]]></FromUserName>
+    <CreateTime>1357290913</CreateTime>
+    <MsgType>update_button</MsgType>
+    template_card_xml
+  </xml>
+  ```
+  """
+  def_eex update_template_card(to_user, from_user, timestamp, template_card_xml) do
+    """
+    <xml>
+    <ToUserName><![CDATA[<%= to_user %>]]></ToUserName>
+    <FromUserName><![CDATA[<%= from_user %>]]></FromUserName>
+    <CreateTime><%= timestamp %></CreateTime>
+    <MsgType>update_template_card</MsgType>
+    <%= template_card_xml %>
     </xml>
     """
   end
