@@ -46,6 +46,9 @@ if Code.ensure_loaded?(Saxy) do
 
     defp stack_to_map(stack) do
       Map.new(stack, fn
+        {name, []} ->
+          {name, ""}
+
         {name, [content]} when is_binary(content) ->
           {name, content}
 
