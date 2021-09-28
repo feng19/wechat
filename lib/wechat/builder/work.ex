@@ -1,6 +1,7 @@
 defmodule WeChat.Builder.Work do
   @moduledoc false
-  alias WeChat.{Work, Work.Contacts, Work.Customer, Work.KF, Builder.Utils}
+  alias WeChat.{Work, Builder.Utils}
+  alias Work.{Contacts, Customer, KF, OA}
 
   @default_opts [
     server_role: :client,
@@ -26,6 +27,12 @@ defmodule WeChat.Builder.Work do
     Customer.Tag,
     Customer.Transfer,
     Customer.Welcome,
+    OA.Approval,
+    OA.Checkin,
+    OA.Journal,
+    OA.MeetingRoom,
+    OA.Pstncc,
+    OA.Vacation,
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]},
     {:kf, [KF.Account, KF.Customer, KF.Message]}
   ]

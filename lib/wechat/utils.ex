@@ -11,14 +11,14 @@ defmodule WeChat.Utils do
       do: {Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000}
   end
 
-  @spec random_string(length :: integer()) :: String.t()
+  @spec random_string(length :: integer) :: String.t()
   def random_string(length) when length > 0 do
     @random_alphanumeric
     |> Enum.take_random(length)
     |> List.to_string()
   end
 
-  @spec now_unix() :: timestamp()
+  @spec now_unix :: timestamp
   def now_unix, do: System.system_time(:second)
 
   def doc_link_prefix, do: "https://developers.weixin.qq.com"

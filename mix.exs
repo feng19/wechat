@@ -66,7 +66,8 @@ defmodule WeChat.MixProject do
         Work.Contacts,
         Work.Customer,
         Work.KF,
-        Work.LinkedCorp
+        Work.LinkedCorp,
+        Work.OA
       ]
     ]
   end
@@ -178,7 +179,13 @@ defmodule WeChat.MixProject do
          Work.KF.Account,
          Work.KF.Customer,
          Work.KF.Message,
-         Work.LinkedCorp.Message
+         Work.LinkedCorp.Message,
+         Work.OA.Approval,
+         Work.OA.Checkin,
+         Work.OA.Journal,
+         Work.OA.MeetingRoom,
+         Work.OA.Pstncc,
+         Work.OA.Vacation
        ]}
     ]
   end
