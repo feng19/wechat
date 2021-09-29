@@ -142,7 +142,9 @@ defmodule WeChat.Refresher.DefaultSettings do
       cache_id = client.agent2cache_id(agent_id)
 
       list =
-        Enum.map(refresh_list, fn
+        refresh_list
+        |> List.wrap()
+        |> Enum.map(fn
           store_key = :js_api_ticket ->
             {cache_id, store_key,
              &__MODULE__.refresh_work_jsapi_ticket(&1, cache_id, agent_id, store_key, false)}
