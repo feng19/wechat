@@ -133,14 +133,29 @@ defmodule WeChat.Refresher.DefaultSettings do
   """
   @spec work_refresh_options(WeChat.client()) :: refresh_options
   def work_refresh_options(client) do
-    Enum.map(client.agents(), fn %{id: agent_id, secret: secret} ->
+    Enum.flat_map(client.agents(), fn %{id: agent_id, secret: secret, refresh_list: refresh_list} ->
       unless secret do
         raise RuntimeError,
               "Please set :secret for agent:#{agent_id} when defining #{inspect(client)}."
       end
 
       cache_id = client.agent2cache_id(agent_id)
-      {cache_id, :access_token, &__MODULE__.refresh_work_access_token(&1, cache_id, agent_id)}
+
+      list =
+        Enum.map(refresh_list, fn
+          store_key = :js_api_ticket ->
+            {cache_id, store_key,
+             &__MODULE__.refresh_work_jsapi_ticket(&1, cache_id, agent_id, store_key, false)}
+
+          store_key = :agent_js_api_ticket ->
+            {cache_id, store_key,
+             &__MODULE__.refresh_work_jsapi_ticket(&1, cache_id, agent_id, store_key, true)}
+        end)
+
+      [
+        {cache_id, :access_token, &__MODULE__.refresh_work_access_token(&1, cache_id, agent_id)}
+        | list
+      ]
     end)
   end
 
@@ -240,6 +255,21 @@ defmodule WeChat.Refresher.DefaultSettings do
          {:ok, %{status: 200, body: data}} <- Work.get_access_token(client, agent_id),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
+    end
+  end
+
+  @spec refresh_work_jsapi_ticket(
+          Work.client(),
+          Cache.cache_id(),
+          Work.agent_id(),
+          Cache.cache_sub_key(),
+          is_agent :: boolean
+        ) :: refresh_fun_result
+  def refresh_work_jsapi_ticket(client, cache_id, agent_id, store_key, is_agent) do
+    with :not_hub_client <- get_hub_client_token(client, cache_id, store_key),
+         {:ok, %{status: 200, body: data}} <- Work.get_jsapi_ticket(client, agent_id, is_agent),
+         %{"ticket" => ticket, "expires_in" => expires_in} <- data do
+      {:ok, ticket, expires_in}
     end
   end
 

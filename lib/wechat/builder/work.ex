@@ -28,10 +28,12 @@ defmodule WeChat.Builder.Work do
     Customer.Transfer,
     Customer.Welcome,
     OA.Approval,
+    OA.Calendar,
     OA.Checkin,
     OA.Journal,
     OA.MeetingRoom,
     OA.Pstncc,
+    OA.Schedule,
     OA.Vacation,
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]},
     {:kf, [KF.Account, KF.Customer, KF.Message]}

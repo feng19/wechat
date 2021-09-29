@@ -181,10 +181,12 @@ defmodule WeChat.MixProject do
          Work.KF.Message,
          Work.LinkedCorp.Message,
          Work.OA.Approval,
+         Work.OA.Calendar,
          Work.OA.Checkin,
          Work.OA.Journal,
          Work.OA.MeetingRoom,
          Work.OA.Pstncc,
+         Work.OA.Schedule,
          Work.OA.Vacation
        ]}
     ]

@@ -33,6 +33,8 @@ defmodule WeChat.Work.Agent do
   """
   @type secret :: String.t()
   @type options :: Keyword.t()
+  @type refresh_key :: :js_api_ticket | :agent_js_api_ticket
+  @type refresh_list :: [refresh_key]
 
   @typedoc "应用配置"
   @type t :: %__MODULE__{
@@ -41,11 +43,12 @@ defmodule WeChat.Work.Agent do
           secret: secret,
           token: WeChat.token(),
           encoding_aes_key: Encryptor.encoding_aes_key(),
-          aes_key: Encryptor.aes_key()
+          aes_key: Encryptor.aes_key(),
+          refresh_list: []
         }
 
   @enforce_keys [:id]
-  defstruct [:name, :id, :secret, :token, :encoding_aes_key, :aes_key]
+  defstruct [:name, :id, :secret, :token, :encoding_aes_key, :aes_key, :refresh_list]
 
   @spec find_agent(Work.client(), Work.agent()) :: t | nil
   def find_agent(client, id) when is_integer(id) do

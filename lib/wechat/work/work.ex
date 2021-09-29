@@ -13,11 +13,14 @@ defmodule WeChat.Work do
         ]
   """
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
-  alias WeChat.Work.Agent
+  import WeChat.Work.Agent, only: [agent2id: 2]
+  alias WeChat.{Utils, Work.Agent}
 
   @doc_link "#{work_doc_link_prefix()}/90135"
 
   @type client :: module()
+  @type js_api_ticket :: String.t()
+  @type url :: String.t()
 
   @typedoc """
   每个企业都拥有唯一的 corpid -
@@ -127,5 +130,72 @@ defmodule WeChat.Work do
     client.get("/cgi-bin/gettoken",
       query: [corpid: client.appid(), corpsecret: corp_secret]
     )
+  end
+
+  @doc """
+  获取jsapi_ticket
+
+  - [企业](#{work_doc_link_prefix()}/90136/90506#获取企业的jsapi_ticket){:target="_blank"}
+  - [应用](#{work_doc_link_prefix()}/90136/90506#获取应用的jsapi_ticket){:target="_blank"}
+  """
+  @spec get_jsapi_ticket(client, agent, is_agent :: boolean) :: WeChat.response()
+  def get_jsapi_ticket(client, agent, is_agent \\ false) do
+    query =
+      if is_agent do
+        [type: "agent_config", access_token: client.get_access_token(agent)]
+      else
+        [access_token: client.get_access_token(agent)]
+      end
+
+    client.get("/cgi-bin/ticket/get", query: query)
+  end
+
+  def get_cache(client, agent, key) do
+    agent
+    |> client.agent2cache_id()
+    |> WeChat.Storage.Cache.get_cache(key)
+  end
+
+  @doc """
+  生成JS-SDK配置 -
+  [官方文档](#{work_doc_link_prefix()}/90136/90514){:target="_blank"}
+  """
+  @spec js_sdk_config(client, agent, url) :: map
+  def js_sdk_config(client, agent, url) do
+    get_cache(client, agent, :js_api_ticket)
+    |> sign_js_sdk(url, client.appid())
+  end
+
+  @doc """
+  生成agentConfig配置 -
+  [官方文档](#{work_doc_link_prefix()}/90136/94313){:target="_blank"}
+  """
+  @spec js_sdk_config(client, agent, url) :: map
+  def js_sdk_agent_config(client, agent, url) do
+    {corp_id, config} =
+      get_cache(client, agent, :agent_js_api_ticket)
+      |> sign_js_sdk(url, client.appid())
+      |> Map.pop!(:appId)
+
+    Map.merge(config, %{corpid: corp_id, agentid: agent2id(client, agent)})
+  end
+
+  @doc """
+  生成JS-SDK配置(by ticket)
+
+  - [签名算法](#{work_doc_link_prefix()}/90136/90506#签名算法){:target="_blank"}
+  """
+  @spec sign_js_sdk(js_api_ticket, url, corp_id) :: map
+  def sign_js_sdk(jsapi_ticket, url, corp_id) do
+    url = String.replace(url, ~r/\#.*/, "")
+    nonce_str = Utils.random_string(16)
+    timestamp = Utils.now_unix()
+
+    signature =
+      Utils.sha1(
+        "jsapi_ticket=#{jsapi_ticket}&noncestr=#{nonce_str}&timestamp=#{timestamp}&url=#{url}"
+      )
+
+    %{appId: corp_id, signature: signature, timestamp: timestamp, nonceStr: nonce_str}
   end
 end
