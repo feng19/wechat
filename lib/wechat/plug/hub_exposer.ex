@@ -25,6 +25,7 @@ if Code.ensure_loaded?(Plug) do
     @valid_keys [
       "access_token",
       "js_api_ticket",
+      "agent_js_api_ticket",
       "wx_card_ticket",
       "component_access_token"
     ]
