@@ -140,16 +140,18 @@ defmodule WeChat.Work do
   """
   @spec get_jsapi_ticket(client, agent, is_agent :: boolean) :: WeChat.response()
   def get_jsapi_ticket(client, agent, is_agent \\ false) do
-    query =
-      if is_agent do
-        [type: "agent_config", access_token: client.get_access_token(agent)]
-      else
-        [access_token: client.get_access_token(agent)]
-      end
-
-    client.get("/cgi-bin/ticket/get", query: query)
+    if is_agent do
+      client.get("/cgi-bin/ticket/get",
+        query: [type: "agent_config", access_token: client.get_access_token(agent)]
+      )
+    else
+      client.get("/cgi-bin/get_jsapi_ticket",
+        query: [access_token: client.get_access_token(agent)]
+      )
+    end
   end
 
+  @doc false
   def get_cache(client, agent, key) do
     agent
     |> client.agent2cache_id()
@@ -170,7 +172,7 @@ defmodule WeChat.Work do
   生成agentConfig配置 -
   [官方文档](#{work_doc_link_prefix()}/90136/94313){:target="_blank"}
   """
-  @spec js_sdk_config(client, agent, url) :: map
+  @spec js_sdk_agent_config(client, agent, url) :: map
   def js_sdk_agent_config(client, agent, url) do
     {corp_id, config} =
       get_cache(client, agent, :agent_js_api_ticket)
