@@ -4,7 +4,7 @@ defmodule WeChat.Work.OA.Checkin do
   import Jason.Helpers
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
-  alias WeChat.Work.Contacts.User
+  alias Work.Contacts.User
 
   @doc_link "#{work_doc_link_prefix()}/90135"
 

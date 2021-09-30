@@ -98,6 +98,13 @@ defmodule WeChat.Work.Agent do
     |> transfer_aes_key()
   end
 
+  @doc "构建[微盘]应用(agent)"
+  @spec we_drive_agent(options) :: t
+  def we_drive_agent(options \\ []) do
+    struct(%__MODULE__{id: :we_drive, name: :we_drive}, options)
+    |> transfer_aes_key()
+  end
+
   defp transfer_aes_key(agent) do
     if is_nil(agent.aes_key) and agent.encoding_aes_key do
       aes_key = Encryptor.aes_key(agent.encoding_aes_key)

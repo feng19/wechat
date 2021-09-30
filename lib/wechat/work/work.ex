@@ -98,7 +98,14 @@ defmodule WeChat.Work do
   defmacro __using__(options \\ []) do
     quote do
       import WeChat.Work.Agent,
-        only: [agent: 1, agent: 2, contacts_agent: 1, customer_agent: 1, kf_agent: 1]
+        only: [
+          agent: 1,
+          agent: 2,
+          contacts_agent: 1,
+          customer_agent: 1,
+          kf_agent: 1,
+          we_drive_agent: 1
+        ]
 
       use WeChat.Builder.Work, unquote(options)
     end

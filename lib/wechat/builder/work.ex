@@ -1,7 +1,7 @@
 defmodule WeChat.Builder.Work do
   @moduledoc false
   alias WeChat.{Work, Builder.Utils}
-  alias Work.{Contacts, Customer, KF, OA}
+  alias Work.{Contacts, Customer, KF, OA, WeDrive}
 
   @default_opts [
     server_role: :client,
@@ -15,7 +15,9 @@ defmodule WeChat.Builder.Work do
     Work.App.Chat,
     Work.App.Menu,
     Work.App.Workbench,
+    Work.Living,
     Work.Material,
+    Work.Meeting,
     Work.Message,
     Work.MiniProgram,
     Customer,
@@ -35,6 +37,8 @@ defmodule WeChat.Builder.Work do
     OA.Pstncc,
     OA.Schedule,
     OA.Vacation,
+    {:we_drive,
+     [WeDrive.FileACL, WeDrive.FileManagement, WeDrive.SpaceACL, WeDrive.SpaceManagement]},
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]},
     {:kf, [KF.Account, KF.Customer, KF.Message]}
   ]

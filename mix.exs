@@ -67,7 +67,8 @@ defmodule WeChat.MixProject do
         Work.Customer,
         Work.KF,
         Work.LinkedCorp,
-        Work.OA
+        Work.OA,
+        Work.WeDrive
       ]
     ]
   end
@@ -161,7 +162,9 @@ defmodule WeChat.MixProject do
          Work.App.Menu,
          Work.App.Workbench,
          Work.ChatRobot,
+         Work.Living,
          Work.Material,
+         Work.Meeting,
          Work.Message,
          Work.MiniProgram,
          Work.Contacts.Department,
@@ -187,7 +190,11 @@ defmodule WeChat.MixProject do
          Work.OA.MeetingRoom,
          Work.OA.Pstncc,
          Work.OA.Schedule,
-         Work.OA.Vacation
+         Work.OA.Vacation,
+         Work.WeDrive.FileACL,
+         Work.WeDrive.FileManagement,
+         Work.WeDrive.SpaceACL,
+         Work.WeDrive.SpaceManagement
        ]}
     ]
   end
