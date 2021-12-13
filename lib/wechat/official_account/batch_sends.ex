@@ -63,6 +63,7 @@ defmodule WeChat.BatchSends do
   """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Material, Material.Article}
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html"
 
@@ -97,7 +98,7 @@ defmodule WeChat.BatchSends do
 
   `media_id` 请从 上传图文消息素材（`WeChat.Material.upload_news/2`） 接口中获取
   """
-  @type news_object :: %{media_id: WeChat.Material.media_id()}
+  @type news_object :: %{media_id: Material.media_id()}
   @typedoc "文本 - `text`"
   @type text_object :: %{content: String.t()}
   @typedoc """
@@ -105,7 +106,7 @@ defmodule WeChat.BatchSends do
 
   `media_id` 请从 素材管理 -> 新增素材（`WeChat.Material.add_material/3`） 接口中获取
   """
-  @type voice_object :: %{media_id: WeChat.Material.media_id()}
+  @type voice_object :: %{media_id: Material.media_id()}
   @typedoc "推荐语，不填则默认为“分享图片”"
   @type recommend :: String.t()
   @typedoc """
@@ -114,10 +115,10 @@ defmodule WeChat.BatchSends do
   `media_id` 请从 素材管理 -> 新增素材（`WeChat.Material.add_material/3`） 接口中获取
   """
   @type image_object :: %{
-          media_ids: [WeChat.Material.media_id()],
+          media_ids: [Material.media_id()],
           recommend: recommend,
-          need_open_comment: WeChat.Article.need_open_comment(),
-          only_fans_can_comment: WeChat.Article.only_fans_can_comment()
+          need_open_comment: Article.need_open_comment(),
+          only_fans_can_comment: Article.only_fans_can_comment()
         }
   @typedoc """
   视频 - `mpvideo`
@@ -125,7 +126,7 @@ defmodule WeChat.BatchSends do
   `media_id` 请从 `WeChat.Material.upload_video/4` 接口中获取
   """
   @type video_object :: %{
-          required(:media_id) => WeChat.Material.media_id(),
+          required(:media_id) => Material.media_id(),
           optional(:title) => String.t(),
           optional(:description) => String.t()
         }

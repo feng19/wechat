@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work}
 
-  @version "0.9.1"
+  @version "0.10.0"
   @source_url "https://github.com/feng19/wechat"
 
   def project do
@@ -75,7 +75,6 @@ defmodule WeChat.MixProject do
 
   defp groups_for_modules do
     [
-      {"Structure", [WeChat.Material.Article]},
       {
         "用户管理 APIs",
         [
@@ -85,6 +84,15 @@ defmodule WeChat.MixProject do
           WeChat.UserTag,
           # 用户管理 - 黑名单管理
           WeChat.UserBlacklist
+        ]
+      },
+      {
+        "素材管理 APIs",
+        [
+          WeChat.Material.Article,
+          WeChat.Material,
+          WeChat.DraftBox,
+          WeChat.Publish
         ]
       },
       {
@@ -99,9 +107,7 @@ defmodule WeChat.MixProject do
           # 消息管理 - 模板消息
           WeChat.Template,
           # 消息管理 - 群发接口和原创效验
-          WeChat.BatchSends,
-          # 素材管理
-          WeChat.Material
+          WeChat.BatchSends
         ]
       },
       {"微信卡券 APIs",

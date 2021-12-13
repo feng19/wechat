@@ -27,6 +27,8 @@ defmodule WeChat.Builder.OfficialAccount do
   @official_account_modules [
     WeChat.Menu,
     WeChat.Material,
+    WeChat.DraftBox,
+    WeChat.Publish,
     WeChat.Card,
     WeChat.CardManaging,
     WeChat.CardDistributing,
