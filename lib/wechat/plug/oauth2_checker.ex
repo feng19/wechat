@@ -5,7 +5,7 @@ if Code.ensure_loaded?(Plug) do
 
     [官方文档](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html){:target="_blank"}
 
-    工作流程
+    工作流程:
 
     1. 检查 `session`, 判断是否已经有授权，有则继续执行后续的 plug, 没有则跳到步骤 2;
     2. 检查 `query` 是否有 `code`, 有则执行 `oauth2_callback_fun` 函数, 没有则跳到步骤 3;

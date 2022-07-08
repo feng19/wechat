@@ -213,8 +213,10 @@ defmodule WeChat.WebPage do
   end
 
   @doc """
-  生成JS-SDK配置 -
+  生成 JS-SDK 配置 -
   [官方文档](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
+
+  返回 `maps` 包含: `appId/signature/timestamp/nonceStr`
   """
   @spec js_sdk_config(WeChat.client(), url) :: js_sdk_config
   def js_sdk_config(client, url) do
@@ -226,8 +228,10 @@ defmodule WeChat.WebPage do
   end
 
   @doc """
-  生成JS-SDK配置(by ticket) -
+  生成 JS-SDK 配置(by ticket) -
   [官方文档](#{@doc_link}/JS-SDK.html#4){:target="_blank"}
+
+  返回 `maps` 包含: `appId/signature/timestamp/nonceStr`
   """
   @spec sign_js_sdk(js_api_ticket, url, WeChat.appid()) :: js_sdk_config
   def sign_js_sdk(jsapi_ticket, url, appid) do

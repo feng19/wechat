@@ -1,7 +1,7 @@
 if Code.ensure_loaded?(Plug) do
   defmodule WeChat.Plug.HubSpringboard do
     @moduledoc """
-    OAuth2 跳板 - 用于 Hub Server
+    OAuth2 跳板 - 用于 Hub Server(中控服务器)
 
     由于微信对于网页授权有域名校验，需要在除指定域名外的域名也支持网页授权，可以使用此跳板
 

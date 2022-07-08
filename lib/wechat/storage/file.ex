@@ -2,7 +2,7 @@ defmodule WeChat.Storage.File do
   @moduledoc """
   文件存储器(default)
 
-  将 `token` 数据存储在 `wechat/priv/wechat_app_tokens.json` 文件下
+  将 `AccessToken` 数据存储在 `wechat/priv/wechat_app_tokens.json` 文件下
   """
   alias WeChat.Storage.Adapter
   @behaviour WeChat.Storage.Adapter

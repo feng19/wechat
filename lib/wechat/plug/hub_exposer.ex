@@ -1,19 +1,21 @@
 if Code.ensure_loaded?(Plug) do
   defmodule WeChat.Plug.HubExposer do
     @moduledoc """
-    用于 Hub 暴露 token 等
+    用于 `Hub`(中控服务器) 提供查询 `AccessToken` 的 `HTTP` 接口
 
-    使用 Phoenix 时，将下面的代码加到 `router` 里面：
+    `Hub Client` 会定期从 `Hub`(中控服务器) 的接口中获取 `AccessToken`
+
+    使用 `Phoenix` 时，将下面的代码加到 `router` 里面：
 
         get "/hub/expose/:store_id/:store_key", #{inspect(__MODULE__)}, clients: [ClientsA, ...]
 
-    使用 PlugCowboy 时，将下面的代码加到 `router` 里面：
+    使用 `PlugCowboy` 时，将下面的代码加到 `router` 里面：
 
         get "/hub/expose/:store_id/:store_key",
           to: #{inspect(__MODULE__)},
           init_opts: [clients: [ClientsA, ...]]
 
-    在暴露接口的同时，请注意安全合规使用，建议在使用前增加安全防护，例如：
+    ** 注意 **, 在暴露接口的同时，请注意安全合规使用，建议在使用前增加安全防护，例如：
 
         import Plug.BasicAuth
         plug :basic_auth, username: "hello", password: "secret"

@@ -3,6 +3,10 @@ if Code.ensure_loaded?(Plug) do
     @moduledoc """
     微信推送消息处理器
 
+    [接入指南](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html)
+
+    ** 注意 **, 定义 `client` 时必须设置: `encoding_aes_key` & `token`
+
     ## Usage
 
     将下面的代码加到 `router` 里面：

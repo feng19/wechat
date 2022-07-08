@@ -1,6 +1,8 @@
 defmodule WeChat.Refresher.Default do
   @moduledoc """
-  token 刷新器
+  AccessToken 刷新器 - 用于定时刷新 AccessToken
+
+  [官方说明](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Getting_Started_Guide.html#_1-5-%E9%87%8D%E8%A6%81%E4%BA%8B%E6%83%85%E6%8F%90%E5%89%8D%E4%BA%A4%E4%BB%A3)
 
   本模块为默认的刷新器
 
@@ -9,12 +11,15 @@ defmodule WeChat.Refresher.Default do
       config :wechat, :refresher, YourRefresher
 
   修改刷新器的配置，支持多种配置方式：
+
   ### 方式1
 
       config :wechat, :refresh_settings, [ClientA, ClientB, ClientC]
 
-  以上配置会自动为三个 `Client` 定时刷新 `token` ，默认会在 `token` 过期前 `30` 分钟刷新，`token` 刷新失败的重试间隔为 `1` 分钟，
-  默认的 `token` 刷新列表为：`WeChat.Refresher.DefaultSettings.get_refresh_options_by_client/1` 输出的结果
+  以上配置会自动为三个 `Client` 定时刷新 `AccessToken` ，
+  默认会在 `AccessToken` 过期前 `30` 分钟刷新，
+  `AccessToken` 刷新失败的重试间隔为 `1` 分钟，
+  可以通过接口 获取默认的 `AccessToken` 刷新列表：`WeChat.Refresher.DefaultSettings.get_refresh_options_by_client/1`
 
   ### 方式2
 
@@ -26,9 +31,9 @@ defmodule WeChat.Refresher.Default do
 
   为了适应 `Storage` 在 `Refresher` 启动之后才启动，可以开启延时启动刷新:
 
-      config :wechat, WeChat.Refresher.Default, wait_for_signal: true
+      config :wechat, #{inspect(__MODULE__)}, wait_for_signal: true
 
-  当所有的 `Storage` 都已经完成，可以即可通过 `WeChat.Refresher.Default.start_monitor/0` 方法刷新 `token`
+  当所有的 `Storage` 都已经完成，可以即可通过 `#{inspect(__MODULE__)}.start_monitor/0` 方法刷新 `AccessToken`
 
   不配置默认为立即启动刷新
   """
@@ -43,22 +48,22 @@ defmodule WeChat.Refresher.Default do
   @refresh_retry_interval 60
 
   @typedoc """
-  在 `token` 过去前多少秒刷新，单位：秒
+  在 `AccessToken` 超时前多少秒刷新，单位：秒
 
   如果`server_role` = `hub`, `hub server` 的值请大于 `hub client`
   """
   @type refresh_before_expired :: non_neg_integer
-  @typedoc "刷新 `token` 失败的重试间隔，单位：秒"
+  @typedoc "刷新 `AccessToken` 失败的重试间隔，单位：秒"
   @type refresh_retry_interval :: non_neg_integer
   @typedoc """
 
   option
-  - `:refresh_before_expired`: 在 `token` 过去前多少秒刷新，单位：秒，可选，
+  - `:refresh_before_expired`: 在 `AccessToken` 超时前多少秒刷新，单位：秒，可选，
   为保证 `hub` & `hub_client` 刷新正常，请保持两者的时间一致；
   `server_role=hub_client` 时, 默认值：`#{@refresh_before_expired} + 30` 秒；
   其余角色默认值：`#{@refresh_before_expired}` 秒
-  - `:refresh_retry_interval`: 刷新 `token` 失败的重试间隔，单位：秒，可选，默认值：`#{@refresh_retry_interval * 1000}` 秒
-  - `:refresh_options`: 刷新 `token` 配置，可选，默认值：`WeChat.Refresher.DefaultSettings.get_refresh_options_by_client/1` 的输出结果
+  - `:refresh_retry_interval`: 刷新 `AccessToken` 失败的重试间隔，单位：秒，可选，默认值：`#{@refresh_retry_interval * 1000}` 秒
+  - `:refresh_options`: 刷新 `AccessToken` 配置，可选，默认值：`WeChat.Refresher.DefaultSettings.get_refresh_options_by_client/1` 的输出结果
   """
   @type client_setting ::
           %{

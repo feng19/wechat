@@ -1,6 +1,6 @@
 defmodule WeChat.Refresher.DefaultSettings do
   @moduledoc """
-  帮助模块： 输出刷新 `token` 的列表
+  刷新 `AccessToken` 的方法
   """
 
   require Logger
@@ -21,8 +21,8 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   rules:
   - `by_component?` == `true`: `component_refresh_options/1`
-  - `official_account`: `official_account_refresh_options/0`
-  - `mini_program`: `mini_program_refresh_options/0`
+  - `official_account`: `official_account_refresh_options/1`
+  - `mini_program`: `mini_program_refresh_options/1`
   """
   @spec get_refresh_options_by_client(WeChat.client()) :: refresh_options
   def get_refresh_options_by_client(client) do
@@ -58,7 +58,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   @doc """
   输出[公众号]的 `refresh_options`
 
-  刷新如下`token`：
+  刷新如下 `AccessToken`：
   - `access_token`
   - `js_api_ticket`
   - `wx_card_ticket`
@@ -77,7 +77,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   @doc """
   输出[第三方平台]的 `refresh_options`
 
-  刷新如下`token`：
+  刷新如下 `AccessToken`：
   - `component_access_token`
   - AuthorizerRefreshOptions (get by client.app_type())
   """
@@ -116,7 +116,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   @doc """
   输出[小程序]的 `refresh_options`
 
-  刷新如下`token`：
+  刷新如下 `AccessToken`：
   - `access_token`
   """
   @spec mini_program_refresh_options(Work.client()) :: refresh_options
@@ -128,7 +128,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   @doc """
   输出[企业微信]的 `refresh_options`
 
-  刷新如下`token`：
+  刷新如下 `AccessToken`：
   - `access_token`
   """
   @spec work_refresh_options(WeChat.client()) :: refresh_options

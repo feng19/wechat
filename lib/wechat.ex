@@ -85,9 +85,9 @@ defmodule WeChat do
   @typedoc """
   服务器角色
 
-  `:client`: 默认，刷新`token`
-  `:hub`: 中控服务器，刷新`token`
-  `:hub_client`: 逻辑服务器，获取`token`
+  `:client`: 默认，刷新 `AccessToken`
+  `:hub`: 中控服务器，刷新 `AccessToken`
+  `:hub_client`: 逻辑服务器，获取 `AccessToken`
   """
   @type server_role :: :client | :hub | :hub_client
   @typedoc "是否第三方平台开发"
@@ -127,7 +127,7 @@ defmodule WeChat do
 
   - `appid`: `t:appid/0` - 必填
   - `app_type`: `t:app_type/0`
-  - `code_name`: `t:code_name/0`, 默认为模块名最后一个名称的全小写格式
+  - `code_name`: `t:code_name/0`, 如不指定，默认为模块名最后一个名称的全小写格式
   - `by_component?`: `t:by_component?/0`
   - `server_role`: `t:server_role/0`
   - `storage`: `t:WeChat.Storage.Adapter.t()`
@@ -148,7 +148,6 @@ defmodule WeChat do
   - `storage`: `WeChat.Storage.File`
   - `requester`: `WeChat.Requester`
   - `gen_sub_module?`: true
-  - 其余参数皆为可选
   """
   @type options :: [
           server_role: server_role,
@@ -254,7 +253,12 @@ defmodule WeChat do
     |> Cache.get_cache({:oauth2_env_url, env})
   end
 
-  def get_refresher do
+  def refresher do
     Application.get_env(:wechat, :refresher, WeChat.Refresher.Default)
+  end
+
+  def add_to_refresher(client, options \\ %{}) do
+    m = refresher()
+    m.add(client, options)
   end
 end

@@ -183,7 +183,7 @@ if Code.ensure_loaded?(Plug) do
            } <- authorization_info do
         now = Utils.now_unix()
 
-        refresher = WeChat.get_refresher()
+        refresher = WeChat.refresher()
 
         refresher.refresh_key(
           client,
