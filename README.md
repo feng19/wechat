@@ -10,17 +10,18 @@
 
 - 目前 `Elixir` 中支持最完善的微信SDK
 - 已支持: 
-  - [公众号](#公众号)
-  - [小程序](#小程序)
-  - [第三方应用](#第三方应用)
-  - [企业微信](#企业微信)
-  - 微信支付
+  - [公众号](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
+  - [小程序](https://developers.weixin.qq.com/miniprogram/dev/framework/)
+  - [第三方应用](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/getting_started/how_to_read.html)
+  - [企业微信](https://developer.work.weixin.qq.com/document/path/90556)
+  - [微信支付](https://pay.weixin.qq.com/wiki/doc/apiv3/index.shtml)
 - WIP: 企业微信服务商
 
 ### Links
 
 - [开发前必读](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Getting_Started_Guide.html)
 - [在线文档](https://hex.pm/packages/wechat_sdk)
+- [WeChat SDK 使用指南](https://feng19.com/2022/07/08/wechat_for_elixir_usage/)
 - [示例项目](https://github.com/feng19/wechat_demo)
 
 ## Installation

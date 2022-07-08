@@ -4,7 +4,7 @@ defmodule WeChat do
 
   ## 定义 `Client` 模块
 
-  ### 公众号(默认):
+  ### 公众号(默认)
 
       defmodule YourApp.WeChatAppCodeName do
         @moduledoc "CodeName"
@@ -13,7 +13,7 @@ defmodule WeChat do
           appsecret: "appsecret"
       end
 
-  ### 小程序:
+  ### 小程序
 
       defmodule YourApp.WeChatAppCodeName do
         @moduledoc "CodeName"
@@ -23,7 +23,7 @@ defmodule WeChat do
           appsecret: "appsecret"
       end
 
-  ### 第三方应用:
+  ### 第三方应用
 
       defmodule YourApp.WeChatAppCodeName do
         @moduledoc "CodeName"

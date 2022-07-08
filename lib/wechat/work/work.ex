@@ -2,6 +2,8 @@ defmodule WeChat.Work do
   @moduledoc """
   企业微信
 
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90556)
+
       use WeChat.Work,
         corp_id: "corp_id",
         agents: [
