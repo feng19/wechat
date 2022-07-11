@@ -85,9 +85,9 @@ defmodule WeChat do
   @typedoc """
   服务器角色
 
-  `:client`: 默认，刷新 `AccessToken`
-  `:hub`: 中控服务器，刷新 `AccessToken`
-  `:hub_client`: 逻辑服务器，获取 `AccessToken`
+  `:client`: 默认，主动刷新 `AccessToken`
+  `:hub`: 中控服务器，主动刷新 `AccessToken`
+  `:hub_client`: 逻辑服务器，从 `hub` 获取 `AccessToken`
   """
   @type server_role :: :client | :hub | :hub_client
   @typedoc "是否第三方平台开发"
