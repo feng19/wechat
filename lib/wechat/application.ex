@@ -7,7 +7,13 @@ defmodule WeChat.Application do
   def start(_type, _args) do
     WeChat.Storage.Cache.init_table()
     config = Application.get_all_env(@app) |> normalize()
-    config[:clients] |> List.wrap() |> setup_clients()
+
+    config[:clients]
+    |> case do
+      clients when is_map(clients) -> Map.to_list(clients)
+      clients -> List.wrap(clients)
+    end
+    |> setup_clients()
 
     children = [
       {Finch, name: WeChat.Finch, pools: %{:default => config[:finch_pool]}},
