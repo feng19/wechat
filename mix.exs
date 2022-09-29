@@ -117,7 +117,9 @@ defmodule WeChat.MixProject do
          # 微信卡券 - 管理卡券
          WeChat.CardManaging,
          # 微信卡券 - 投放卡券
-         WeChat.CardDistributing
+         WeChat.CardDistributing,
+         # 微信卡券 - 会员卡
+         WeChat.MemberCard
        ]},
       {"事件推送",
        [
