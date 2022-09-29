@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work}
 
-  @version "0.10.3"
+  @version "0.10.4"
   @source_url "https://github.com/feng19/wechat"
 
   def project do
