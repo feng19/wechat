@@ -8,6 +8,12 @@ defmodule WeChat.Refresher.DefaultTest do
   end
 
   test "add client" do
+    Application.put_env(:wechat, :check_token_for_clients, [
+      MiniComponent,
+      Component,
+      OfficialAccount
+    ])
+
     assert :ok = Default.add(OfficialAccount)
     assert :ok = Default.add(Component)
     assert :ok = Default.add(MiniComponent)
@@ -16,10 +22,12 @@ defmodule WeChat.Refresher.DefaultTest do
 
     assert %{
              "wx3c2769f8efd9abc3" => %{
-               clients: [Component, MiniComponent],
-               keys: [:component_access_token]
+               keys: [:component_access_token],
+               clients: [Component, MiniComponent]
              }
            } = Default.components()
+
+    assert ["wx2c2769f8efd9abc2", "wx3c2769f8efd9abc3"] = WeChat.TokenChecker.ids()
   end
 
   test "refresh_client" do

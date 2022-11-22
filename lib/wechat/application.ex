@@ -17,7 +17,8 @@ defmodule WeChat.Application do
 
     children = [
       {Finch, name: WeChat.Finch, pools: %{:default => config[:finch_pool]}},
-      {config[:refresher], config[:refresh_settings]}
+      {config[:refresher], config[:refresh_settings]},
+      {WeChat.TokenChecker, config[:token_checker]}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: WeChat.Supervisor)

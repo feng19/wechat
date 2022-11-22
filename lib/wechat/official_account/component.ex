@@ -73,8 +73,25 @@ defmodule WeChat.Component do
   end
 
   @doc """
+  查询接口调用次数 -
+  [官方文档](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_api_quota.html){:target="_blank"}
+
+  [接口调用频次限制说明](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
+  """
+  @spec get_quota(WeChat.client, cgi_path :: String.t()) :: WeChat.response()
+  def get_quota(client, cgi_path) do
+    component_appid = client.component_appid()
+
+    client.post("/cgi-bin/openapi/quota/get", json_map(cgi_path: cgi_path),
+      query: [access_token: get_access_token(component_appid)]
+    )
+  end
+
+  @doc """
   接口调用次数清零 -
-  [官方文档](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/Official_account_interface.html){:target="_blank"}
+  [官方文档](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/2.0/api/openApi/clear_quota.html){:target="_blank"}
+
+  [接口调用频次限制说明](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do
@@ -82,8 +99,8 @@ defmodule WeChat.Component do
 
     client.post(
       "/cgi-bin/component/clear_quota",
-      json_map(component_appid: component_appid),
-      query: [component_access_token: get_access_token(component_appid)]
+      json_map(appid: component_appid),
+      query: [access_token: get_access_token(component_appid)]
     )
   end
 

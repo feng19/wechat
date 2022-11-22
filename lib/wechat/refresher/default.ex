@@ -47,6 +47,8 @@ defmodule WeChat.Refresher.Default do
   # 刷新失败重试时间间隔 1 分钟
   @refresh_retry_interval 60
 
+  @default_state %{wait_for_signal: false, components: %{}}
+
   @typedoc """
   在 `AccessToken` 超时前多少秒刷新，单位：秒
 
@@ -121,7 +123,18 @@ defmodule WeChat.Refresher.Default do
     GenServer.cast(__MODULE__, {:refresh_key, client, store_id, store_key, value, expires})
   end
 
+  @spec client_options(WeChat.client()) :: client_setting | nil
+  def client_options(client), do: GenServer.call(__MODULE__, {:client_options, client})
+
+  @spec clients() :: [WeChat.client()]
   def clients, do: GenServer.call(__MODULE__, :clients)
+
+  @spec components() :: %{
+          WeChat.component_appid() => %{
+            keys: [StorageAdapter.store_key()],
+            clients: [WeChat.client()]
+          }
+        }
   def components, do: GenServer.call(__MODULE__, :components)
 
   @spec start_link(client_settings) :: GenServer.on_start()
@@ -148,7 +161,7 @@ defmodule WeChat.Refresher.Default do
       |> Map.new()
 
     state =
-      %{wait_for_signal: false, components: %{}}
+      @default_state
       |> Map.merge(options)
       |> Map.merge(state)
       |> Map.put(:clients, clients)
@@ -237,6 +250,10 @@ defmodule WeChat.Refresher.Default do
     else
       _ -> {:reply, :not_found, state}
     end
+  end
+
+  def handle_call({:client_options, client}, _from, state) do
+    {:reply, Map.get(state, client), state}
   end
 
   def handle_call(:clients, _from, state) do
@@ -374,6 +391,7 @@ defmodule WeChat.Refresher.Default do
       end
 
     options = %{options | refresh_options: refresh_options}
+    WeChat.TokenChecker.maybe_add_client(client, refresh_options)
     Map.put(state, client, options)
   end
 
@@ -383,8 +401,8 @@ defmodule WeChat.Refresher.Default do
 
       {refresh_options, components} =
         Enum.reduce(refresh_options, {[], state.components}, fn
-          {{^component_appid, _store_key}, _fun, _timer} = record, {acc, components} ->
-            update_component(record, client, acc, components)
+          {{^component_appid, _store_key}, _fun, _timer} = option, {acc, components} ->
+            update_component(option, client, acc, components)
 
           record, {acc, components} ->
             {[record | acc], components}
@@ -397,17 +415,22 @@ defmodule WeChat.Refresher.Default do
   end
 
   defp update_component(
-         record = {{component_appid, store_key}, _fun, _timer},
+         option = {{component_appid, store_key}, _fun, _timer},
          client,
-         acc,
+         refresh_options,
          components
        ) do
-    {acc, component} =
+    {refresh_options, component} =
       if component = Map.get(components, component_appid) do
         if store_key in component.keys do
-          {acc, %{component | clients: Utils.uniq_and_sort([client | component.clients])}}
+          Logger.info(
+            "Ignore refresh_option: #{inspect(option)} for #{inspect(client)}, because duplicated."
+          )
+
+          {refresh_options,
+           %{component | clients: Utils.uniq_and_sort([client | component.clients])}}
         else
-          {[record | acc],
+          {[option | refresh_options],
            %{
              component
              | keys: Utils.uniq_and_sort([store_key | component.keys]),
@@ -415,10 +438,10 @@ defmodule WeChat.Refresher.Default do
            }}
         end
       else
-        {[record | acc], %{keys: [store_key], clients: [client]}}
+        {[option | refresh_options], %{keys: [store_key], clients: [client]}}
       end
 
-    {acc, Map.put(components, component_appid, component)}
+    {refresh_options, Map.put(components, component_appid, component)}
   end
 
   defp do_refresh(client, %{refresh_options: refresh_options} = opts) do
