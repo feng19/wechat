@@ -13,7 +13,8 @@ defmodule WeChat.Test.Component do
   use WeChat,
     appid: "wx2c2769f8efd9abc2",
     by_component?: true,
-    component_appid: "wx3c2769f8efd9abc3"
+    component_appid: "wx3c2769f8efd9abc3",
+    component_appsecret: "component_appsecret"
 end
 
 defmodule WeChat.Test.Mini do
@@ -29,7 +30,8 @@ defmodule WeChat.Test.MiniComponent do
     appid: "wx2c2769f8efd9abc2",
     app_type: :mini_program,
     by_component?: true,
-    component_appid: "wx3c2769f8efd9abc3"
+    component_appid: "wx3c2769f8efd9abc3",
+    component_appsecret: "component_appsecret"
 end
 
 defmodule WeChat.Test.Work do

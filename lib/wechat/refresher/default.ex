@@ -98,6 +98,18 @@ defmodule WeChat.Refresher.Default do
     GenServer.call(__MODULE__, {:refresh, client})
   end
 
+  @spec refresh(WeChat.client(), StorageAdapter.store_id(), StorageAdapter.store_key()) ::
+          :ok | :not_found
+  def refresh(client, store_id, store_key) do
+    GenServer.call(__MODULE__, {:refresh, client, store_id, store_key})
+  end
+
+  @spec refresh_component(WeChat.component_appid(), StorageAdapter.store_key()) ::
+          :ok | :not_found
+  def refresh_component(component_appid, store_key) do
+    GenServer.call(__MODULE__, {:refresh_component, component_appid, store_key})
+  end
+
   @spec refresh_key(
           WeChat.client(),
           StorageAdapter.store_id(),
@@ -108,6 +120,9 @@ defmodule WeChat.Refresher.Default do
   def refresh_key(client, store_id, store_key, value, expires) do
     GenServer.cast(__MODULE__, {:refresh_key, client, store_id, store_key, value, expires})
   end
+
+  def clients, do: GenServer.call(__MODULE__, :clients)
+  def components, do: GenServer.call(__MODULE__, :components)
 
   @spec start_link(client_settings) :: GenServer.on_start()
   def start_link(client_settings \\ %{}) do
@@ -133,7 +148,7 @@ defmodule WeChat.Refresher.Default do
       |> Map.new()
 
     state =
-      %{wait_for_signal: false}
+      %{wait_for_signal: false, components: %{}}
       |> Map.merge(options)
       |> Map.merge(state)
       |> Map.put(:clients, clients)
@@ -154,12 +169,7 @@ defmodule WeChat.Refresher.Default do
   end
 
   def handle_continue(:start_monitor, state) do
-    state =
-      Enum.reduce(state.clients, state, fn client, acc ->
-        options = start_monitor_client(client, Map.get(acc, client))
-        Map.put(acc, client, options)
-      end)
-
+    state = Enum.reduce(state.clients, state, &start_monitor_client/2)
     {:noreply, %{state | wait_for_signal: false}}
   end
 
@@ -198,6 +208,43 @@ defmodule WeChat.Refresher.Default do
       _ ->
         {:reply, :not_found, state}
     end
+  end
+
+  def handle_call({:refresh, client, store_id, store_key}, _from, state) do
+    with opts when is_map(opts) <- Map.get(state, client) do
+      opts = do_refresh(client, store_id, store_key, opts)
+      state = Map.put(state, client, opts)
+      {:reply, :ok, state}
+    else
+      _ ->
+        {:reply, :not_found, state}
+    end
+  end
+
+  def handle_call({:refresh_component, component_appid, store_key}, _from, state) do
+    with component when is_map(component) <- Map.get(state.components, component_appid),
+         true <- store_key in component.keys do
+      client =
+        Enum.find(component.clients, fn c ->
+          Map.get(state, c)
+          |> Map.get(:refresh_options)
+          |> Enum.find(&match?({{^component_appid, ^store_key}, _, _}, &1))
+        end)
+
+      opts = do_refresh(client, component_appid, store_key, state[client])
+      state = Map.put(state, client, opts)
+      {:reply, :ok, state}
+    else
+      _ -> {:reply, :not_found, state}
+    end
+  end
+
+  def handle_call(:clients, _from, state) do
+    {:reply, state.clients, state}
+  end
+
+  def handle_call(:components, _from, state) do
+    {:reply, state.components, state}
   end
 
   @impl true
@@ -305,11 +352,13 @@ defmodule WeChat.Refresher.Default do
     Map.put(options, :refresh_options, refresh_options)
   end
 
-  defp start_monitor_client(client, options) do
+  defp start_monitor_client(client, state) do
     Logger.info("Monitoring WeChat Client: #{inspect(client)}.")
+    options = Map.get(state, client)
+    {refresh_options, state} = filter_duplicate_component(client, options.refresh_options, state)
 
     refresh_options =
-      for {{store_id, store_key}, fun, _timer} <- options.refresh_options do
+      for {{store_id, store_key}, fun, _timer} <- refresh_options do
         timer =
           case restore_and_cache(store_id, store_key, client) do
             false ->
@@ -324,7 +373,52 @@ defmodule WeChat.Refresher.Default do
         {{store_id, store_key}, fun, timer}
       end
 
-    %{options | refresh_options: refresh_options}
+    options = %{options | refresh_options: refresh_options}
+    Map.put(state, client, options)
+  end
+
+  defp filter_duplicate_component(client, refresh_options, state) do
+    if client.by_component?() do
+      component_appid = client.component_appid()
+
+      {refresh_options, components} =
+        Enum.reduce(refresh_options, {[], state.components}, fn
+          {{^component_appid, _store_key}, _fun, _timer} = record, {acc, components} ->
+            update_component(record, client, acc, components)
+
+          record, {acc, components} ->
+            {[record | acc], components}
+        end)
+
+      {Enum.reverse(refresh_options), %{state | components: components}}
+    else
+      {refresh_options, state}
+    end
+  end
+
+  defp update_component(
+         record = {{component_appid, store_key}, _fun, _timer},
+         client,
+         acc,
+         components
+       ) do
+    {acc, component} =
+      if component = Map.get(components, component_appid) do
+        if store_key in component.keys do
+          {acc, %{component | clients: Utils.uniq_and_sort([client | component.clients])}}
+        else
+          {[record | acc],
+           %{
+             component
+             | keys: Utils.uniq_and_sort([store_key | component.keys]),
+               clients: Utils.uniq_and_sort([client | component.clients])
+           }}
+        end
+      else
+        {[record | acc], %{keys: [store_key], clients: [client]}}
+      end
+
+    {acc, Map.put(components, component_appid, component)}
   end
 
   defp do_refresh(client, %{refresh_options: refresh_options} = opts) do
@@ -337,6 +431,27 @@ defmodule WeChat.Refresher.Default do
         cancel_timer(timer)
         timer = refresh_token(store_id, store_key, fun, client, opts)
         {{store_id, store_key}, fun, timer}
+      end
+
+    %{opts | refresh_options: refresh_options}
+  end
+
+  defp do_refresh(client, store_id, store_key, %{refresh_options: refresh_options} = opts) do
+    Logger.info(
+      "Refreshing WeChat Client: #{inspect(client)} with list: #{inspect(refresh_options)}."
+    )
+
+    refresh_options =
+      for {{id, key}, fun, timer} = option <- refresh_options do
+        case {id, key} do
+          {^store_id, ^store_key} ->
+            cancel_timer(timer)
+            timer = refresh_token(store_id, store_key, fun, client, opts)
+            {{store_id, store_key}, fun, timer}
+
+          _ ->
+            option
+        end
       end
 
     %{opts | refresh_options: refresh_options}
@@ -413,17 +528,18 @@ defmodule WeChat.Refresher.Default do
   end
 
   defp add_client(state, client, options) do
-    options =
-      if state.wait_for_signal do
-        init_client_options(client, options)
-      else
-        options = init_client_options(client, options)
-        start_monitor_client(client, options)
-      end
+    options = init_client_options(client, options)
 
-    state
-    |> Map.put(client, options)
-    |> Map.put(:clients, [client | state.clients])
+    state =
+      state
+      |> Map.put(client, options)
+      |> Map.put(:clients, [client | state.clients])
+
+    if state.wait_for_signal do
+      state
+    else
+      start_monitor_client(client, state)
+    end
   end
 
   defp remove_client(state, client) do

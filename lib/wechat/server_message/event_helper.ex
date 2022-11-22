@@ -110,38 +110,22 @@ if Code.ensure_loaded?(Plug) do
     * [验证票据](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
     * [授权相关推送通知](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/authorize_event.html)
     """
-    def handle_component_event(%{"AppId" => component_appid} = message, client) do
+    def handle_component_event(_conn, client, %{"AppId" => component_appid} = message) do
       case info_type = message["InfoType"] do
+        # 验证票据
         "component_verify_ticket" ->
-          # 验证票据
-          ticket = message["ComponentVerifyTicket"]
-          store_id = component_appid
-          store_key = :component_verify_ticket
-          store_map = %{"value" => ticket, "expired_time" => Utils.now_unix() + 600}
-          Cache.put_cache(store_id, store_key, ticket)
-          Cache.put_cache({:store_map, store_id}, store_key, store_map)
+          component_verify_ticket_message(component_appid, client, message)
 
-          if storage = client.storage() do
-            result = storage.store(store_id, store_key, store_map)
-
-            Logger.info(
-              "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."
-            )
-          end
-
-          Logger.info("#{component_appid} Received [component_verify_ticket] info.")
-          :handled
-
+        # 授权成功通知
         "authorized" ->
-          # 授权成功通知
           authorized_message(component_appid, info_type, message)
 
+        # 授权更新通知
         "updateauthorized" ->
-          # 授权更新通知
           authorized_message(component_appid, info_type, message)
 
+        # 取消授权通知
         "unauthorized" ->
-          # 取消授权通知
           authorizer_appid = message["AuthorizerAppid"]
 
           Logger.info(
@@ -150,11 +134,31 @@ if Code.ensure_loaded?(Plug) do
 
           Cache.del_cache(authorizer_appid, :authorization_code)
           Cache.del_cache(authorizer_appid, :authorization_code_expired_time)
-          :handled
+          :ok
 
         _ ->
           :ignore
       end
+    end
+
+    defp component_verify_ticket_message(component_appid, client, message) do
+      ticket = message["ComponentVerifyTicket"]
+      store_id = component_appid
+      store_key = :component_verify_ticket
+      store_map = %{"value" => ticket, "expired_time" => Utils.now_unix() + 600}
+      Cache.put_cache(store_id, store_key, ticket)
+      Cache.put_cache({:store_map, store_id}, store_key, store_map)
+
+      if storage = client.storage() do
+        result = storage.store(store_id, store_key, store_map)
+
+        Logger.info(
+          "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."
+        )
+      end
+
+      Logger.info("#{component_appid} Received [component_verify_ticket] info.")
+      :ok
     end
 
     defp authorized_message(component_appid, info_type, message) do
@@ -203,7 +207,7 @@ if Code.ensure_loaded?(Plug) do
         )
       end
 
-      :handled
+      :ok
     end
 
     @doc false

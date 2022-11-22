@@ -102,4 +102,8 @@ defmodule WeChat.Utils do
       end
     end)
   end
+
+  def uniq_and_sort(list) do
+    list |> Enum.uniq() |> Enum.sort()
+  end
 end

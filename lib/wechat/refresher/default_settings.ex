@@ -36,11 +36,11 @@ defmodule WeChat.Refresher.DefaultSettings do
 
       case client.app_type() do
         :official_account ->
-          check_secret(client)
+          check_secret(client, :appsecret)
           official_account_refresh_options(client)
 
         :mini_program ->
-          check_secret(client)
+          check_secret(client, :appsecret)
           mini_program_refresh_options(client)
 
         :work ->
@@ -49,9 +49,11 @@ defmodule WeChat.Refresher.DefaultSettings do
     end
   end
 
-  defp check_secret(client) do
-    unless function_exported?(client, :appsecret, 0) do
-      raise RuntimeError, "Please set :appsecret when defining #{inspect(client)}."
+  defp check_secret(client, fun) do
+    if client.server_role() != :hub_client do
+      unless function_exported?(client, fun, 0) do
+        raise RuntimeError, "Please set :appsecret when defining #{inspect(client)}."
+      end
     end
   end
 
@@ -88,6 +90,8 @@ defmodule WeChat.Refresher.DefaultSettings do
 
     case client.app_type() do
       :official_account ->
+        check_secret(client, :component_appsecret)
+
         [
           {component_appid, :component_access_token,
            &__MODULE__.refresh_component_access_token/1},
@@ -97,6 +101,8 @@ defmodule WeChat.Refresher.DefaultSettings do
         ]
 
       :mini_program ->
+        check_secret(client, :component_appsecret)
+
         [
           {component_appid, :component_access_token,
            &__MODULE__.refresh_component_access_token/1},
@@ -163,7 +169,7 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   @spec refresh_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_access_token(client) do
-    with :not_hub_client <- get_hub_client_token(client, :access_token),
+    with :ignore <- get_token_for_hub_client(client, :access_token),
          {:ok, %{status: 200, body: data}} <- Account.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
@@ -176,7 +182,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   @spec refresh_ticket(WeChat.WebPage.js_api_ticket_type(), WeChat.client()) :: refresh_fun_result
   def refresh_ticket(ticket_type, client) do
     with store_key <- get_store_key_by_ticket_type(ticket_type),
-         :not_hub_client <- get_hub_client_token(client, store_key),
+         :ignore <- get_token_for_hub_client(client, store_key),
          {:ok, %{status: 200, body: data}} <- WebPage.get_ticket(client, ticket_type),
          %{"ticket" => ticket, "expires_in" => expires_in} <- data do
       {:ok, ticket, expires_in}
@@ -185,8 +191,9 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   @spec refresh_component_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_component_access_token(client) do
-    with :not_hub_client <-
-           get_hub_client_token(client, client.component_appid(), :component_access_token),
+    component_appid = client.component_appid()
+
+    with :ignore <- get_token_for_hub_client(client, component_appid, :component_access_token),
          ticket when ticket != nil <- ensure_component_verify_ticket(client),
          {:ok, %{status: 200, body: data}} <- Component.get_component_token(client, ticket),
          %{"component_access_token" => component_access_token, "expires_in" => expires_in} <- data do
@@ -224,7 +231,7 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   @spec refresh_authorizer_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_authorizer_access_token(client) do
-    with :not_hub_client <- get_hub_client_token(client, :access_token),
+    with :ignore <- get_token_for_hub_client(client, :access_token),
          {:ok, %{status: 200, body: data}} <- Component.authorizer_token(client),
          %{
            "authorizer_access_token" => authorizer_access_token,
@@ -243,7 +250,7 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   @spec refresh_mini_program_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_mini_program_access_token(client) do
-    with :not_hub_client <- get_hub_client_token(client, :access_token),
+    with :ignore <- get_token_for_hub_client(client, :access_token),
          {:ok, %{status: 200, body: data}} <- MiniProgram.Auth.get_access_token(client),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
@@ -253,7 +260,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   @spec refresh_work_access_token(Work.client(), Cache.cache_id(), Work.agent_id()) ::
           refresh_fun_result
   def refresh_work_access_token(client, cache_id, agent_id) do
-    with :not_hub_client <- get_hub_client_token(client, cache_id, :access_token),
+    with :ignore <- get_token_for_hub_client(client, cache_id, :access_token),
          {:ok, %{status: 200, body: data}} <- Work.get_access_token(client, agent_id),
          %{"access_token" => access_token, "expires_in" => expires_in} <- data do
       {:ok, access_token, expires_in}
@@ -268,14 +275,15 @@ defmodule WeChat.Refresher.DefaultSettings do
           is_agent :: boolean
         ) :: refresh_fun_result
   def refresh_work_jsapi_ticket(client, cache_id, agent_id, store_key, is_agent) do
-    with :not_hub_client <- get_hub_client_token(client, cache_id, store_key),
+    with :ignore <- get_token_for_hub_client(client, cache_id, store_key),
          {:ok, %{status: 200, body: data}} <- Work.get_jsapi_ticket(client, agent_id, is_agent),
          %{"ticket" => ticket, "expires_in" => expires_in} <- data do
       {:ok, ticket, expires_in}
     end
   end
 
-  defp get_hub_client_token(client, store_id \\ nil, store_key) do
+  # return token for hub_client role
+  defp get_token_for_hub_client(client, store_id \\ nil, store_key) do
     store_id = store_id || client.appid()
 
     if match?(:hub_client, client.server_role()) do
@@ -286,7 +294,7 @@ defmodule WeChat.Refresher.DefaultSettings do
         {:ok, access_token, expires_in}
       end
     else
-      :not_hub_client
+      :ignore
     end
   end
 end
