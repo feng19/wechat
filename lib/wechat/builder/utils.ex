@@ -64,7 +64,10 @@ defmodule WeChat.Builder.Utils do
       do:
         {:__block__, [],
          [
-           quote(do: @file(unquote(to_string(acc.module))))
+           quote do
+             @file unquote(to_string(acc.module))
+             @compile {:no_warn_undefined, unquote(acc.client)}
+           end
            | list
          ]}
     ]
