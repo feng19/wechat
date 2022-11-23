@@ -122,7 +122,7 @@ defmodule WeChat.TokenChecker do
   defp check_token(id, %{check_fun: check_fun, refresh_fun: refresh_fun}) do
     with {:ok, %{status: 200, body: %{"errcode" => code}}} <- check_fun.(),
          true <- code in [40001, 42001] do
-      Logger.info("found the token of #{inspect(id)} already expired, go refresh.")
+      Logger.info("TokenChecker found the token of #{inspect(id)} already expired, go refresh.")
       refresh_fun.()
     end
   rescue
