@@ -42,21 +42,25 @@ defmodule WeChat.TokenChecker do
 
   @spec add_client(WeChat.client(), refresh_options) :: :ok
   def add_client(client, refresh_options) do
-    Enum.each(refresh_options, fn {{id, key}, fun, _ref} ->
+    refresher = WeChat.refresher()
+
+    Enum.each(refresh_options, fn {{id, key}, _fun, _ref} ->
       case key do
         :access_token ->
           check_fun = fn ->
             WeChat.Account.get_quota(client, "/cgi-bin/openapi/quota/get")
           end
 
-          add(id, check_fun, fn -> fun.(client) end)
+          refresh_fun = fn -> refresher.refresh(client, id, key) end
+          add(id, check_fun, refresh_fun)
 
         :component_access_token ->
           check_fun = fn ->
             WeChat.Component.get_quota(client, "/cgi-bin/openapi/quota/get")
           end
 
-          add(id, check_fun, fn -> fun.(client) end)
+          refresh_fun = fn -> refresher.refresh_component(id, key) end
+          add(id, check_fun, refresh_fun)
 
         _ ->
           :ignore
