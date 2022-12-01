@@ -82,9 +82,9 @@ defmodule WeChat.Work do
   """
   @type options :: [
           corp_id: corp_id,
-          agents: agents,
-          server_role: WeChat.server_role(),
-          storage: WeChat.Storage.Adapter.t(),
+          agents: agents | :from_env,
+          server_role: WeChat.server_role() | :from_env,
+          storage: WeChat.Storage.Adapter.t() | :from_env,
           requester: module
         ]
 
@@ -134,10 +134,10 @@ defmodule WeChat.Work do
   """
   @spec get_access_token(client, agent) :: WeChat.response()
   def get_access_token(client, agent) do
-    corp_secret = client.agent_secret(agent)
+    agent = Agent.fetch_agent!(client, agent)
 
     client.get("/cgi-bin/gettoken",
-      query: [corpid: client.appid(), corpsecret: corp_secret]
+      query: [corpid: client.appid(), corpsecret: agent.secret]
     )
   end
 
@@ -162,8 +162,7 @@ defmodule WeChat.Work do
 
   @doc false
   def get_cache(client, agent, key) do
-    agent
-    |> client.agent2cache_id()
+    Agent.fetch_agent_cache_id!(client, agent)
     |> WeChat.Storage.Cache.get_cache(key)
   end
 

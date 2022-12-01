@@ -62,6 +62,7 @@ defmodule WeChat do
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Work, Storage.Cache}
+  alias WeChat.Work.Agent, as: WorkAgent
 
   @typedoc """
   OpenID 普通用户的标识，对当前公众号唯一
@@ -150,16 +151,16 @@ defmodule WeChat do
   - `gen_sub_module?`: true
   """
   @type options :: [
-          server_role: server_role | :dynamic,
-          by_component?: by_component? | :dynamic,
-          app_type: app_type | :dynamic,
-          storage: WeChat.Storage.Adapter.t() | :dynamic,
+          server_role: server_role | :from_env,
+          by_component?: by_component? | :from_env,
+          app_type: app_type | :from_env,
+          storage: WeChat.Storage.Adapter.t() | :from_env,
           appid: appid,
-          appsecret: appsecret | :dynamic,
+          appsecret: appsecret | :from_env,
           component_appid: component_appid,
-          component_appsecret: component_appsecret | :dynamic,
-          encoding_aes_key: WeChat.ServerMessage.Encryptor.encoding_aes_key() | :dynamic,
-          token: token | :dynamic,
+          component_appsecret: component_appsecret | :from_env,
+          encoding_aes_key: WeChat.ServerMessage.Encryptor.encoding_aes_key() | :from_env,
+          token: token | :from_env,
           requester: module
         ]
   @type client :: module()
@@ -180,7 +181,7 @@ defmodule WeChat do
   defdelegate get_client(app_flag), to: WeChat.Storage.Cache, as: :search_client
 
   @spec get_client_agent(appid | code_name, WeChat.Work.agent() | String.t()) ::
-          nil | {client, Work.Agent.t()}
+          nil | {client, WorkAgent.t()}
   defdelegate get_client_agent(app_flag, agent_flag),
     to: WeChat.Storage.Cache,
     as: :search_client_agent
@@ -212,7 +213,7 @@ defmodule WeChat do
   @doc "set hub_springboard_url for hub client"
   @spec set_hub_springboard_url(client, Work.agent(), url) :: true
   def set_hub_springboard_url(client, agent, url) when is_binary(url) do
-    client.agent2cache_id(agent)
+    WorkAgent.fetch_agent_cache_id!(client, agent)
     |> Cache.put_cache(:hub_springboard_url, url)
   end
 
@@ -223,7 +224,7 @@ defmodule WeChat do
 
   @spec get_hub_springboard_url(client, Work.agent()) :: nil | url
   def get_hub_springboard_url(client, agent) do
-    client.agent2cache_id(agent)
+    WorkAgent.fetch_agent_cache_id!(client, agent)
     |> Cache.get_cache(:hub_springboard_url)
   end
 
@@ -238,7 +239,7 @@ defmodule WeChat do
   @doc "set oauth2_env_url for hub server"
   @spec set_oauth2_env_url(client, Work.agent(), env, url) :: true
   def set_oauth2_env_url(client, agent, env, url) when is_binary(env) and is_binary(url) do
-    client.agent2cache_id(agent)
+    WorkAgent.fetch_agent_cache_id!(client, agent)
     |> Cache.put_cache({:oauth2_env_url, env}, url)
   end
 
@@ -249,7 +250,7 @@ defmodule WeChat do
 
   @spec get_oauth2_env_url(client, Work.agent(), env) :: nil | url
   def get_oauth2_env_url(client, agent, env) do
-    client.agent2cache_id(agent)
+    WorkAgent.fetch_agent_cache_id!(client, agent)
     |> Cache.get_cache({:oauth2_env_url, env})
   end
 

@@ -4,6 +4,7 @@ defmodule WeChat.Work.Agent do
   import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
   alias WeChat.ServerMessage.Encryptor
+  alias WeChat.Storage.Cache
 
   @term_introduction_doc_link "#{work_doc_link_prefix()}/90135/90665"
 
@@ -44,11 +45,12 @@ defmodule WeChat.Work.Agent do
           token: WeChat.token(),
           encoding_aes_key: Encryptor.encoding_aes_key(),
           aes_key: Encryptor.aes_key(),
-          refresh_list: []
+          refresh_list: [],
+          cache_id: Cache.cache_id()
         }
 
   @enforce_keys [:id]
-  defstruct [:name, :id, :secret, :token, :encoding_aes_key, :aes_key, :refresh_list]
+  defstruct [:name, :id, :secret, :token, :encoding_aes_key, :aes_key, :refresh_list, :cache_id]
 
   @spec find_agent(Work.client(), Work.agent()) :: t | nil
   def find_agent(client, id) when is_integer(id) do
@@ -57,6 +59,20 @@ defmodule WeChat.Work.Agent do
 
   def find_agent(client, name) do
     Enum.find(client.agents(), &match?(%{name: ^name}, &1))
+  end
+
+  @spec fetch_agent!(Work.client(), Work.agent()) :: t
+  def fetch_agent!(client, agent) do
+    if agent = find_agent(client, agent) do
+      agent
+    else
+      raise "missing #{inspect(agent)} for #{inspect(client)}, maybe it's a wrong name or id, maybe it not set in agents."
+    end
+  end
+
+  @spec fetch_agent_cache_id!(Work.client(), Work.agent()) :: Cache.cache_id()
+  def fetch_agent_cache_id!(client, agent) do
+    fetch_agent!(client, agent) |> Map.fetch!(:cache_id)
   end
 
   @spec name2id(Work.client(), agent_name) :: agent_id | nil
@@ -103,6 +119,27 @@ defmodule WeChat.Work.Agent do
   def we_drive_agent(options \\ []) do
     struct(%__MODULE__{id: :we_drive, name: :we_drive}, options)
     |> transfer_aes_key()
+  end
+
+  def maybe_init_work_agents(client) do
+    with {:ok, configs} <- Application.fetch_env(:wechat, client),
+         agents <- client.agents(),
+         {:ok, ^agents} <- Keyword.fetch(configs, :agents),
+         true <- Enum.any?(agents, &(not match?(%{cache_id: _}, &1))) do
+      agents
+      |> Enum.all?(&is_struct(&1, __MODULE__))
+      |> unless do
+        raise ArgumentError, "please set WeChat.Work.Agent struct for :agents option"
+      end
+
+      corp_id = client.appid()
+
+      Enum.map(agents, fn agent ->
+        Map.put(agent, :cache_id, "#{corp_id}_#{agent.id}")
+      end)
+      |> then(&Map.put(configs, :agents, &1))
+      |> then(&Application.put_env(:wechat, client, &1))
+    end
   end
 
   defp transfer_aes_key(agent) do

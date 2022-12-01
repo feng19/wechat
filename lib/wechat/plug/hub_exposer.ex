@@ -23,6 +23,7 @@ if Code.ensure_loaded?(Plug) do
         get "/hub/expose/:store_id/:store_key", #{inspect(__MODULE__)}, clients: [ClientsA, ...]
     """
     import WeChat.Plug.Helper
+    alias WeChat.Work.Agent, as: WorkAgent
 
     @valid_keys [
       "access_token",
@@ -50,9 +51,7 @@ if Code.ensure_loaded?(Plug) do
 
     defp transfer_client({client, :all}, acc) do
       if match?(:work, client.app_type()) do
-        Enum.into(client.agents(), acc, fn agent ->
-          {client.agent2cache_id(agent.id), :all}
-        end)
+        Enum.into(client.agents(), acc, &{&1.cache_id, :all})
       else
         Map.put(acc, client.appid(), :all)
       end
@@ -62,10 +61,10 @@ if Code.ensure_loaded?(Plug) do
       if match?(:work, client.app_type()) do
         Enum.into(scope_list, acc, fn
           {agent, :all} ->
-            {client.agent2cache_id(agent), :all}
+            {WorkAgent.fetch_agent_cache_id!(client, agent), :all}
 
           {agent, scope_list} when is_list(scope_list) ->
-            {client.agent2cache_id(agent), scope_list}
+            {WorkAgent.fetch_agent_cache_id!(client, agent), scope_list}
         end)
       else
         Map.put(acc, client.appid(), scope_list)

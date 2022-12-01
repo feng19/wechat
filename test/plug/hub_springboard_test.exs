@@ -79,7 +79,7 @@ defmodule WeChat.Plug.HubSpringboardTest do
     env_url = "http://127.0.0.1:4000"
     env = "dev"
     WeChat.set_oauth2_env_url(client, agent_id, env, env_url)
-    agent = WeChat.Work.Agent.find_agent(client, agent_id)
+    agent = WeChat.Work.Agent.fetch_agent!(client, agent_id)
     WeChat.Storage.Cache.put_cache(client.appid(), to_string(agent_id), {client, agent})
 
     conn =

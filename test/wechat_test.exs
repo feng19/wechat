@@ -1,6 +1,7 @@
 defmodule WeChatTest do
   use ExUnit.Case, async: true
-  alias WeChat.Test.{OfficialAccount, Work, Work2, DynamicSecretA, DynamicSecretB}
+  alias WeChat.Work.Agent, as: WorkAgent
+  alias WeChat.Test.{OfficialAccount, Work, Work2, Work3, DynamicSecretA, DynamicSecretB}
   doctest WeChat
 
   test "Auto generate functions(OfficialAccount)" do
@@ -30,22 +31,12 @@ defmodule WeChatTest do
     assert Work.storage() == WeChat.Storage.File
     assert Work.appid() == "corp_id"
     assert is_list(Work.agents())
-    assert Work.agent2cache_id(10000) == "corp_id_10000"
-    assert Work.agent2cache_id(:agent_name) == "corp_id_10000"
+    assert is_list(Work2.agents())
+    assert WorkAgent.fetch_agent_cache_id!(Work, 10000) == "corp_id_10000"
+    assert WorkAgent.fetch_agent_cache_id!(Work, :agent_name) == "corp_id_10000"
 
     assert true = Enum.all?(1..3, &function_exported?(Work, :get, &1))
     assert true = Enum.all?(2..4, &function_exported?(Work, :post, &1))
-    assert Code.ensure_loaded?(Work.Message)
-    assert function_exported?(Work.Message, :send_message, 2)
-    assert Code.ensure_loaded?(Work.Contacts.Department)
-    assert function_exported?(Work.Contacts.Department, :list, 0)
-  end
-
-  test "Auto generate functions(Work) - exclude Contacts" do
-    assert Code.ensure_loaded?(Work2.Message)
-    assert function_exported?(Work2.Message, :send_message, 2)
-    assert false == Code.ensure_loaded?(Work2.Contacts.Department)
-    assert false == function_exported?(Work2.Contacts.Department, :list, 0)
   end
 
   test "build official_account client" do
@@ -99,5 +90,13 @@ defmodule WeChatTest do
     assert "dynamic_aes_key" = DynamicSecretA.aes_key()
     assert "dynamic_encoding_aes_key" = DynamicSecretA.encoding_aes_key()
     assert "component_app_secret" = DynamicSecretB.component_appsecret()
+  end
+
+  test "dynamic_agents" do
+    WorkAgent.maybe_init_work_agents(Work3)
+    assert is_list(Work3.agents())
+    assert 1 = length(Work3.agents())
+    assert WorkAgent.fetch_agent_cache_id!(Work2, 10000) == "corp_id_10000"
+    assert WorkAgent.fetch_agent_cache_id!(Work2, :agent_name) == "corp_id_10000"
   end
 end

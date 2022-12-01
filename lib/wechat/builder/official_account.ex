@@ -62,8 +62,14 @@ defmodule WeChat.Builder.OfficialAccount do
   ]
 
   defmacro __using__(options \\ []) do
+    client = __CALLER__.module
     opts = Macro.prewalk(options, &Macro.expand(&1, __CALLER__))
     default_opts = Keyword.merge(@default_opts, opts)
+
+    unless Keyword.get(default_opts, :appid) |> is_binary() do
+      raise ArgumentError, "please set appid option for #{inspect(client)}"
+    end
+
     app_type = Keyword.fetch!(default_opts, :app_type)
 
     sub_modules =
@@ -100,8 +106,6 @@ defmodule WeChat.Builder.OfficialAccount do
         }
       end
 
-    client = __CALLER__.module
-
     if Keyword.get(opts, :gen_sub_module?, true) do
       gen_get_functions(default_opts, client) ++ Utils.gen_sub_modules(sub_modules, client)
     else
@@ -110,21 +114,17 @@ defmodule WeChat.Builder.OfficialAccount do
   end
 
   defp gen_get_functions(default_opts, client) do
-    appid =
-      case Keyword.get(default_opts, :appid) do
-        appid when is_binary(appid) -> appid
-        _ -> raise ArgumentError, "please set appid"
-      end
+    {appid, default_opts} = Keyword.pop!(default_opts, :appid)
+    {requester, default_opts} = Keyword.pop!(default_opts, :requester)
 
     {code_name, default_opts} =
       Keyword.pop_lazy(default_opts, :code_name, fn ->
         client |> to_string() |> String.split(".") |> List.last() |> String.downcase()
       end)
 
-    {requester, default_opts} = Keyword.pop(default_opts, :requester)
-
-    base =
+    base_funs =
       quote do
+        def appid, do: unquote(appid)
         def code_name, do: unquote(code_name)
         def get_access_token, do: WeChat.Storage.Cache.get_cache(unquote(appid), :access_token)
         defdelegate get(url), to: unquote(requester)
@@ -137,12 +137,13 @@ defmodule WeChat.Builder.OfficialAccount do
 
     get_funs =
       Enum.map(default_opts, fn
-        {:encoding_aes_key, :dynamic} ->
+        {:encoding_aes_key, :from_env} ->
           quote do
             def encoding_aes_key,
               do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:encoding_aes_key)
 
-            def aes_key, do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:aes_key)
+            def aes_key,
+              do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:aes_key)
           end
 
         {:encoding_aes_key, value} ->
@@ -153,7 +154,7 @@ defmodule WeChat.Builder.OfficialAccount do
             def aes_key, do: unquote(aes_key)
           end
 
-        {key, :dynamic} ->
+        {key, :from_env} ->
           quote do
             def unquote(key)(),
               do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(unquote(key))
@@ -165,6 +166,6 @@ defmodule WeChat.Builder.OfficialAccount do
           end
       end)
 
-    [base | get_funs]
+    [base_funs | get_funs]
   end
 end

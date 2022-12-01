@@ -3,6 +3,7 @@ defmodule WeChat.Plug.HubExposerTest do
   use Plug.Test
   alias WeChat.Plug.HubExposer
   alias WeChat.HubExposerRouter
+  alias WeChat.Work.Agent, as: WorkAgent
 
   test "init - empty clients" do
     msg = "please set clients when using WeChat.Plug.HubExposer"
@@ -23,7 +24,7 @@ defmodule WeChat.Plug.HubExposerTest do
 
   test "init - ok for work" do
     client = WeChat.Test.Work2
-    store_id = client.agent2cache_id(10000)
+    store_id = WorkAgent.fetch_agent_cache_id!(client, 10000)
     opts = %{store_id => :all}
     assert opts == HubExposer.init(clients: [client])
     assert opts == HubExposer.init(clients: [{client, :all}])

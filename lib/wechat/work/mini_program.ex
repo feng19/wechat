@@ -15,7 +15,7 @@ defmodule WeChat.Work.MiniProgram do
   """
   @spec code2session(Work.client(), Work.agent(), code :: String.t()) :: WeChat.response()
   def code2session(client, agent, code) do
-    agent = Work.Agent.find_agent(client, agent)
+    agent = Work.Agent.fetch_agent!(client, agent)
 
     client.get("/cgi-bin/miniprogram/jscode2session",
       query: [
