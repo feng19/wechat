@@ -26,7 +26,7 @@ defmodule WeChat.Work.App do
 
   @doc """
   获取access_token对应的应用列表 -
-  [官方文档](#{@doc_link}/90227#获取指定的应用详情){:target="_blank"}
+  [官方文档](#{@doc_link}/90227#获取access-token对应的应用列表){:target="_blank"}
   """
   @spec list(Work.client(), Work.agent()) :: WeChat.response()
   def list(client, agent) do

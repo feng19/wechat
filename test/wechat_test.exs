@@ -1,6 +1,6 @@
 defmodule WeChatTest do
   use ExUnit.Case, async: true
-  alias WeChat.Test.{OfficialAccount, Work, Work2}
+  alias WeChat.Test.{OfficialAccount, Work, Work2, DynamicSecretA, DynamicSecretB}
   doctest WeChat
 
   test "Auto generate functions(OfficialAccount)" do
@@ -92,5 +92,12 @@ defmodule WeChatTest do
     assert apply(WxApp5, :appid, []) == "wx2c2769f8efd9abc2"
     assert false == function_exported?(WxApp5.WebPage, :code2access_token, 1)
     assert function_exported?(WxApp5.MiniProgram.Auth, :code2session, 1)
+  end
+
+  test "dynamic_secret" do
+    assert "dynamic_app_secret" = DynamicSecretA.appsecret()
+    assert "dynamic_aes_key" = DynamicSecretA.aes_key()
+    assert "dynamic_encoding_aes_key" = DynamicSecretA.encoding_aes_key()
+    assert "component_app_secret" = DynamicSecretB.component_appsecret()
   end
 end

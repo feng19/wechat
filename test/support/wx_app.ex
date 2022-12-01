@@ -8,6 +8,16 @@ defmodule WeChat.Test.OfficialAccount do
     gen_sub_module?: false
 end
 
+defmodule WeChat.Test.DynamicSecretA do
+  @moduledoc "公众号"
+  use WeChat,
+    appid: "wx2c2769f8efd9abc2",
+    appsecret: :dynamic,
+    encoding_aes_key: :dynamic,
+    token: :dynamic,
+    gen_sub_module?: false
+end
+
 defmodule WeChat.Test.Component do
   @moduledoc "公众号 - by第三方"
   use WeChat,
@@ -15,6 +25,15 @@ defmodule WeChat.Test.Component do
     by_component?: true,
     component_appid: "wx3c2769f8efd9abc3",
     component_appsecret: "component_appsecret"
+end
+
+defmodule WeChat.Test.DynamicSecretB do
+  @moduledoc "公众号 - by第三方"
+  use WeChat,
+    appid: "wx2c2769f8efd9abc2",
+    by_component?: true,
+    component_appid: "wx3c2769f8efd9abc3",
+    component_appsecret: :dynamic
 end
 
 defmodule WeChat.Test.Mini do

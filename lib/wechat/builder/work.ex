@@ -38,7 +38,12 @@ defmodule WeChat.Builder.Work do
     OA.Schedule,
     OA.Vacation,
     {:we_drive,
-     [WeDrive.FileACL, WeDrive.FileManagement, WeDrive.SpaceACL, WeDrive.SpaceManagement]},
+     [
+       WeDrive.FileACL,
+       WeDrive.FileManagement,
+       WeDrive.SpaceACL,
+       WeDrive.SpaceManagement
+     ]},
     {:contacts, [Contacts.Tag, Contacts.User, Contacts.Department]},
     {:kf, [KF.Account, KF.Customer, KF.Message]}
   ]

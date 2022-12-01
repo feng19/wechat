@@ -150,16 +150,16 @@ defmodule WeChat do
   - `gen_sub_module?`: true
   """
   @type options :: [
-          server_role: server_role,
-          by_component?: by_component?,
-          app_type: app_type,
-          storage: WeChat.Storage.Adapter.t(),
+          server_role: server_role | :dynamic,
+          by_component?: by_component? | :dynamic,
+          app_type: app_type | :dynamic,
+          storage: WeChat.Storage.Adapter.t() | :dynamic,
           appid: appid,
-          appsecret: appsecret,
+          appsecret: appsecret | :dynamic,
           component_appid: component_appid,
-          component_appsecret: component_appsecret,
-          encoding_aes_key: WeChat.ServerMessage.Encryptor.encoding_aes_key(),
-          token: token,
+          component_appsecret: component_appsecret | :dynamic,
+          encoding_aes_key: WeChat.ServerMessage.Encryptor.encoding_aes_key() | :dynamic,
+          token: token | :dynamic,
           requester: module
         ]
   @type client :: module()

@@ -13,6 +13,7 @@ defmodule WeChat.Builder.OfficialAccount do
     :encoding_aes_key,
     :token
   ]
+
   @default_opts [
     app_type: :official_account,
     server_role: :client,
@@ -20,10 +21,12 @@ defmodule WeChat.Builder.OfficialAccount do
     storage: WeChat.Storage.File,
     requester: WeChat.Requester.OfficialAccount
   ]
+
   @both_modules [
     WeChat.CustomMessage,
     WeChat.SubscribeMessage
   ]
+
   @official_account_modules [
     WeChat.Menu,
     WeChat.Material,
@@ -43,6 +46,7 @@ defmodule WeChat.Builder.OfficialAccount do
     WeChat.Comment,
     WeChat.WebPage
   ]
+
   @mini_program_modules [
     MiniProgram.Auth,
     MiniProgram.Code,
@@ -133,12 +137,26 @@ defmodule WeChat.Builder.OfficialAccount do
 
     get_funs =
       Enum.map(default_opts, fn
+        {:encoding_aes_key, :dynamic} ->
+          quote do
+            def encoding_aes_key,
+              do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:encoding_aes_key)
+
+            def aes_key, do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:aes_key)
+          end
+
         {:encoding_aes_key, value} ->
           aes_key = WeChat.ServerMessage.Encryptor.aes_key(value)
 
           quote do
             def encoding_aes_key, do: unquote(value)
             def aes_key, do: unquote(aes_key)
+          end
+
+        {key, :dynamic} ->
+          quote do
+            def unquote(key)(),
+              do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(unquote(key))
           end
 
         {key, value} ->
