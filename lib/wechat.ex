@@ -118,7 +118,7 @@ defmodule WeChat do
   @type err_code :: non_neg_integer
   @typedoc "错误信息"
   @type err_msg :: String.t()
-  @type env_option :: :fetch_env | :compile_env | {:fetch_env, app} | {:compile_env, app}
+  @type env_option :: :runtime_env | {:runtime_env, app} | :compile_env | {:compile_env, app}
   @typep app :: atom
   @typep env :: String.t()
   @typep url :: String.t()

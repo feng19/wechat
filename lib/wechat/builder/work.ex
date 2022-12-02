@@ -19,7 +19,7 @@ defmodule WeChat.Builder.Work do
     end
 
     {agents, default_opts} =
-      case Keyword.pop(default_opts, :agents, :fetch_env) do
+      case Keyword.pop(default_opts, :agents, :runtime_env) do
         {[], _} ->
           raise ArgumentError, "please set at least one WeChat.Work.Agent for :agents option"
 

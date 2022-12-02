@@ -125,14 +125,14 @@ defmodule WeChat.Builder.Utils do
 
   defp ast_transform(ast, _acc), do: ast
 
-  def handle_env_option(_client, key, :fetch_env) do
+  def handle_env_option(_client, key, :runtime_env) do
     quote do
       def unquote(key)(),
         do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(unquote(key))
     end
   end
 
-  def handle_env_option(_client, key, {:fetch_env, app}) do
+  def handle_env_option(_client, key, {:runtime_env, app}) do
     quote do
       def unquote(key)(), do: Application.fetch_env!(unquote(app), unquote(key))
     end
