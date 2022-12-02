@@ -28,12 +28,12 @@ if Code.ensure_loaded?(Plug) do
           init_opts: [clients: [Client, ...]]
     """
     import WeChat.Plug.Helper
+    alias WeChat.Utils
     alias WeChat.Plug.OAuth2Checker
 
     @doc false
     def init(opts) do
-      clients = opts |> Map.new() |> WeChat.Utils.transfer_clients(__MODULE__)
-      %{clients: clients}
+      opts |> Map.new() |> Utils.init_plug_clients(__MODULE__)
     end
 
     @doc false
@@ -44,6 +44,8 @@ if Code.ensure_loaded?(Plug) do
           } = conn,
           options
         ) do
+      options = Utils.setup_clients_for_plug(options)
+
       with {_type, client, agent} <- OAuth2Checker.get_client_agent_by_path(conn, options) do
         oauth2_callback(conn, client, agent, env, callback_path)
       end

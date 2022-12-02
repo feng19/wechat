@@ -65,7 +65,7 @@ if Code.ensure_loaded?(Plug) do
     @doc false
     def init(opts) do
       opts = Map.new(opts)
-      clients = Utils.transfer_clients(opts, __MODULE__)
+      options = Utils.init_plug_clients(opts, __MODULE__)
 
       oauth2_callback_fun =
         with {:ok, fun} <- Map.fetch(opts, :oauth2_callback_fun),
@@ -93,11 +93,10 @@ if Code.ensure_loaded?(Plug) do
                   "the :event_parser must arg 4 function when using #{inspect(__MODULE__)}"
         end
 
-      %{
-        clients: clients,
+      Map.merge(options, %{
         oauth2_callback_fun: oauth2_callback_fun,
         authorize_url_fun: authorize_url_fun
-      }
+      })
     end
 
     @doc false
@@ -106,6 +105,8 @@ if Code.ensure_loaded?(Plug) do
     # 2. check code
     # 3. redirect to authorize_url
     def call(conn, options) do
+      options = Utils.setup_clients_for_plug(options)
+
       case get_client_agent_by_path(conn, options) do
         {:work, client, agent} ->
           conn = fetch_session(conn)

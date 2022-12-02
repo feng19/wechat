@@ -59,6 +59,10 @@ defmodule WeChat.Utils do
     |> Enum.reduce(%{}, &transfer_client/2)
   end
 
+  def transfer_clients(clients) do
+    Enum.reduce(clients, %{}, &transfer_client/2)
+  end
+
   defp transfer_client(client, acc) when is_atom(client) do
     if match?(:work, client.app_type()) do
       transfer_client({client, :all}, acc)
@@ -101,6 +105,50 @@ defmodule WeChat.Utils do
         acc
       end
     end)
+  end
+
+  def init_plug_clients(opts, plug) when is_map(opts) do
+    runtime = Map.get(opts, :runtime, false)
+
+    clients =
+      Map.get(opts, :clients)
+      |> List.wrap()
+      |> case do
+        [] -> raise ArgumentError, "please set clients when using #{inspect(plug)}"
+        list -> list
+      end
+
+    {persistent_id, clients} =
+      if runtime do
+        persistent_id = Map.get(opts, :persistent_id)
+
+        unless persistent_id do
+          raise ArgumentError,
+                "please set persistent_id when runtime: true for using #{inspect(plug)}"
+        end
+
+        {persistent_id, clients}
+      else
+        {nil, transfer_clients(clients)}
+      end
+
+    %{runtime: runtime, persistent_id: persistent_id, clients: clients}
+  end
+
+  def setup_clients_for_plug(options) do
+    if options.runtime do
+      persistent_id = options.persistent_id
+
+      clients =
+        with nil <- :persistent_term.get(persistent_id, nil) do
+          transfer_clients(options.clients)
+          |> tap(&:persistent_term.put(persistent_id, &1))
+        end
+
+      %{options | clients: clients}
+    else
+      options
+    end
   end
 
   def uniq_and_sort(list) do
