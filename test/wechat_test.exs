@@ -97,7 +97,7 @@ defmodule WeChatTest do
     WorkAgent.maybe_init_work_agents(Work3)
     assert is_list(Work3.agents())
     assert 1 = length(Work3.agents())
-    assert WorkAgent.fetch_agent_cache_id!(Work2, 10000) == "corp_id_10000"
-    assert WorkAgent.fetch_agent_cache_id!(Work2, :agent_name) == "corp_id_10000"
+    assert WorkAgent.fetch_agent_cache_id!(Work3, 10000) == "corp_id_10000"
+    assert WorkAgent.fetch_agent_cache_id!(Work3, :agent_name) == "corp_id_10000"
   end
 end

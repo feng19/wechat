@@ -125,7 +125,7 @@ defmodule WeChat.Work.Agent do
     with {:ok, configs} <- Application.fetch_env(:wechat, client),
          agents <- client.agents(),
          {:ok, ^agents} <- Keyword.fetch(configs, :agents),
-         true <- Enum.any?(agents, &(not match?(%{cache_id: _}, &1))) do
+         true <- Enum.any?(agents, &match?(%{cache_id: nil}, &1)) do
       agents
       |> Enum.all?(&is_struct(&1, __MODULE__))
       |> unless do
@@ -137,7 +137,7 @@ defmodule WeChat.Work.Agent do
       Enum.map(agents, fn agent ->
         Map.put(agent, :cache_id, "#{corp_id}_#{agent.id}")
       end)
-      |> then(&Map.put(configs, :agents, &1))
+      |> then(&Keyword.put(configs, :agents, &1))
       |> then(&Application.put_env(:wechat, client, &1))
     end
   end

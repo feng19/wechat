@@ -74,6 +74,7 @@ defmodule WeChat.Application do
 
   defp setup_work_client(client, agents) do
     WeChat.Work.Agent.maybe_init_work_agents(client)
+
     for {agent, settings} <- agents do
       %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks} =
         settings |> replace_app(client) |> replace_agent(agent)
