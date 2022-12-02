@@ -65,7 +65,7 @@ if Code.ensure_loaded?(Plug) do
     @doc false
     def init(opts) do
       opts = Map.new(opts)
-      options = Utils.init_plug_clients(opts, __MODULE__)
+      options = init_plug_clients(opts, __MODULE__)
 
       oauth2_callback_fun =
         with {:ok, fun} <- Map.fetch(opts, :oauth2_callback_fun),
@@ -105,7 +105,7 @@ if Code.ensure_loaded?(Plug) do
     # 2. check code
     # 3. redirect to authorize_url
     def call(conn, options) do
-      options = Utils.setup_clients_for_plug(options)
+      options = setup_clients_for_plug(options)
 
       case get_client_agent_by_path(conn, options) do
         {:work, client, agent} ->

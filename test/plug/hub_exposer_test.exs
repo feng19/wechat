@@ -14,22 +14,22 @@ defmodule WeChat.Plug.HubExposerTest do
   test "init - ok for official_account" do
     client = WeChat.Test.OfficialAccount
     store_id = client.appid()
-    opts = %{store_id => :all}
+    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => :all}}
     assert opts == HubExposer.init(clients: [client])
     assert opts == HubExposer.init(clients: [{client, :all}])
 
-    opts = %{store_id => ["access_token"]}
+    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => ["access_token"]}}
     assert opts == HubExposer.init(clients: [{client, ["access_token"]}])
   end
 
   test "init - ok for work" do
     client = WeChat.Test.Work2
     store_id = WorkAgent.fetch_agent_cache_id!(client, 10000)
-    opts = %{store_id => :all}
+    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => :all}}
     assert opts == HubExposer.init(clients: [client])
     assert opts == HubExposer.init(clients: [{client, :all}])
     assert opts == HubExposer.init(clients: [{client, [{10000, :all}]}])
-    opts = %{store_id => ["access_token"]}
+    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => ["access_token"]}}
     assert opts == HubExposer.init(clients: [{client, [{10000, ["access_token"]}]}])
   end
 

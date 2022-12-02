@@ -35,14 +35,76 @@ if Code.ensure_loaded?(Plug) do
 
     @doc false
     def init(opts) do
-      Map.new(opts)
-      |> Map.get(:clients)
-      |> List.wrap()
-      |> case do
-        [] -> raise ArgumentError, "please set clients when using #{inspect(__MODULE__)}"
-        list -> list
-      end
-      |> Enum.reduce(%{}, &transfer_client/2)
+      opts = Map.new(opts)
+      runtime = Map.get(opts, :runtime, false)
+
+      clients =
+        opts
+        |> Map.get(:clients)
+        |> List.wrap()
+        |> case do
+          [] -> raise ArgumentError, "please set clients when using #{inspect(__MODULE__)}"
+          list -> list
+        end
+
+      {persistent_id, clients} =
+        if runtime do
+          persistent_id = Map.get(opts, :persistent_id)
+
+          unless persistent_id do
+            raise ArgumentError,
+                  "please set persistent_id when runtime: true for using #{inspect(__MODULE__)}"
+          end
+
+          {persistent_id, clients}
+        else
+          {nil, transfer_clients(clients)}
+        end
+
+      %{runtime: runtime, persistent_id: persistent_id, clients: clients}
+    end
+
+    @doc false
+    def call(%{path_params: %{"store_id" => store_id, "store_key" => store_key}} = conn, options) do
+      clients =
+        if options.runtime do
+          persistent_id = options.persistent_id
+
+          with nil <- :persistent_term.get(persistent_id, nil) do
+            transfer_clients(options.clients)
+            |> tap(&:persistent_term.put(persistent_id, &1))
+          end
+        else
+          options.clients
+        end
+
+      in_scope? =
+        case Map.fetch(clients, store_id) do
+          {:ok, :all} -> true
+          {:ok, scope_list} when is_list(scope_list) -> store_key in scope_list
+          _ -> false
+        end
+
+      json =
+        with true <- in_scope?,
+             true <- store_key in @valid_keys,
+             store_key <- String.to_existing_atom(store_key),
+             store_map when store_map != nil <-
+               WeChat.Storage.Cache.get_cache({:store_map, store_id}, store_key) do
+          %{error: 0, msg: "success", store_map: store_map}
+        else
+          _ -> %{error: 404, msg: "not found"}
+        end
+
+      json(conn, json)
+    rescue
+      ArgumentError -> json(conn, %{error: 404, msg: "not found"})
+    end
+
+    def call(conn, _), do: not_found(conn)
+
+    defp transfer_clients(clients) do
+      Enum.reduce(clients, %{}, &transfer_client/2)
     end
 
     defp transfer_client(client, acc) when is_atom(client) do
@@ -70,32 +132,5 @@ if Code.ensure_loaded?(Plug) do
         Map.put(acc, client.appid(), scope_list)
       end
     end
-
-    @doc false
-    def call(%{path_params: %{"store_id" => store_id, "store_key" => store_key}} = conn, opts) do
-      in_scope? =
-        case Map.fetch(opts, store_id) do
-          {:ok, :all} -> true
-          {:ok, scope_list} when is_list(scope_list) -> store_key in scope_list
-          _ -> false
-        end
-
-      json =
-        with true <- in_scope?,
-             true <- store_key in @valid_keys,
-             store_key <- String.to_existing_atom(store_key),
-             store_map when store_map != nil <-
-               WeChat.Storage.Cache.get_cache({:store_map, store_id}, store_key) do
-          %{error: 0, msg: "success", store_map: store_map}
-        else
-          _ -> %{error: 404, msg: "not found"}
-        end
-
-      json(conn, json)
-    rescue
-      ArgumentError -> json(conn, %{error: 404, msg: "not found"})
-    end
-
-    def call(conn, _), do: not_found(conn)
   end
 end
