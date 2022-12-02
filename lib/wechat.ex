@@ -118,6 +118,8 @@ defmodule WeChat do
   @type err_code :: non_neg_integer
   @typedoc "错误信息"
   @type err_msg :: String.t()
+  @type env_option :: :fetch_env | :compile_env | {:fetch_env, app} | {:compile_env, app}
+  @typep app :: atom
   @typep env :: String.t()
   @typep url :: String.t()
 
@@ -151,16 +153,16 @@ defmodule WeChat do
   - `gen_sub_module?`: true
   """
   @type options :: [
-          server_role: server_role | :from_env,
-          by_component?: by_component? | :from_env,
-          app_type: app_type | :from_env,
-          storage: WeChat.Storage.Adapter.t() | :from_env,
+          server_role: server_role | env_option,
+          by_component?: by_component? | env_option,
+          app_type: app_type | env_option,
+          storage: WeChat.Storage.Adapter.t() | env_option,
           appid: appid,
-          appsecret: appsecret | :from_env,
+          appsecret: appsecret | env_option,
           component_appid: component_appid,
-          component_appsecret: component_appsecret | :from_env,
-          encoding_aes_key: WeChat.ServerMessage.Encryptor.encoding_aes_key() | :from_env,
-          token: token | :from_env,
+          component_appsecret: component_appsecret | env_option,
+          encoding_aes_key: WeChat.ServerMessage.Encryptor.encoding_aes_key() | env_option,
+          token: token | env_option,
           requester: module
         ]
   @type client :: module()

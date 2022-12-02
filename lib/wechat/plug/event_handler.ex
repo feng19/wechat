@@ -22,6 +22,13 @@ if Code.ensure_loaded?(Plug) do
       请将入口路径设置为如下格式: `/*xxx/:app`
 
           scope "/wx/event/:app" do
+            get "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/3
+            post "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/3
+          end
+
+      before phoenix 1.17:
+
+          scope "/wx/event/:app" do
             forward "/", #{inspect(__MODULE__)}, event_handler: &YourModule.handle_event/3
           end
 

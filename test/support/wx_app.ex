@@ -12,9 +12,9 @@ defmodule WeChat.Test.DynamicSecretA do
   @moduledoc "公众号"
   use WeChat,
     appid: "wx2c2769f8efd9abc2",
-    appsecret: :from_env,
-    encoding_aes_key: :from_env,
-    token: :from_env,
+    appsecret: :fetch_env,
+    encoding_aes_key: :compile_env,
+    token: {:compile_env, :wechat},
     gen_sub_module?: false
 end
 
@@ -33,7 +33,7 @@ defmodule WeChat.Test.DynamicSecretB do
     appid: "wx2c2769f8efd9abc2",
     by_component?: true,
     component_appid: "wx3c2769f8efd9abc3",
-    component_appsecret: :from_env
+    component_appsecret: :fetch_env
 end
 
 defmodule WeChat.Test.Mini do
@@ -79,5 +79,5 @@ defmodule WeChat.Test.Work3 do
   @moduledoc "企业微信"
   use WeChat.Work,
     corp_id: "corp_id",
-    agents: :from_env
+    agents: :fetch_env
 end

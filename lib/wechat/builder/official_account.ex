@@ -137,16 +137,7 @@ defmodule WeChat.Builder.OfficialAccount do
 
     get_funs =
       Enum.map(default_opts, fn
-        {:encoding_aes_key, :from_env} ->
-          quote do
-            def encoding_aes_key,
-              do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:encoding_aes_key)
-
-            def aes_key,
-              do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:aes_key)
-          end
-
-        {:encoding_aes_key, value} ->
+        {:encoding_aes_key, value} when is_binary(value) ->
           aes_key = WeChat.ServerMessage.Encryptor.aes_key(value)
 
           quote do
@@ -154,15 +145,17 @@ defmodule WeChat.Builder.OfficialAccount do
             def aes_key, do: unquote(aes_key)
           end
 
-        {key, :from_env} ->
-          quote do
-            def unquote(key)(),
-              do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(unquote(key))
-          end
+        {:encoding_aes_key, value} ->
+          [
+            Utils.handle_env_option(client, :encoding_aes_key, value),
+            Utils.handle_env_option(client, :aes_key, value)
+          ]
 
         {key, value} ->
-          quote do
-            def unquote(key)(), do: unquote(value)
+          with :not_handle <- Utils.handle_env_option(client, key, value) do
+            quote do
+              def unquote(key)(), do: unquote(value)
+            end
           end
       end)
 

@@ -124,4 +124,35 @@ defmodule WeChat.Builder.Utils do
   end
 
   defp ast_transform(ast, _acc), do: ast
+
+  def handle_env_option(_client, key, :fetch_env) do
+    quote do
+      def unquote(key)(),
+        do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(unquote(key))
+    end
+  end
+
+  def handle_env_option(_client, key, {:fetch_env, app}) do
+    quote do
+      def unquote(key)(), do: Application.fetch_env!(unquote(app), unquote(key))
+    end
+  end
+
+  def handle_env_option(client, key, :compile_env) do
+    value = Application.fetch_env!(:wechat, client) |> Keyword.fetch!(key)
+
+    quote do
+      def unquote(key)(), do: unquote(value)
+    end
+  end
+
+  def handle_env_option(client, key, {:compile_env, app}) do
+    value = Application.fetch_env!(app, client) |> Keyword.fetch!(key)
+
+    quote do
+      def unquote(key)(), do: unquote(value)
+    end
+  end
+
+  def handle_env_option(_, _, _), do: :not_handle
 end

@@ -18,7 +18,7 @@ defmodule WeChat.Builder.Work do
     end
 
     {agents, default_opts} =
-      case Keyword.pop(default_opts, :agents, :from_env) do
+      case Keyword.pop(default_opts, :agents, :fetch_env) do
         {[], _} ->
           raise ArgumentError, "please set at least one WeChat.Work.Agent for :agents option"
 
@@ -33,8 +33,8 @@ defmodule WeChat.Builder.Work do
 
           {agents, default_opts}
 
-        {:from_env, default_opts} ->
-          {:from_env, default_opts}
+        {:fetch_env, default_opts} ->
+          {:fetch_env, default_opts}
 
         nil ->
           raise ArgumentError, "please set :agents option"
@@ -72,24 +72,19 @@ defmodule WeChat.Builder.Work do
       end
 
     get_funs =
-      Enum.map(default_opts, fn
-        {key, :from_env} ->
-          quote do
-            def unquote(key)(),
-              do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(unquote(key))
-          end
-
-        {key, value} ->
+      Enum.map(default_opts, fn {key, value} ->
+        with :not_handle <- WeChat.Builder.Utils.handle_env_option(client, key, value) do
           quote do
             def unquote(key)(), do: unquote(value)
           end
+        end
       end)
 
     agent_funs = gen_agent_funs(corp_id, agents)
     List.flatten([base_funs, get_funs, agent_funs])
   end
 
-  defp gen_agent_funs(_corp_id, :from_env) do
+  defp gen_agent_funs(_corp_id, :fetch_env) do
     quote do
       def agents, do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:agents)
     end

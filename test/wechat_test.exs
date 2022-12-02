@@ -89,6 +89,7 @@ defmodule WeChatTest do
     assert "dynamic_app_secret" = DynamicSecretA.appsecret()
     assert "dynamic_aes_key" = DynamicSecretA.aes_key()
     assert "dynamic_encoding_aes_key" = DynamicSecretA.encoding_aes_key()
+    assert "dynamic_token" = DynamicSecretA.token()
     assert "component_app_secret" = DynamicSecretB.component_appsecret()
   end
 

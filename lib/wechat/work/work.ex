@@ -82,9 +82,9 @@ defmodule WeChat.Work do
   """
   @type options :: [
           corp_id: corp_id,
-          agents: agents | :from_env,
-          server_role: WeChat.server_role() | :from_env,
-          storage: WeChat.Storage.Adapter.t() | :from_env,
+          agents: agents | WeChat.env_option(),
+          server_role: WeChat.server_role() | WeChat.env_option(),
+          storage: WeChat.Storage.Adapter.t() | WeChat.env_option(),
           requester: module
         ]
 
