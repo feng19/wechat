@@ -1,5 +1,6 @@
 defmodule WeChat.Builder.Work do
   @moduledoc false
+  alias WeChat.Builder.Utils
 
   @default_opts [
     server_role: :client,
@@ -22,6 +23,9 @@ defmodule WeChat.Builder.Work do
         {[], _} ->
           raise ArgumentError, "please set at least one WeChat.Work.Agent for :agents option"
 
+        {nil, _} ->
+          raise ArgumentError, "please set :agents option"
+
         {agents, default_opts} when is_list(agents) ->
           agents = Code.eval_quoted(agents, [], __CALLER__) |> elem(0)
 
@@ -33,11 +37,8 @@ defmodule WeChat.Builder.Work do
 
           {agents, default_opts}
 
-        {:fetch_env, default_opts} ->
-          {:fetch_env, default_opts}
-
-        nil ->
-          raise ArgumentError, "please set :agents option"
+        {value, default_opts} ->
+          {value, default_opts}
       end
 
     gen_get_functions(client, default_opts, agents)
@@ -73,24 +74,18 @@ defmodule WeChat.Builder.Work do
 
     get_funs =
       Enum.map(default_opts, fn {key, value} ->
-        with :not_handle <- WeChat.Builder.Utils.handle_env_option(client, key, value) do
+        with :not_handle <- Utils.handle_env_option(client, key, value) do
           quote do
             def unquote(key)(), do: unquote(value)
           end
         end
       end)
 
-    agent_funs = gen_agent_funs(corp_id, agents)
+    agent_funs = gen_agent_funs(client, corp_id, agents)
     List.flatten([base_funs, get_funs, agent_funs])
   end
 
-  defp gen_agent_funs(_corp_id, :fetch_env) do
-    quote do
-      def agents, do: Application.fetch_env!(:wechat, __MODULE__) |> Keyword.fetch!(:agents)
-    end
-  end
-
-  defp gen_agent_funs(corp_id, agents) do
+  defp gen_agent_funs(_client, corp_id, agents) when is_list(agents) do
     agents =
       Enum.map(agents, fn agent ->
         Map.put(agent, :cache_id, "#{corp_id}_#{agent.id}")
@@ -99,5 +94,9 @@ defmodule WeChat.Builder.Work do
     quote do
       def agents, do: unquote(Macro.escape(agents))
     end
+  end
+
+  defp gen_agent_funs(client, _corp_id, value) do
+    Utils.handle_env_option(client, :agents, value)
   end
 end
