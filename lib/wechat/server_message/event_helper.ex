@@ -11,7 +11,7 @@ if Code.ensure_loaded?(Plug) do
     import WeChat.Utils, only: [doc_link_prefix: 0]
     require Logger
     alias WeChat.{Work, Utils, Component, Storage.Cache}
-    alias WeChat.ServerMessage.{Encryptor, XmlParser, XmlMessage}
+    alias WeChat.ServerMessage.{Encryptor, XmlParser, ReplyMessage}
 
     @type data_type :: :plaqin_text | :encrypted_xml | :encrypted_json
     @type encrypt_content :: String.t()
@@ -296,7 +296,7 @@ if Code.ensure_loaded?(Plug) do
       nonce = Utils.random_string(10)
 
       Utils.sha1([token, to_string(timestamp), nonce, encrypt_content])
-      |> XmlMessage.reply_msg(nonce, timestamp, encrypt_content)
+      |> ReplyMessage.reply_msg(nonce, timestamp, encrypt_content)
     end
   end
 end

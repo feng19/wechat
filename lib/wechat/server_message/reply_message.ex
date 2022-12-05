@@ -1,4 +1,4 @@
-defmodule WeChat.ServerMessage.XmlMessage do
+defmodule WeChat.ServerMessage.ReplyMessage do
   @moduledoc """
   被动回复消息
 
@@ -351,5 +351,11 @@ defmodule WeChat.ServerMessage.XmlMessage do
     <%= template_card_xml %>
     </xml>
     """
+  end
+
+  def biz_msg_menu(show_text, reply_text \\ nil, id \\ 0) do
+    reply_text = reply_text || show_text
+
+    "<a href=\"weixin://bizmsgmenu?msgmenucontent=#{reply_text}&msgmenuid=#{id}\">#{show_text}</a>"
   end
 end

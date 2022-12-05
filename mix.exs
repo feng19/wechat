@@ -127,7 +127,7 @@ defmodule WeChat.MixProject do
          WeChat.Plug.WorkEventHandler,
          ServerMessage.EventHelper,
          ServerMessage.Encryptor,
-         ServerMessage.XmlMessage,
+         ServerMessage.ReplyMessage,
          ServerMessage.XmlParser
        ]},
       {"网页开发",

@@ -1,13 +1,13 @@
 defmodule WeChat.XmlParserTest do
   use ExUnit.Case, async: true
   alias WeChat.Utils
-  alias WeChat.ServerMessage.{XmlMessage, XmlParser}
+  alias WeChat.ServerMessage.{ReplyMessage, XmlParser}
 
   test "xml_parse" do
     timestamp = Utils.now_unix()
 
     {:ok, map} =
-      XmlMessage.reply_text(
+      ReplyMessage.reply_text(
         "oia2TjjewbmiOUlr6X-1crbLOvLw",
         "gh_7f083739789a",
         timestamp,
@@ -28,7 +28,7 @@ defmodule WeChat.XmlParserTest do
     timestamp = Utils.now_unix()
 
     {:ok, map} =
-      XmlMessage.reply_text(
+      ReplyMessage.reply_text(
         "oia2TjjewbmiOUlr6X-1crbLOvLw",
         "gh_7f083739789a",
         timestamp,

@@ -1,6 +1,6 @@
 defmodule WeChat.EventHandlerTest do
   use ExUnit.Case, async: true
-  alias WeChat.ServerMessage.{EventHelper, XmlMessage, XmlParser}
+  alias WeChat.ServerMessage.{EventHelper, ReplyMessage, XmlParser}
   alias WeChat.{Utils, Test.OfficialAccount}
 
   test "Encrypt Msg" do
@@ -9,7 +9,7 @@ defmodule WeChat.EventHandlerTest do
     to_openid = "oia2TjjewbmiOUlr6X-1crbLOvLw"
     from_wx_no = "gh_7f083739789a"
     content = "hello world"
-    xml_text = XmlMessage.reply_text(to_openid, from_wx_no, timestamp, content)
+    xml_text = ReplyMessage.reply_text(to_openid, from_wx_no, timestamp, content)
 
     xml_string = EventHelper.encrypt_xml_msg(xml_text, timestamp, client)
     {:ok, xml} = XmlParser.parse(xml_string)
