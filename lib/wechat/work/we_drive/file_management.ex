@@ -2,12 +2,11 @@ defmodule WeChat.Work.WeDrive.FileManagement do
   @moduledoc "微盘-文件管理"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
   alias Work.WeDrive.SpaceManagement
 
-  @doc_link new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
   @type file_id :: String.t()
   @type file_id_list :: [file_id]
   @typedoc """

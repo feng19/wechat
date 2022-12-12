@@ -2,12 +2,11 @@ defmodule WeChat.Work.WeDrive.FileACL do
   @moduledoc "微盘-文件权限"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
   alias Work.WeDrive.FileManagement
 
-  @doc_link new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
   @type auth_info :: [map]
   @typedoc """
   权限范围

@@ -2,11 +2,10 @@ defmodule WeChat.Work.Contacts.Tag do
   @moduledoc "通讯录管理-标签管理"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.{Department, User}
 
-  @doc_link new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
 
   @typedoc """
   每个标签都有唯一的标签id -

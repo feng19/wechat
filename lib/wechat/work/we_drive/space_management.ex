@@ -2,11 +2,10 @@ defmodule WeChat.Work.WeDrive.SpaceManagement do
   @moduledoc "微盘-空间管理"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
   @type space_id :: String.t()
   @type space_name :: String.t()
 

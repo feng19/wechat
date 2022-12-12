@@ -1,11 +1,13 @@
 defmodule WeChat.Work.App do
   @moduledoc "应用管理"
 
-  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
-  @doc_link new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+
+  @typep opts :: Enumerable.t()
+  @typep redirect_uri :: String.t()
 
   @doc """
   获取指定的应用详情 -
@@ -38,7 +40,7 @@ defmodule WeChat.Work.App do
   @doc """
   设置应用 - [官方文档](#{@doc_link}/90228){:target="_blank"}
   """
-  @spec set(Work.client(), Work.agent(), opts :: Enumerable.t()) :: WeChat.response()
+  @spec set(Work.client(), Work.agent(), opts) :: WeChat.response()
   def set(client, agent, opts \\ []) do
     client.post(
       "/cgi-bin/agent/set",
@@ -53,7 +55,7 @@ defmodule WeChat.Work.App do
   @spec qr_connect_url(
           WeChat.client(),
           Work.agent(),
-          redirect_uri :: String.t(),
+          redirect_uri,
           state :: String.t(),
           lang :: String.t()
         ) :: url :: String.t()
@@ -80,12 +82,7 @@ defmodule WeChat.Work.App do
   @doc """
   构造内嵌登录二维码 - [官方文档](#{@doc_link}/91019#构造内嵌登录二维码){:target="_blank"}
   """
-  @spec qr_connect_opts(
-          WeChat.client(),
-          Work.agent(),
-          redirect_uri :: String.t(),
-          opts :: Enumerable.t()
-        ) :: opts :: map
+  @spec qr_connect_opts(WeChat.client(), Work.agent(), redirect_uri, opts) :: opts :: map
   def qr_connect_opts(client, agent, redirect_uri, opts \\ []) do
     Map.new(opts)
     |> Map.merge(%{
