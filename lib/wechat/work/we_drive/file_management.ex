@@ -2,13 +2,12 @@ defmodule WeChat.Work.WeDrive.FileManagement do
   @moduledoc "微盘-文件管理"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
   alias Work.WeDrive.SpaceManagement
 
-  @doc_link "#{work_doc_link_prefix()}/90135/93657"
-  @agent :we_drive
+  @doc_link new_work_doc_link_prefix()
   @type file_id :: String.t()
   @type file_id_list :: [file_id]
   @typedoc """
@@ -38,10 +37,11 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   获取文件列表
-  - [官方文档](#{@doc_link}#获取文件列表){:target="_blank"}
+  - [官方文档](#{@doc_link}/93657){:target="_blank"}
   """
   @spec list(
           Work.client(),
+          Work.agent(),
           User.userid(),
           SpaceManagement.space_id(),
           father_id :: file_id,
@@ -49,7 +49,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
           start :: integer,
           limit :: 1..1000
         ) :: WeChat.response()
-  def list(client, userid, space_id, father_id, sort_type \\ 1, start \\ 0, limit \\ 100) do
+  def list(client, agent, userid, space_id, father_id, sort_type \\ 1, start \\ 0, limit \\ 100) do
     client.post(
       "/cgi-bin/wedrive/file_list",
       json_map(
@@ -60,25 +60,26 @@ defmodule WeChat.Work.WeDrive.FileManagement do
         start: start,
         limit: limit
       ),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
   @doc """
   上传文件
-  - [官方文档](#{@doc_link}#上传文件){:target="_blank"}
+  - [官方文档](#{@doc_link}/97880){:target="_blank"}
 
   **注意：只需要填入文件内容的Base64，不需要添加任何如：”data:application/x-javascript;base64” 的数据类型描述信息**
   """
   @spec upload(
           Work.client(),
+          Work.agent(),
           User.userid(),
           SpaceManagement.space_id(),
           father_id :: file_id,
           file_name,
           file_base64_content
         ) :: WeChat.response()
-  def upload(client, userid, space_id, father_id, file_name, file_base64_content) do
+  def upload(client, agent, userid, space_id, father_id, file_name, file_base64_content) do
     client.post(
       "/cgi-bin/wedrive/file_upload",
       json_map(
@@ -88,34 +89,35 @@ defmodule WeChat.Work.WeDrive.FileManagement do
         file_name: file_name,
         file_base64_content: file_base64_content
       ),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
   @doc """
   下载文件
-  - [官方文档](#{@doc_link}#下载文件){:target="_blank"}
+  - [官方文档](#{@doc_link}/97881){:target="_blank"}
   """
-  @spec download(Work.client(), User.userid(), file_id) :: WeChat.response()
-  def download(client, userid, file_id) do
+  @spec download(Work.client(), Work.agent(), User.userid(), file_id) :: WeChat.response()
+  def download(client, agent, userid, file_id) do
     client.post("/cgi-bin/wedrive/file_download", json_map(userid: userid, fileid: file_id),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
   @doc """
-  新建文件/微文档
-  - [官方文档](#{@doc_link}#新建文件/微文档){:target="_blank"}
+  新建文件夹/文档
+  - [官方文档](#{@doc_link}/97882){:target="_blank"}
   """
   @spec create(
           Work.client(),
+          Work.agent(),
           User.userid(),
           SpaceManagement.space_id(),
           father_id :: file_id,
           file_type,
           file_name
         ) :: WeChat.response()
-  def create(client, userid, space_id, father_id, file_type, file_name) do
+  def create(client, agent, userid, space_id, father_id, file_type, file_name) do
     client.post(
       "/cgi-bin/wedrive/file_create",
       json_map(
@@ -125,26 +127,27 @@ defmodule WeChat.Work.WeDrive.FileManagement do
         file_type: file_type,
         file_name: file_name
       ),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
   @doc """
   重命名文件
-  - [官方文档](#{@doc_link}#重命名文件){:target="_blank"}
+  - [官方文档](#{@doc_link}/97883){:target="_blank"}
   """
-  @spec rename(Work.client(), User.userid(), file_id, file_name) :: WeChat.response()
-  def rename(client, userid, file_id, new_name) do
+  @spec rename(Work.client(), Work.agent(), User.userid(), file_id, file_name) ::
+          WeChat.response()
+  def rename(client, agent, userid, file_id, new_name) do
     client.post(
       "/cgi-bin/wedrive/file_rename",
       json_map(userid: userid, fileid: file_id, new_name: new_name),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
   @doc """
   移动文件
-  - [官方文档](#{@doc_link}#重命名文件){:target="_blank"}
+  - [官方文档](#{@doc_link}/97884){:target="_blank"}
 
   ## 参数说明
 
@@ -153,39 +156,45 @@ defmodule WeChat.Work.WeDrive.FileManagement do
   - `true`: 重名文件覆盖
   - `false`: 重名文件进行冲突重命名处理（移动后文件名格式如xxx(1).txt xxx(1).doc等）
   """
-  @spec move(Work.client(), User.userid(), father_id :: file_id, file_id_list, replace :: boolean) ::
-          WeChat.response()
-  def move(client, userid, father_id, file_id_list, replace \\ false) do
+  @spec move(
+          Work.client(),
+          Work.agent(),
+          User.userid(),
+          father_id :: file_id,
+          file_id_list,
+          replace :: boolean
+        ) :: WeChat.response()
+  def move(client, agent, userid, father_id, file_id_list, replace \\ false) do
     client.post(
       "/cgi-bin/wedrive/file_move",
       json_map(userid: userid, fatherid: father_id, fileid: file_id_list, replace: replace),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
   @doc """
   删除文件
-  - [官方文档](#{@doc_link}#删除文件){:target="_blank"}
+  - [官方文档](#{@doc_link}/97885){:target="_blank"}
   """
-  @spec delete(Work.client(), User.userid(), file_id_list) :: WeChat.response()
-  def delete(client, userid, file_id_list) do
+  @spec delete(Work.client(), Work.agent(), User.userid(), file_id_list) :: WeChat.response()
+  def delete(client, agent, userid, file_id_list) do
     client.post(
       "/cgi-bin/wedrive/file_delete",
       json_map(userid: userid, fileid: file_id_list),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
   @doc """
   文件信息
-  - [官方文档](#{@doc_link}#文件信息){:target="_blank"}
+  - [官方文档](#{@doc_link}/97886){:target="_blank"}
   """
-  @spec info(Work.client(), User.userid(), file_id) :: WeChat.response()
-  def info(client, userid, file_id) do
+  @spec info(Work.client(), Work.agent(), User.userid(), file_id) :: WeChat.response()
+  def info(client, agent, userid, file_id) do
     client.post(
       "/cgi-bin/wedrive/file_info",
       json_map(userid: userid, fileid: file_id),
-      query: [access_token: client.get_access_token(@agent)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 end

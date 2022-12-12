@@ -61,7 +61,6 @@ defmodule WeChat.Test.Work do
       contacts_agent(secret: "your_contacts_secret"),
       customer_agent(secret: "your_customer_secret"),
       kf_agent(secret: "your_customer_secret"),
-      we_drive_agent(secret: "your_customer_secret"),
       agent(10000, name: :agent_name, secret: "your_secret")
     ]
 end

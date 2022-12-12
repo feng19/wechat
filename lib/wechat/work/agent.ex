@@ -114,13 +114,6 @@ defmodule WeChat.Work.Agent do
     |> transfer_aes_key()
   end
 
-  @doc "构建[微盘]应用(agent)"
-  @spec we_drive_agent(options) :: t
-  def we_drive_agent(options \\ []) do
-    struct(%__MODULE__{id: :we_drive, name: :we_drive}, options)
-    |> transfer_aes_key()
-  end
-
   def maybe_init_work_agents(client) do
     with {:ok, configs} <- Application.fetch_env(:wechat, client),
          agents <- client.agents(),
