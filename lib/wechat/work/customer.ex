@@ -109,7 +109,7 @@ defmodule WeChat.Work.Customer do
           time,
           time,
           nil | User.userid_list(),
-          nil | Department.party_id_list()
+          nil | Department.id_list()
         ) :: WeChat.response()
   def get_user_behavior_data(client, agent, start_time, end_time, userid_list, party_id_list) do
     body =

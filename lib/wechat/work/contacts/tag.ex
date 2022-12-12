@@ -2,11 +2,11 @@ defmodule WeChat.Work.Contacts.Tag do
   @moduledoc "通讯录管理-标签管理"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.{Department, User}
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link new_work_doc_link_prefix()
 
   @typedoc """
   每个标签都有唯一的标签id -
@@ -18,15 +18,6 @@ defmodule WeChat.Work.Contacts.Tag do
   @type tag_id_list :: [tag_id]
   @typedoc "标签名称，长度限制为32个字以内（汉字或英文字母），标签名不可与其他标签重名"
   @type tag_name :: String.t()
-
-  @doc """
-  获取标签列表 -
-  [官方文档](#{@doc_link}/90216){:target="_blank"}
-  """
-  @spec list(Work.client()) :: WeChat.response()
-  def list(client) do
-    client.get("/cgi-bin/tag/list", query: [access_token: client.get_access_token(:contacts)])
-  end
 
   @doc """
   创建标签 -
@@ -87,7 +78,7 @@ defmodule WeChat.Work.Contacts.Tag do
           Work.client(),
           tag_id,
           nil | User.userid_list(),
-          nil | Department.party_id_list()
+          nil | Department.id_list()
         ) :: WeChat.response()
   def add_user(client, tag_id, userid_list, party_id_list) do
     body =
@@ -108,7 +99,7 @@ defmodule WeChat.Work.Contacts.Tag do
           Work.client(),
           tag_id,
           nil | User.userid_list(),
-          nil | Department.party_id_list()
+          nil | Department.id_list()
         ) :: WeChat.response()
   def delete_user(client, tag_id, userid_list, party_id_list) do
     body =
@@ -119,5 +110,14 @@ defmodule WeChat.Work.Contacts.Tag do
     client.post("/cgi-bin/tag/deltagusers", body,
       query: [access_token: client.get_access_token(:contacts)]
     )
+  end
+
+  @doc """
+  获取标签列表 -
+  [官方文档](#{@doc_link}/90216){:target="_blank"}
+  """
+  @spec list(Work.client()) :: WeChat.response()
+  def list(client) do
+    client.get("/cgi-bin/tag/list", query: [access_token: client.get_access_token(:contacts)])
   end
 end

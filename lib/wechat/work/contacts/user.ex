@@ -2,11 +2,11 @@ defmodule WeChat.Work.Contacts.User do
   @moduledoc "通讯录管理-成员管理"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.{Department, Tag}
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link new_work_doc_link_prefix()
 
   @typedoc """
   每个成员都有唯一的 userid -
@@ -17,7 +17,7 @@ defmodule WeChat.Work.Contacts.User do
   @type userid :: String.t()
   @type userid_list :: [userid]
   @typedoc """
-  qrcode尺寸类型
+  qrcode 尺寸类型
 
   - 1: 171 x 171
   - 2: 399 x 399
@@ -86,42 +86,28 @@ defmodule WeChat.Work.Contacts.User do
   end
 
   @doc """
-  获取部门成员列表(简要) -
+  获取部门成员(简要) -
   [官方文档](#{@doc_link}/90200){:target="_blank"}
-
-  获取部门成员列表
-
-  `fetch_child` 是否递归获取子部门下面的成员：
-  - `1`: 递归获取
-  - `0`: 只获取本部门
   """
-  @spec list_department_users(Work.client(), Department.party_id()) :: WeChat.response()
-  def list_department_users(client, department_id, fetch_child \\ 0) do
+  @spec list_department_users(Work.client(), Department.id()) :: WeChat.response()
+  def list_department_users(client, department_id) do
     client.get("/cgi-bin/user/simplelist",
       query: [
         department_id: department_id,
-        fetch_child: fetch_child,
         access_token: client.get_access_token(:contacts)
       ]
     )
   end
 
   @doc """
-  获取部门成员列表(详情) -
+  获取部门成员(详情) -
   [官方文档](#{@doc_link}/90201){:target="_blank"}
-
-  获取部门成员列表(详情)
-
-  `fetch_child` 是否递归获取子部门下面的成员：
-  - `1`: 递归获取
-  - `0`: 只获取本部门
   """
-  @spec list_department_users_detail(Work.client(), Department.party_id()) :: WeChat.response()
-  def list_department_users_detail(client, department_id, fetch_child \\ 0) do
+  @spec list_department_users_detail(Work.client(), Department.id()) :: WeChat.response()
+  def list_department_users_detail(client, department_id) do
     client.get("/cgi-bin/user/list",
       query: [
         department_id: department_id,
-        fetch_child: fetch_child,
         access_token: client.get_access_token(:contacts)
       ]
     )
@@ -187,7 +173,7 @@ defmodule WeChat.Work.Contacts.User do
   @spec batch_invite(
           Work.client(),
           nil | userid_list,
-          nil | Department.party_id_list(),
+          nil | Department.id_list(),
           nil | Tag.tag_id_list()
         ) :: WeChat.response()
   def batch_invite(client, userid_list, party_id_list, tag_id_list) do
@@ -215,14 +201,50 @@ defmodule WeChat.Work.Contacts.User do
   end
 
   @doc """
-  获取企业活跃成员数 -
-  [官方文档](#{@doc_link}/92714){:target="_blank"}
+  手机号获取 userid -
+  [官方文档](#{@doc_link}/95402){:target="_blank"}
 
-  支持企业用户获取实时成员加入二维码。
+  通过手机号获取其所对应的userid。
   """
-  @spec get_active_stat(Work.client(), date :: String.t() | Date.t()) :: WeChat.response()
-  def get_active_stat(client, date) do
-    client.post("/cgi-bin/user/get_active_stat", json_map(date: date),
+  @spec get_userid(Work.client(), mobile :: String.t()) :: WeChat.response()
+  def get_userid(client, mobile) do
+    client.post("/cgi-bin/user/getuserid", json_map(mobile: mobile),
+      query: [access_token: client.get_access_token(:contacts)]
+    )
+  end
+
+  @doc """
+  邮箱获取 userid -
+  [官方文档](#{@doc_link}/95895){:target="_blank"}
+
+  通过邮箱获取其所对应的userid。
+  """
+  @spec get_userid_by_email(Work.client(), email :: String.t(), email_type :: 1 | 2) ::
+          WeChat.response()
+  def get_userid_by_email(client, email, email_type \\ 1) do
+    client.post(
+      "/cgi-bin/user/get_userid_by_email",
+      json_map(email: email, email_type: email_type),
+      query: [access_token: client.get_access_token(:contacts)]
+    )
+  end
+
+  @doc """
+  获取成员ID列表 -
+  [官方文档](#{@doc_link}/96067){:target="_blank"}
+
+  获取企业成员的userid与对应的部门ID列表，预计于2022年8月8号发布。若需要获取其他字段，参见「适配建议」。
+  """
+  @spec list_id(Work.client(), cursor :: String.t(), limit :: 1..10000) :: WeChat.response()
+  def list_id(client, cursor \\ nil, limit \\ 10000) do
+    body =
+      if cursor do
+        json_map(cursor: cursor, limit: limit)
+      else
+        json_map(limit: limit)
+      end
+
+    client.post("/cgi-bin/user/list_id", body,
       query: [access_token: client.get_access_token(:contacts)]
     )
   end
