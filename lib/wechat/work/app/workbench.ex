@@ -11,11 +11,11 @@ defmodule WeChat.Work.App.Workbench do
 
   import Jason.Helpers
   import WeChat.Work.Agent, only: [agent2id: 2]
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link new_work_doc_link_prefix()
 
   @typedoc """
   模版类型

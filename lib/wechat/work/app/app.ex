@@ -1,11 +1,11 @@
 defmodule WeChat.Work.App do
   @moduledoc "应用管理"
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link new_work_doc_link_prefix()
 
   @doc """
   获取指定的应用详情 -

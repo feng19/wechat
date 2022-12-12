@@ -1,11 +1,11 @@
 defmodule WeChat.Work.App.Chat do
   @moduledoc "群聊会话"
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   alias WeChat.{Work, Work.Message, Work.Material}
   alias Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link new_work_doc_link_prefix()
 
   @type chat_id :: String.t()
   @type opts :: Enumerable.t()
@@ -110,8 +110,7 @@ defmodule WeChat.Work.App.Chat do
           title :: String.t(),
           description :: String.t(),
           opts
-        ) ::
-          WeChat.response()
+        ) :: WeChat.response()
   def send_video(client, agent, chat_id, media_id, title, description, opts \\ []) do
     msg = %{
       "media_id" => media_id,
@@ -143,8 +142,7 @@ defmodule WeChat.Work.App.Chat do
           url :: String.t(),
           btn_txt :: String.t(),
           opts
-        ) ::
-          WeChat.response()
+        ) :: WeChat.response()
   def send_text_card(client, agent, chat_id, title, description, url, btn_txt, opts \\ []) do
     msg = %{
       "title" => title,

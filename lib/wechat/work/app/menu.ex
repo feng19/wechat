@@ -1,11 +1,11 @@
 defmodule WeChat.Work.App.Menu do
   @moduledoc "应用自定义菜单"
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0]
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link new_work_doc_link_prefix()
 
   @doc """
   创建菜单 - [官方文档](#{@doc_link}/90231){:target="_blank"}
