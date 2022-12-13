@@ -12,10 +12,10 @@ defmodule WeChat.Work.ChatRobot do
   消息发送频率限制: 每个机器人发送的消息不能超过20条/分钟。
   """
 
-  import WeChat.Utils, only: [new_work_doc_link_prefix: 0, default_adapter: 0]
+  import WeChat.Utils, only: [work_doc_link_prefix: 0, default_adapter: 0]
   alias Tesla.Multipart
 
-  @doc_link "#{new_work_doc_link_prefix()}/91770"
+  @doc_link "#{work_doc_link_prefix()}/91770"
 
   @type webhook_url :: String.t()
   @typedoc "调用接口凭证, 机器人webhookurl中的key参数"

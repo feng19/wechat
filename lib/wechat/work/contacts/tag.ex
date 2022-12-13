@@ -5,7 +5,7 @@ defmodule WeChat.Work.Contacts.Tag do
   alias WeChat.Work
   alias Work.Contacts.{Department, User}
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc """
   每个标签都有唯一的标签id -

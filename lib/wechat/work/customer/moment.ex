@@ -4,7 +4,7 @@ defmodule WeChat.Work.Customer.Moment do
   import Jason.Helpers
   alias WeChat.{Work, Work.User}
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc "朋友圈ID"
   @type moment_id :: String.t()

@@ -5,7 +5,7 @@ defmodule WeChat.Work.Meeting do
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc "会议ID"
   @type meeting_id :: String.t()

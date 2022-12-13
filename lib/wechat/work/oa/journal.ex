@@ -12,10 +12,9 @@ defmodule WeChat.Work.OA.Journal do
   """
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @type timestamp :: integer
   @typedoc "游标首次请求传0，非首次请求携带上一次请求返回的next_cursor"
@@ -113,6 +112,38 @@ defmodule WeChat.Work.OA.Journal do
         starttime: start_time,
         endtime: end_time
       ),
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  导出汇报文档
+  - [官方文档](#{@doc_link}/96108){:target="_blank"}
+  """
+  @spec export_doc(Work.client(), Work.agent(), journal_uuid, doc_id :: String.t()) ::
+          WeChat.response()
+  def export_doc(client, agent, journal_uuid, doc_id) do
+    client.post(
+      "/cgi-bin/oa/journal/export_doc",
+      json_map(journaluuid: journal_uuid, docid: doc_id),
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  下载微盘文件
+  - [官方文档](#{@doc_link}/98021){:target="_blank"}
+  """
+  @spec download_we_drive_file(
+          Work.client(),
+          Work.agent(),
+          journal_uuid,
+          Work.WeDrive.FileManagement.file_id()
+        ) :: WeChat.response()
+  def download_we_drive_file(client, agent, journal_uuid, file_id) do
+    client.post(
+      "/cgi-bin/oa/journal/download_wedrive_file",
+      json_map(journaluuid: journal_uuid, fileid: file_id),
       query: [access_token: client.get_access_token(agent)]
     )
   end

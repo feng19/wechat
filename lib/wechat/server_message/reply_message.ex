@@ -298,8 +298,8 @@ defmodule WeChat.ServerMessage.ReplyMessage do
   end
 
   @doc """
-  模板卡片更新消息(更新点击用户的按钮点击文案) -
-  [官方文档](#{work_doc_link_prefix()}/90135/90241#模板卡片更新消息){:target="_blank"}
+  模板卡片更新消息(更新点击用户的按钮文案) -
+  [官方文档](#{work_doc_link_prefix()}/90241#更新点击用户的按钮文案){:target="_blank"}
 
   ```xml
   <xml>
@@ -329,7 +329,7 @@ defmodule WeChat.ServerMessage.ReplyMessage do
 
   @doc """
   模板卡片更新消息(更新点击用户的整张卡片) -
-  [官方文档](#{work_doc_link_prefix()}/90135/90241#更新点击用户的整张卡片){:target="_blank"}
+  [官方文档](#{work_doc_link_prefix()}/90241#更新点击用户的整张卡片){:target="_blank"}
 
   ```xml
   <xml>

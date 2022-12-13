@@ -5,7 +5,7 @@ defmodule WeChat.Work.OA.Checkin do
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc """
   打卡类型

@@ -22,8 +22,7 @@ defmodule WeChat.Utils do
   def now_unix, do: System.system_time(:second)
 
   def doc_link_prefix, do: "https://developers.weixin.qq.com"
-  def work_doc_link_prefix, do: "https://open.work.weixin.qq.com/api/doc/9000"
-  def new_work_doc_link_prefix, do: "https://developer.work.weixin.qq.com/document/path"
+  def work_doc_link_prefix, do: "https://developer.work.weixin.qq.com/document/path"
   def work_kf_doc_link_prefix, do: "https://open.work.weixin.qq.com/kf/doc/92512/93143"
 
   @spec sha1([String.t()] | String.t()) :: signature :: String.t()

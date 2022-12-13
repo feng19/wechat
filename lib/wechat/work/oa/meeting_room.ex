@@ -2,13 +2,14 @@ defmodule WeChat.Work.OA.MeetingRoom do
   @moduledoc "会议室"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc "会议室的ID"
   @type meeting_room_id :: integer
+  @typedoc "会议的ID"
+  @type meeting_id :: integer
 
   # management
 
@@ -87,6 +88,20 @@ defmodule WeChat.Work.OA.MeetingRoom do
   @spec cancel_book(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def cancel_book(client, agent, body) do
     client.post("/cgi-bin/oa/meetingroom/cancel_book", body,
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  会议室预定管理-根据会议ID查询会议室的预定信息
+  - [官方文档](#{@doc_link}/93620#根据会议id查询会议室的预定信息){:target="_blank"}
+  """
+  @spec get_booking_info_by_meeting_id(Work.client(), Work.agent(), meeting_room_id, meeting_id) ::
+          WeChat.response()
+  def get_booking_info_by_meeting_id(client, agent, meeting_room_id, meeting_id) do
+    client.post(
+      "/cgi-bin/oa/meetingroom/get_booking_info_by_meeting_id",
+      json_map(meetingroom_id: meeting_room_id, meeting_id: meeting_id),
       query: [access_token: client.get_access_token(agent)]
     )
   end

@@ -6,7 +6,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
   alias Work.Contacts.User
   alias Work.WeDrive.SpaceManagement
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
   @type file_id :: String.t()
   @type file_id_list :: [file_id]
   @typedoc """

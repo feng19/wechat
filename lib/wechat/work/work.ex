@@ -17,7 +17,7 @@ defmodule WeChat.Work do
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.{Utils, Work.Agent}
 
-  @doc_link Utils.new_work_doc_link_prefix()
+  @doc_link Utils.work_doc_link_prefix()
 
   @type client :: module()
   @type js_api_ticket :: String.t()

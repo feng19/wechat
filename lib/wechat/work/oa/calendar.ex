@@ -2,17 +2,17 @@ defmodule WeChat.Work.OA.Calendar do
   @moduledoc "日历"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90135/93647"
+  @doc_link WeChat.Utils.work_doc_link_prefix()
+
   @typedoc "日历ID"
   @type calendar_id :: String.t()
   @type calendar_id_list :: [calendar_id]
 
   @doc """
-  创建日历
-  - [官方文档](#{@doc_link}#创建日历){:target="_blank"}
+  创建日历 -
+  [官方文档](#{@doc_link}/93647){:target="_blank"}
   """
   @spec add(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def add(client, agent, body) do
@@ -22,8 +22,8 @@ defmodule WeChat.Work.OA.Calendar do
   end
 
   @doc """
-  更新日历
-  - [官方文档](#{@doc_link}#更新日历){:target="_blank"}
+  更新日历 -
+  [官方文档](#{@doc_link}/97716){:target="_blank"}
   """
   @spec update(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def update(client, agent, body) do
@@ -33,8 +33,8 @@ defmodule WeChat.Work.OA.Calendar do
   end
 
   @doc """
-  获取日历详情
-  - [官方文档](#{@doc_link}#获取日历详情){:target="_blank"}
+  获取日历详情 -
+  [官方文档](#{@doc_link}/97717){:target="_blank"}
   """
   @spec get(Work.client(), Work.agent(), calendar_id_list) :: WeChat.response()
   def get(client, agent, calendar_id_list) do
@@ -45,7 +45,7 @@ defmodule WeChat.Work.OA.Calendar do
 
   @doc """
   删除日历
-  - [官方文档](#{@doc_link}#删除日历){:target="_blank"}
+  - [官方文档](#{@doc_link}/97718){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), calendar_id) :: WeChat.response()
   def delete(client, agent, calendar_id) do

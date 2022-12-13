@@ -2,11 +2,10 @@ defmodule WeChat.Work.OA.Pstncc do
   @moduledoc "紧急通知"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc "发起自动语音来电ID"
   @type call_id :: String.t()
@@ -24,7 +23,7 @@ defmodule WeChat.Work.OA.Pstncc do
 
   @doc """
   获取接听状态
-  - [官方文档](#{@doc_link}/91627){:target="_blank"}
+  - [官方文档](#{@doc_link}/91628){:target="_blank"}
   """
   @spec get_states(Work.client(), Work.agent(), User.userid(), call_id) :: WeChat.response()
   def get_states(client, agent, userid, call_id) do

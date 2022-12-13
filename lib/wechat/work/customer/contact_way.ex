@@ -4,7 +4,7 @@ defmodule WeChat.Work.Customer.ContactWay do
   import Jason.Helpers
   alias WeChat.{Work, Work.Customer, Work.Contacts.User}
 
-  @doc_link "#{WeChat.Utils.new_work_doc_link_prefix()}/92228"
+  @doc_link "#{WeChat.Utils.work_doc_link_prefix()}/92228"
 
   @type config_id :: String.t()
 

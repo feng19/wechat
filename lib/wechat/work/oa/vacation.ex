@@ -2,11 +2,11 @@ defmodule WeChat.Work.OA.Vacation do
   @moduledoc "假期管理"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.work_doc_link_prefix()
+
   @typedoc "假期ID"
   @type vacation_id :: integer
   @typedoc """

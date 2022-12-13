@@ -6,7 +6,7 @@ defmodule WeChat.Work.WeDrive.SpaceACL do
   alias Work.Contacts.User
   alias Work.WeDrive.SpaceManagement
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
   @type auth_info :: [map]
 
   @doc """

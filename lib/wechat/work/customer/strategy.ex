@@ -4,7 +4,7 @@ defmodule WeChat.Work.Customer.Strategy do
   import Jason.Helpers
   alias WeChat.Work
 
-  @doc_link "#{WeChat.Utils.new_work_doc_link_prefix()}/94883"
+  @doc_link "#{WeChat.Utils.work_doc_link_prefix()}/94883"
 
   @typedoc "客户联系规则组ID"
   @type strategy_id :: integer

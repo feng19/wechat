@@ -5,7 +5,7 @@ defmodule WeChat.Work.WeDrive.SpaceManagement do
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
   @type space_id :: String.t()
   @type space_name :: String.t()
 

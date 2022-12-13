@@ -4,7 +4,7 @@ defmodule WeChat.Work.Message do
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.{Work, Work.Material}
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc """
   消息类型

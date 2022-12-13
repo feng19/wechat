@@ -4,7 +4,7 @@ defmodule WeChat.Work.Contacts.Department do
   import Jason.Helpers
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc """
   部门ID - [官方文档](#{@doc_link}/90665#部门id){:target="_blank"}

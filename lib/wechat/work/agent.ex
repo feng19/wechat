@@ -5,7 +5,7 @@ defmodule WeChat.Work.Agent do
   alias WeChat.ServerMessage.Encryptor
   alias WeChat.Storage.Cache
 
-  @term_introduction_doc_link "#{WeChat.Utils.new_work_doc_link_prefix()}/90665"
+  @term_introduction_doc_link "#{WeChat.Utils.work_doc_link_prefix()}/90665"
 
   @typedoc """
   每个应用都有唯一的 agentid -

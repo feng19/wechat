@@ -5,7 +5,7 @@ defmodule WeChat.Work.Material do
   alias WeChat.Work
   alias Tesla.Multipart
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @typedoc """
   素材的类型

@@ -4,7 +4,7 @@ defmodule WeChat.Work.App.Menu do
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @doc """
   创建菜单 - [官方文档](#{@doc_link}/90231){:target="_blank"}

@@ -2,7 +2,7 @@ defmodule WeChat.Work.MiniProgram do
   @moduledoc "小程序"
 
   alias WeChat.Work
-  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @doc """
   登录 - [官方文档](#{@doc_link}/91507){:target="_blank"}

@@ -66,7 +66,6 @@ defmodule WeChat.MixProject do
         Work.Contacts,
         Work.Customer,
         Work.KF,
-        Work.LinkedCorp,
         Work.OA,
         Work.WeDrive
       ]
