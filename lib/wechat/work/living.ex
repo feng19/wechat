@@ -2,11 +2,11 @@ defmodule WeChat.Work.Living do
   @moduledoc "直播"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+
   @typedoc "直播ID"
   @type living_id :: String.t()
   @type living_id_list :: [living_id]

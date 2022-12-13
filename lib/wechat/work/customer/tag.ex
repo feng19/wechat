@@ -5,10 +5,9 @@ defmodule WeChat.Work.Customer.Tag do
   企业客户标签是针对企业的外部联系人进行标记和分类的标签，由企业统一配置后，企业成员可使用此标签对客户进行标记。
   """
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.{Work, Work.Customer, Work.Customer.Strategy}
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
 
   @typedoc "标签的id 或 标签组的id"
   @type id :: tag_id | group_id

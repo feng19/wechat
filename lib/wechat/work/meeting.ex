@@ -2,11 +2,11 @@ defmodule WeChat.Work.Meeting do
   @moduledoc "会议"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
+
   @typedoc "会议ID"
   @type meeting_id :: String.t()
   @type meeting_id_list :: [meeting_id]

@@ -1,10 +1,9 @@
 defmodule WeChat.Work.Customer.Welcome do
   @moduledoc "客户欢迎语"
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
 
   @typedoc "群欢迎语的素材id"
   @type template_id :: String.t()

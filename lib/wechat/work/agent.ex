@@ -1,12 +1,11 @@
 defmodule WeChat.Work.Agent do
   @moduledoc "应用"
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
   alias WeChat.ServerMessage.Encryptor
   alias WeChat.Storage.Cache
 
-  @term_introduction_doc_link "#{work_doc_link_prefix()}/90135/90665"
+  @term_introduction_doc_link "#{WeChat.Utils.new_work_doc_link_prefix()}/90665"
 
   @typedoc """
   每个应用都有唯一的 agentid -

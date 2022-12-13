@@ -2,10 +2,9 @@ defmodule WeChat.Work.Customer.Moment do
   @moduledoc "客户朋友圈"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.{Work, Work.User}
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
 
   @typedoc "朋友圈ID"
   @type moment_id :: String.t()
@@ -15,9 +14,9 @@ defmodule WeChat.Work.Customer.Moment do
   @typep start_time :: integer
   @typep end_time :: integer
 
-  ##########################
+  ###########################
   # 获取客户朋友圈全部的发表记录 #
-  ##########################
+  ###########################
 
   @doc """
   获取企业全部的发表列表 -

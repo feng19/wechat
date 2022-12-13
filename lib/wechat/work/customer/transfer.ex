@@ -2,10 +2,10 @@ defmodule WeChat.Work.Customer.Transfer do
   @moduledoc "客户继承"
 
   import Jason.Helpers
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
-  alias WeChat.{Work, Work.User, Work.Customer}
+  alias WeChat.Work
+  alias Work.{User, Customer}
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
 
   @doc """
   分配在职成员的客户 -
@@ -76,6 +76,26 @@ defmodule WeChat.Work.Customer.Transfer do
       end
 
     client.post("/cgi-bin/externalcontact/transfer_result", body,
+      query: [access_token: client.get_access_token(agent)]
+    )
+  end
+
+  @doc """
+  分配在职成员的客户群 -
+  [官方文档](#{@doc_link}/95703){:target="_blank"}
+
+  企业可通过此接口，将在职成员为群主的群，分配给另一个客服成员。
+  """
+  @spec transfer_group_chat(
+          Work.client(),
+          Work.agent(),
+          Customer.GroupChat.chat_id_list(),
+          User.userid()
+        ) :: WeChat.response()
+  def transfer_group_chat(client, agent, chat_id_list, new_owner) do
+    client.post(
+      "/cgi-bin/externalcontact/groupchat/onjob_transfer",
+      json_map(new_owner: new_owner, chat_id_list: chat_id_list),
       query: [access_token: client.get_access_token(agent)]
     )
   end

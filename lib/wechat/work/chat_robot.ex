@@ -12,10 +12,10 @@ defmodule WeChat.Work.ChatRobot do
   消息发送频率限制: 每个机器人发送的消息不能超过20条/分钟。
   """
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0, default_adapter: 0]
+  import WeChat.Utils, only: [new_work_doc_link_prefix: 0, default_adapter: 0]
   alias Tesla.Multipart
 
-  @doc_link "#{work_doc_link_prefix()}/90136/91770"
+  @doc_link "#{new_work_doc_link_prefix()}/91770"
 
   @type webhook_url :: String.t()
   @typedoc "调用接口凭证, 机器人webhookurl中的key参数"
@@ -51,7 +51,8 @@ defmodule WeChat.Work.ChatRobot do
   end
 
   @doc """
-  发送文本消息 - [官方文档](#{@doc_link}#文本类型){:target="_blank"}
+  发送文本消息
+  - [官方文档](#{@doc_link}#文本类型){:target="_blank"}
   """
   @spec send_text(webhook_url, content, opts) :: WeChat.response()
   def send_text(webhook_url, content, opts \\ []) do
@@ -59,7 +60,8 @@ defmodule WeChat.Work.ChatRobot do
   end
 
   @doc """
-  发送图片消息 - [官方文档](#{@doc_link}#图片类型){:target="_blank"}
+  发送图片消息
+  - [官方文档](#{@doc_link}#图片类型){:target="_blank"}
 
   - `base64`: 图片内容的 `base64` 编码
   - `md5`: 图片内容（base64编码前）的 `md5` 值
@@ -79,7 +81,8 @@ defmodule WeChat.Work.ChatRobot do
   end
 
   @doc """
-  发送文件消息 - [官方文档](#{@doc_link}#文件类型){:target="_blank"}
+  发送文件消息
+  - [官方文档](#{@doc_link}#文件类型){:target="_blank"}
   """
   @spec send_file(webhook_url, Material.media_id()) :: WeChat.response()
   def send_file(webhook_url, media_id) do
@@ -87,7 +90,8 @@ defmodule WeChat.Work.ChatRobot do
   end
 
   @doc """
-  发送图文消息 - [官方文档](#{@doc_link}#图文类型){:target="_blank"}
+  发送图文消息
+  - [官方文档](#{@doc_link}#图文类型){:target="_blank"}
   """
   @spec send_news(webhook_url, msg) :: WeChat.response()
   def send_news(webhook_url, msg) do
@@ -95,7 +99,8 @@ defmodule WeChat.Work.ChatRobot do
   end
 
   @doc """
-  发送markdown消息 - [官方文档](#{@doc_link}#markdown类型){:target="_blank"}
+  发送markdown消息
+  - [官方文档](#{@doc_link}#markdown类型){:target="_blank"}
   """
   @spec send_markdown(webhook_url, content) :: WeChat.response()
   def send_markdown(webhook_url, content) do
@@ -103,7 +108,8 @@ defmodule WeChat.Work.ChatRobot do
   end
 
   @doc """
-  发送模板卡片消息 - [官方文档](#{@doc_link}#模板卡片类型){:target="_blank"}
+  发送模板卡片消息
+  - [官方文档](#{@doc_link}#模板卡片类型){:target="_blank"}
   """
   @spec send_template_card(webhook_url, msg) :: WeChat.response()
   def send_template_card(webhook_url, msg) do

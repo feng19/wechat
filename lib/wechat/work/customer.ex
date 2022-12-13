@@ -1,11 +1,10 @@
 defmodule WeChat.Work.Customer do
   @moduledoc "客户联系"
 
-  import WeChat.Utils, only: [work_doc_link_prefix: 0]
   alias WeChat.Work
   alias Work.Contacts.{User, Department}
 
-  @doc_link "#{work_doc_link_prefix()}/90135"
+  @doc_link WeChat.Utils.new_work_doc_link_prefix()
 
   @type external_userid :: String.t()
   @type external_userid_list :: [external_userid]
@@ -14,7 +13,7 @@ defmodule WeChat.Work.Customer do
 
   @doc """
   获取配置了客户联系功能的成员列表 -
-  [官方文档](#{@doc_link}/90227#获取指定的应用详情){:target="_blank"}
+  [官方文档](#{@doc_link}/92576){:target="_blank"}
 
   企业和第三方服务商可通过此接口获取配置了客户联系功能的成员列表。
   """
@@ -27,7 +26,7 @@ defmodule WeChat.Work.Customer do
 
   @doc """
   获取客户列表 -
-  [官方文档](#{@doc_link}/92113){:target="_blank"}
+  [官方文档](#{@doc_link}/92264){:target="_blank"}
 
   企业可通过此接口获取指定成员添加的客户列表。客户是指配置了客户联系功能的成员所添加的外部联系人。没有配置客户联系功能的成员，所添加的外部联系人将不会作为客户返回。
   """
@@ -43,7 +42,7 @@ defmodule WeChat.Work.Customer do
 
   @doc """
   获取客户详情 -
-  [官方文档](#{@doc_link}/92114){:target="_blank"}
+  [官方文档](#{@doc_link}/92265){:target="_blank"}
 
   企业可通过此接口，根据外部联系人的 userid，拉取客户详情。
   """
@@ -67,7 +66,7 @@ defmodule WeChat.Work.Customer do
 
   @doc """
   批量获取客户详情 -
-  [官方文档](#{@doc_link}/92994){:target="_blank"}
+  [官方文档](#{@doc_link}/93010){:target="_blank"}
 
   企业/第三方可通过此接口获取指定成员添加的客户信息列表。
   """
@@ -83,7 +82,7 @@ defmodule WeChat.Work.Customer do
 
   @doc """
   修改客户备注信息 -
-  [官方文档](#{@doc_link}/92115){:target="_blank"}
+  [官方文档](#{@doc_link}/92694){:target="_blank"}
 
   企业可通过此接口修改指定用户添加的客户的备注信息。
   """

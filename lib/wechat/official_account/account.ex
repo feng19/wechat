@@ -120,7 +120,7 @@ defmodule WeChat.Account do
 
   [接口调用频次限制说明](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
-  @spec get_quota(WeChat.client, cgi_path :: String.t()) :: WeChat.response()
+  @spec get_quota(WeChat.client(), cgi_path :: String.t()) :: WeChat.response()
   def get_quota(client, cgi_path) do
     client.post("/cgi-bin/openapi/quota/get", json_map(cgi_path: cgi_path),
       query: [access_token: client.get_access_token()]
