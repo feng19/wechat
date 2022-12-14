@@ -29,10 +29,10 @@ defmodule WeChat.Work.Contacts.User do
   创建成员 -
   [官方文档](#{@doc_link}/92195){:target="_blank"}
   """
-  @spec create(Work.client(), body :: map) :: WeChat.response()
-  def create(client, body) do
+  @spec create(Work.client(), Work.agent(), body :: map) :: WeChat.response()
+  def create(client, agent, body) do
     client.post("/cgi-bin/user/create", body,
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -42,10 +42,10 @@ defmodule WeChat.Work.Contacts.User do
 
   在通讯录同步助手中此接口可以读取企业通讯录的所有成员信息，而自建应用可以读取该应用设置的可见范围内的成员信息。
   """
-  @spec get(Work.client(), userid) :: WeChat.response()
-  def get(client, userid) do
+  @spec get(Work.client(), Work.agent(), userid) :: WeChat.response()
+  def get(client, agent, userid) do
     client.get("/cgi-bin/user/get",
-      query: [userid: userid, access_token: client.get_access_token(:contacts)]
+      query: [userid: userid, access_token: client.get_access_token(agent)]
     )
   end
 
@@ -53,10 +53,10 @@ defmodule WeChat.Work.Contacts.User do
   更新成员 -
   [官方文档](#{@doc_link}/92197){:target="_blank"}
   """
-  @spec update(Work.client(), body :: map) :: WeChat.response()
-  def update(client, body) do
+  @spec update(Work.client(), Work.agent(), body :: map) :: WeChat.response()
+  def update(client, agent, body) do
     client.post("/cgi-bin/user/update", body,
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -64,10 +64,10 @@ defmodule WeChat.Work.Contacts.User do
   删除成员 -
   [官方文档](#{@doc_link}/92198){:target="_blank"}
   """
-  @spec delete(Work.client(), userid) :: WeChat.response()
-  def delete(client, userid) do
+  @spec delete(Work.client(), Work.agent(), userid) :: WeChat.response()
+  def delete(client, agent, userid) do
     client.get("/cgi-bin/user/delete",
-      query: [userid: userid, access_token: client.get_access_token(:contacts)]
+      query: [userid: userid, access_token: client.get_access_token(agent)]
     )
   end
 
@@ -77,10 +77,10 @@ defmodule WeChat.Work.Contacts.User do
 
   对应管理端的帐号。最多支持200个。若存在无效UserID，直接返回错误
   """
-  @spec batch_delete(Work.client(), userid_list) :: WeChat.response()
-  def batch_delete(client, userid_list) do
+  @spec batch_delete(Work.client(), Work.agent(), userid_list) :: WeChat.response()
+  def batch_delete(client, agent, userid_list) do
     client.post("/cgi-bin/user/batchdelete", json_map(useridlist: userid_list),
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -88,12 +88,12 @@ defmodule WeChat.Work.Contacts.User do
   获取部门成员(简要) -
   [官方文档](#{@doc_link}/90200){:target="_blank"}
   """
-  @spec list_department_users(Work.client(), Department.id()) :: WeChat.response()
-  def list_department_users(client, department_id) do
+  @spec list_department_users(Work.client(), Work.agent(), Department.id()) :: WeChat.response()
+  def list_department_users(client, agent, department_id) do
     client.get("/cgi-bin/user/simplelist",
       query: [
         department_id: department_id,
-        access_token: client.get_access_token(:contacts)
+        access_token: client.get_access_token(agent)
       ]
     )
   end
@@ -102,12 +102,13 @@ defmodule WeChat.Work.Contacts.User do
   获取部门成员(详情) -
   [官方文档](#{@doc_link}/90201){:target="_blank"}
   """
-  @spec list_department_users_detail(Work.client(), Department.id()) :: WeChat.response()
-  def list_department_users_detail(client, department_id) do
+  @spec list_department_users_detail(Work.client(), Work.agent(), Department.id()) ::
+          WeChat.response()
+  def list_department_users_detail(client, agent, department_id) do
     client.get("/cgi-bin/user/list",
       query: [
         department_id: department_id,
-        access_token: client.get_access_token(:contacts)
+        access_token: client.get_access_token(agent)
       ]
     )
   end
@@ -121,10 +122,10 @@ defmodule WeChat.Work.Contacts.User do
   注：需要成员使用微信登录企业微信或者关注微工作台（原企业号）才能转成 `openid`;
   如果是外部联系人，请使用外部联系人 `openid` 转换 `openid`
   """
-  @spec userid2openid(Work.client(), userid) :: WeChat.response()
-  def userid2openid(client, userid) do
+  @spec userid2openid(Work.client(), Work.agent(), userid) :: WeChat.response()
+  def userid2openid(client, agent, userid) do
     client.post("/cgi-bin/user/convert_to_openid", json_map(userid: userid),
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -135,10 +136,10 @@ defmodule WeChat.Work.Contacts.User do
   该接口主要应用于使用企业支付之后的结果查询。
   开发者需要知道某个结果事件的 `openid` 对应企业微信内成员的信息时，可以通过调用该接口进行转换查询。
   """
-  @spec openid2userid(Work.client(), WeChat.openid()) :: WeChat.response()
-  def openid2userid(client, openid) do
+  @spec openid2userid(Work.client(), Work.agent(), WeChat.openid()) :: WeChat.response()
+  def openid2userid(client, agent, openid) do
     client.post("/cgi-bin/user/convert_to_userid", json_map(openid: openid),
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -156,10 +157,10 @@ defmodule WeChat.Work.Contacts.User do
 
   如果成员是首次加入企业，企业获取到userid，并验证了成员信息后，调用如下接口即可让成员成功加入企业。
   """
-  @spec join_confirm(Work.client(), userid) :: WeChat.response()
-  def join_confirm(client, userid) do
+  @spec join_confirm(Work.client(), Work.agent(), userid) :: WeChat.response()
+  def join_confirm(client, agent, userid) do
     client.get("/cgi-bin/user/authsucc",
-      query: [userid: userid, access_token: client.get_access_token(:contacts)]
+      query: [userid: userid, access_token: client.get_access_token(agent)]
     )
   end
 
@@ -171,18 +172,19 @@ defmodule WeChat.Work.Contacts.User do
   """
   @spec batch_invite(
           Work.client(),
+          Work.agent(),
           nil | userid_list,
           nil | Department.id_list(),
           nil | Tag.tag_id_list()
         ) :: WeChat.response()
-  def batch_invite(client, userid_list, party_id_list, tag_id_list) do
+  def batch_invite(client, agent, userid_list, party_id_list, tag_id_list) do
     body =
       [user: List.wrap(userid_list), party: List.wrap(party_id_list), tag: List.wrap(tag_id_list)]
       |> Enum.reject(&Enum.empty?(elem(&1, 1)))
       |> Map.new()
 
     client.post("/cgi-bin/batch/invite", body,
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -192,10 +194,10 @@ defmodule WeChat.Work.Contacts.User do
 
   支持企业用户获取实时成员加入二维码。
   """
-  @spec get_join_qrcode(Work.client(), size_type) :: WeChat.response()
-  def get_join_qrcode(client, size_type) do
+  @spec get_join_qrcode(Work.client(), Work.agent(), size_type) :: WeChat.response()
+  def get_join_qrcode(client, agent, size_type) do
     client.get("/cgi-bin/corp/get_join_qrcode",
-      query: [size_type: size_type, access_token: client.get_access_token(:contacts)]
+      query: [size_type: size_type, access_token: client.get_access_token(agent)]
     )
   end
 
@@ -205,10 +207,10 @@ defmodule WeChat.Work.Contacts.User do
 
   通过手机号获取其所对应的userid。
   """
-  @spec get_userid(Work.client(), mobile :: String.t()) :: WeChat.response()
-  def get_userid(client, mobile) do
+  @spec get_userid(Work.client(), Work.agent(), mobile :: String.t()) :: WeChat.response()
+  def get_userid(client, agent, mobile) do
     client.post("/cgi-bin/user/getuserid", json_map(mobile: mobile),
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -218,13 +220,13 @@ defmodule WeChat.Work.Contacts.User do
 
   通过邮箱获取其所对应的userid。
   """
-  @spec get_userid_by_email(Work.client(), email :: String.t(), email_type :: 1 | 2) ::
+  @spec get_userid_by_email(Work.client(), Work.agent(), email :: String.t(), email_type :: 1 | 2) ::
           WeChat.response()
-  def get_userid_by_email(client, email, email_type \\ 1) do
+  def get_userid_by_email(client, agent, email, email_type \\ 1) do
     client.post(
       "/cgi-bin/user/get_userid_by_email",
       json_map(email: email, email_type: email_type),
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 
@@ -234,8 +236,9 @@ defmodule WeChat.Work.Contacts.User do
 
   获取企业成员的userid与对应的部门ID列表，预计于2022年8月8号发布。若需要获取其他字段，参见「适配建议」。
   """
-  @spec list_id(Work.client(), cursor :: String.t(), limit :: 1..10000) :: WeChat.response()
-  def list_id(client, cursor \\ nil, limit \\ 10000) do
+  @spec list_id(Work.client(), Work.agent(), cursor :: String.t(), limit :: 1..10000) ::
+          WeChat.response()
+  def list_id(client, agent, cursor \\ nil, limit \\ 10000) do
     body =
       if cursor do
         json_map(cursor: cursor, limit: limit)
@@ -244,7 +247,7 @@ defmodule WeChat.Work.Contacts.User do
       end
 
     client.post("/cgi-bin/user/list_id", body,
-      query: [access_token: client.get_access_token(:contacts)]
+      query: [access_token: client.get_access_token(agent)]
     )
   end
 end
