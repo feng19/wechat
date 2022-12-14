@@ -34,6 +34,9 @@ defmodule WeChat.Plug.HubSpringboardTest do
     assert %{clients: ^clients} = HubSpringboard.init(clients: [{client, 10000}])
     assert %{clients: ^clients} = HubSpringboard.init(clients: [{client, [10000]}])
     assert %{clients: ^clients} = HubSpringboard.init(clients: [{client, :agent_name}])
+
+    assert %{client: ^client, agent: :agent_name} =
+             HubSpringboard.init(client: client, agent: :agent_name)
   end
 
   @opts HubSpringboardRouter.init([])
@@ -62,12 +65,21 @@ defmodule WeChat.Plug.HubSpringboardTest do
     env_url = "http://127.0.0.1:4000"
     env = "dev"
     WeChat.set_oauth2_env_url(client, env, env_url)
+    redirect_url = "#{env_url}/a/b/c?code=test"
 
+    # get "/:env/:app/cb/*callback_path"
     conn =
-      conn(:get, "/#{env}/#{appid}/cb/test/a/b/c", %{code: "test"})
+      conn(:get, "/#{env}/#{appid}/cb/a/b/c", %{code: "test"})
       |> HubSpringboardRouter.call(@opts)
 
-    redirect_url = "#{env_url}/test/a/b/c?code=test"
+    assert conn.status == 302
+    assert get_resp_header(conn, "location") == [redirect_url]
+
+    # get "/normal/:env/cb/*callback_path"
+    conn =
+      conn(:get, "/normal/#{env}/cb/a/b/c", %{code: "test"})
+      |> HubSpringboardRouter.call(@opts)
+
     assert conn.status == 302
     assert get_resp_header(conn, "location") == [redirect_url]
   end
@@ -80,13 +92,44 @@ defmodule WeChat.Plug.HubSpringboardTest do
     env = "dev"
     WeChat.set_oauth2_env_url(client, agent_id, env, env_url)
     agent = WeChat.Work.Agent.fetch_agent!(client, agent_id)
-    WeChat.Storage.Cache.put_cache(client.appid(), to_string(agent_id), {client, agent})
+    WeChat.Storage.Cache.put_cache(appid, to_string(agent_id), {client, agent})
+    redirect_url = "#{env_url}/a/b/c?code=test"
 
+    # get "/:env/:app/:agent/cb/*callback_path"
     conn =
-      conn(:get, "/#{env}/#{appid}/#{agent_id}/cb/test/a/b/c", %{code: "test"})
+      conn(:get, "/#{env}/#{appid}/#{agent_id}/cb/a/b/c", %{code: "test"})
       |> HubSpringboardRouter.call(@opts)
 
-    redirect_url = "#{env_url}/test/a/b/c?code=test"
+    assert conn.status == 302
+    assert get_resp_header(conn, "location") == [redirect_url]
+
+    # get "/work/:env/cb/*callback_path"
+    conn =
+      conn(:get, "/work/#{env}/cb/a/b/c", %{code: "test"})
+      |> HubSpringboardRouter.call(@opts)
+
+    assert conn.status == 302
+    assert get_resp_header(conn, "location") == [redirect_url]
+
+    # get "/work/:env/:agent/cb/*callback_path"
+    conn =
+      conn(:get, "/work/#{env}/#{agent_id}/cb/a/b/c", %{code: "test"})
+      |> HubSpringboardRouter.call(@opts)
+
+    assert conn.status == 302
+    assert get_resp_header(conn, "location") == [redirect_url]
+
+    client = WeChat.Test.Work3
+    appid = client.appid()
+    WeChat.set_oauth2_env_url(client, agent_id, env, env_url)
+    agent = WeChat.Work.Agent.fetch_agent!(client, agent_id)
+    WeChat.Storage.Cache.put_cache(appid, to_string(agent_id), {client, agent})
+
+    # get "/work/runtime/:env/:agent/cb/*callback_path"
+    conn =
+      conn(:get, "/work/runtime/#{env}/#{agent_id}/cb/a/b/c", %{code: "test"})
+      |> HubSpringboardRouter.call(@opts)
+
     assert conn.status == 302
     assert get_resp_header(conn, "location") == [redirect_url]
   end

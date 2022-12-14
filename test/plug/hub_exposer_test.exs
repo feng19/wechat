@@ -4,6 +4,7 @@ defmodule WeChat.Plug.HubExposerTest do
   alias WeChat.Plug.HubExposer
   alias WeChat.HubExposerRouter
   alias WeChat.Work.Agent, as: WorkAgent
+  alias WeChat.Test
 
   test "init - empty clients" do
     msg = "please set clients when using WeChat.Plug.HubExposer"
@@ -12,7 +13,7 @@ defmodule WeChat.Plug.HubExposerTest do
   end
 
   test "init - ok for official_account" do
-    client = WeChat.Test.OfficialAccount
+    client = Test.OfficialAccount
     store_id = client.appid()
     opts = %{persistent_id: nil, runtime: false, clients: %{store_id => :all}}
     assert opts == HubExposer.init(clients: [client])
@@ -23,7 +24,7 @@ defmodule WeChat.Plug.HubExposerTest do
   end
 
   test "init - ok for work" do
-    client = WeChat.Test.Work2
+    client = Test.Work2
     store_id = WorkAgent.fetch_agent_cache_id!(client, 10000)
     opts = %{persistent_id: nil, runtime: false, clients: %{store_id => :all}}
     assert opts == HubExposer.init(clients: [client])
@@ -31,6 +32,12 @@ defmodule WeChat.Plug.HubExposerTest do
     assert opts == HubExposer.init(clients: [{client, [{10000, :all}]}])
     opts = %{persistent_id: nil, runtime: false, clients: %{store_id => ["access_token"]}}
     assert opts == HubExposer.init(clients: [{client, [{10000, ["access_token"]}]}])
+
+    # runtime
+    client = Test.Work3
+
+    assert %{persistent_id: :test_hub_exposer, runtime: true, clients: [client]} ==
+             HubExposer.init(clients: [client], runtime: true, persistent_id: :test_hub_exposer)
   end
 
   @opts HubExposerRouter.init([])
@@ -46,7 +53,7 @@ defmodule WeChat.Plug.HubExposerTest do
   end
 
   test "call - in scope" do
-    store_id = WeChat.Test.OfficialAccount.appid()
+    store_id = Test.OfficialAccount.appid()
     store_key = :access_token
     store_map = %{"value" => "token", "expired_time" => 7200}
     WeChat.Storage.Cache.put_cache({:store_map, store_id}, store_key, store_map)
@@ -61,7 +68,7 @@ defmodule WeChat.Plug.HubExposerTest do
   end
 
   test "call - not in scope" do
-    store_id = WeChat.Test.OfficialAccount.appid()
+    store_id = Test.OfficialAccount.appid()
     store_key = :err_access_token
     store_map = %{"value" => "token", "expired_time" => 7200}
     WeChat.Storage.Cache.put_cache({:store_map, store_id}, store_key, store_map)

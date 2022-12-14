@@ -2,7 +2,7 @@ if Code.ensure_loaded?(Plug) do
   defmodule WeChat.Plug.Helper do
     @moduledoc false
     import Plug.Conn
-    alias WeChat.Utils
+    alias WeChat.{Work, Utils}
 
     @spec not_found(Plug.Conn.t()) :: Plug.Conn.t()
     def not_found(conn) do
@@ -41,6 +41,64 @@ if Code.ensure_loaded?(Plug) do
       |> send_resp(conn.status || 200, Jason.encode_to_iodata!(data))
     end
 
+    def get_client_agent_by_path(%{path_params: %{"app" => app}} = conn, options) do
+      case Map.get(options.clients, app) do
+        nil ->
+          not_found(conn)
+
+        client when is_atom(client) ->
+          {:normal, client, nil}
+
+        # for work
+        {client, agent_flag_list} ->
+          get_agent_by_path(conn, client, agent_flag_list)
+      end
+    end
+
+    def get_client_agent_by_path(conn, _options), do: not_found(conn)
+
+    def get_agent_by_path(conn, client, agent_flag_list) do
+      with agent_flag when agent_flag != nil <- Map.get(conn.path_params, "agent"),
+           true <- agent_flag in agent_flag_list,
+           {_, agent} <- WeChat.get_client_agent(client.appid(), agent_flag) do
+        {:work, client, agent}
+      else
+        _ -> not_found(conn)
+      end
+    end
+
+    def init_plug_clients(opts = %{client: client, agent: agent}, _plug)
+        when is_atom(client) and is_atom(agent) do
+      opts
+    end
+
+    def init_plug_clients(opts = %{client: client, agents: :runtime}, plug)
+        when is_atom(client) do
+      persistent_id = Map.get(opts, :persistent_id)
+
+      unless persistent_id do
+        raise ArgumentError,
+              "please set persistent_id when agents: :runtime for using #{inspect(plug)}"
+      end
+
+      opts
+    end
+
+    def init_plug_clients(opts = %{client: client, agents: agents}, _plug)
+        when is_atom(client) and (is_list(agents) or agents == :all) do
+      [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transfer_client({client, agents})
+      %{opts | agents: agent_flag_list}
+    end
+
+    def init_plug_clients(opts = %{client: client}, _plug) when is_atom(client) do
+      if match?(:work, client.app_type()) do
+        [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transfer_client({client, :all})
+        Map.put(opts, :agents, agent_flag_list)
+      else
+        opts
+      end
+    end
+
     def init_plug_clients(opts, plug) when is_map(opts) do
       runtime = Map.get(opts, :runtime, false)
 
@@ -69,20 +127,48 @@ if Code.ensure_loaded?(Plug) do
       %{runtime: runtime, persistent_id: persistent_id, clients: clients}
     end
 
-    def setup_clients_for_plug(options) do
-      if options.runtime do
-        persistent_id = options.persistent_id
-
-        clients =
-          with nil <- :persistent_term.get(persistent_id, nil) do
-            Utils.transfer_clients(options.clients)
-            |> tap(&:persistent_term.put(persistent_id, &1))
-          end
-
-        %{options | clients: clients}
+    def setup_plug(conn, %{client: client, agent: agent_or_id} = _options) do
+      if agent = Work.Agent.find_agent(client, agent_or_id) do
+        {:work, client, agent}
       else
-        options
+        not_found(conn)
       end
+    end
+
+    def setup_plug(
+          conn,
+          %{client: client, agents: :runtime, persistent_id: persistent_id} = options
+        ) do
+      agents =
+        with nil <- :persistent_term.get(persistent_id, nil) do
+          [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transfer_client({client, :all})
+          :persistent_term.put(persistent_id, agent_flag_list)
+          agent_flag_list
+        end
+
+      setup_plug(conn, %{options | agents: agents})
+    end
+
+    def setup_plug(conn, %{client: client, agents: agents} = _options) do
+      get_agent_by_path(conn, client, agents)
+    end
+
+    def setup_plug(_conn, %{client: client} = _options) do
+      {:normal, client, nil}
+    end
+
+    def setup_plug(conn, %{runtime: true, persistent_id: persistent_id} = options) do
+      clients =
+        with nil <- :persistent_term.get(persistent_id, nil) do
+          Utils.transfer_clients(options.clients)
+          |> tap(&:persistent_term.put(persistent_id, &1))
+        end
+
+      get_client_agent_by_path(conn, %{options | clients: clients})
+    end
+
+    def setup_plug(conn, options) do
+      get_client_agent_by_path(conn, options)
     end
   end
 end

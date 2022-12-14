@@ -63,6 +63,10 @@ defmodule WeChat.Utils do
     Enum.reduce(clients, %{}, &transfer_client/2)
   end
 
+  def transfer_client(client) do
+    transfer_client(client, [])
+  end
+
   defp transfer_client(client, acc) when is_atom(client) do
     if match?(:work, client.app_type()) do
       transfer_client({client, :all}, acc)

@@ -28,7 +28,6 @@ if Code.ensure_loaded?(Plug) do
           init_opts: [clients: [Client, ...]]
     """
     import WeChat.Plug.Helper
-    alias WeChat.Plug.OAuth2Checker
 
     @doc false
     def init(opts) do
@@ -43,9 +42,7 @@ if Code.ensure_loaded?(Plug) do
           } = conn,
           options
         ) do
-      options = setup_clients_for_plug(options)
-
-      with {_type, client, agent} <- OAuth2Checker.get_client_agent_by_path(conn, options) do
+      with {_type, client, agent} <- setup_plug(conn, options) do
         oauth2_callback(conn, client, agent, env, callback_path)
       end
     end
