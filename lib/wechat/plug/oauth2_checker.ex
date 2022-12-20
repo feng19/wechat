@@ -22,7 +22,7 @@ if Code.ensure_loaded?(Plug) do
 
     ** 注意 **: 服务器角色为 `hub_client` 时，请确保已经配置 `hub_springboard_url`:
 
-        WeChat.set_hub_springboard_url(Client, "https://wx.example.com")
+        WeChat.HubClient.set_hub_springboard_url(Client, "https://wx.example.com")
 
     ## Usage
 
@@ -51,7 +51,7 @@ if Code.ensure_loaded?(Plug) do
     import Plug.Conn
     import WeChat.Plug.Helper
     require Logger
-    alias WeChat.{Utils, WebPage, Work}
+    alias WeChat.{Utils, WebPage, Work, HubClient}
 
     @typedoc "授权回调处理函数"
     @type oauth2_callback_fun ::
@@ -254,7 +254,7 @@ if Code.ensure_loaded?(Plug) do
     end
 
     defp hub_springboard_authorize_url(:normal, conn = %{query_params: query_params}, client, _) do
-      if hub_springboard_url = WeChat.get_hub_springboard_url(client) do
+      if hub_springboard_url = HubClient.get_hub_springboard_url(client) do
         scope = Map.get(query_params, "scope", "snsapi_base")
         state = Map.get(query_params, "state", "")
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
@@ -265,7 +265,7 @@ if Code.ensure_loaded?(Plug) do
     end
 
     defp hub_springboard_authorize_url(:work, conn, client, _agent = %{id: agent_id}) do
-      if hub_springboard_url = WeChat.get_hub_springboard_url(client, agent_id) do
+      if hub_springboard_url = HubClient.get_hub_springboard_url(client, agent_id) do
         state = Map.get(conn.query_params, "state", "")
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
         WebPage.oauth2_authorize_url(client, callback_uri, "snsapi_base", state)
@@ -275,7 +275,7 @@ if Code.ensure_loaded?(Plug) do
     end
 
     defp hub_springboard_authorize_url(:work_qr, conn, client, _agent = %{id: agent_id}) do
-      if hub_springboard_url = WeChat.get_hub_springboard_url(client, agent_id) do
+      if hub_springboard_url = HubClient.get_hub_springboard_url(client, agent_id) do
         state = Map.get(conn.query_params, "state", "")
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
         Work.App.qr_connect_url(client, agent_id, callback_uri, state)

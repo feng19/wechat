@@ -61,7 +61,7 @@ defmodule WeChat do
 
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Work, Refresher, Storage.Cache}
+  alias WeChat.{Refresher, HubClient, HubServer}
   alias WeChat.Work.Agent, as: WorkAgent
 
   @typedoc """
@@ -120,10 +120,6 @@ defmodule WeChat do
   @type err_msg :: String.t()
   @type env_option :: :runtime_env | {:runtime_env, app} | :compile_env | {:compile_env, app}
   @typep app :: atom
-  @typep env :: String.t()
-  @typep url :: String.t()
-  @type hub_springboard_url :: url
-  @type oauth2_callbacks :: %{env => url}
 
   @typedoc """
   参数
@@ -171,8 +167,8 @@ defmodule WeChat do
   @type requester :: module()
   @type response :: Tesla.Env.result()
   @type start_options :: %{
-          optional(:hub_springboard_url) => hub_springboard_url,
-          optional(:oauth2_callbacks) => oauth2_callbacks,
+          optional(:hub_springboard_url) => HubClient.hub_springboard_url(),
+          optional(:oauth2_callbacks) => HubServer.oauth2_callbacks(),
           optional(:refresh_before_expired) => Refresher.Default.refresh_before_expired(),
           optional(:refresh_retry_interval) => Refresher.Default.refresh_retry_interval(),
           optional(:refresh_options) => Refresher.DefaultSettings.refresh_options()
@@ -219,74 +215,6 @@ defmodule WeChat do
     {options, refresher_setting} = Map.split(options, [:hub_springboard_url, :oauth2_callbacks])
     WeChat.Setup.setup_client(client, options)
     add_to_refresher(client, refresher_setting)
-  end
-
-  # hub_url
-
-  @doc "set hub_springboard_url for hub client"
-  @spec set_hub_springboard_url(client, url) :: true
-  def set_hub_springboard_url(client, url) when is_binary(url) do
-    Cache.put_cache(client.appid(), :hub_springboard_url, url)
-  end
-
-  @doc "set hub_springboard_url for hub client"
-  @spec set_hub_springboard_url(client, Work.agent(), url) :: true
-  def set_hub_springboard_url(client, agent, url) when is_binary(url) do
-    WorkAgent.fetch_agent_cache_id!(client, agent)
-    |> Cache.put_cache(:hub_springboard_url, url)
-  end
-
-  @spec get_hub_springboard_url(client) :: nil | url
-  def get_hub_springboard_url(client) do
-    Cache.get_cache(client.appid(), :hub_springboard_url)
-  end
-
-  @spec get_hub_springboard_url(client, Work.agent()) :: nil | url
-  def get_hub_springboard_url(client, agent) do
-    WorkAgent.fetch_agent_cache_id!(client, agent)
-    |> Cache.get_cache(:hub_springboard_url)
-  end
-
-  # oauth2_env_url
-
-  @doc "set oauth2_env_url for hub server"
-  @spec set_oauth2_callbacks(client, oauth2_callbacks) :: [true]
-  def set_oauth2_callbacks(client, oauth2_callbacks) do
-    for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
-      set_oauth2_env_url(client, env, url)
-    end
-  end
-
-  @doc "set oauth2_env_url for hub server"
-  @spec set_oauth2_callbacks(client, Work.agent(), oauth2_callbacks) :: [true]
-  def set_oauth2_callbacks(client, agent, oauth2_callbacks) do
-    for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
-      set_oauth2_env_url(client, agent, env, url)
-    end
-  end
-
-  @doc "set oauth2_env_url for hub server"
-  @spec set_oauth2_env_url(client, env, url) :: true
-  def set_oauth2_env_url(client, env, url) when is_binary(env) and is_binary(url) do
-    Cache.put_cache(client.appid(), {:oauth2_env_url, env}, url)
-  end
-
-  @doc "set oauth2_env_url for hub server"
-  @spec set_oauth2_env_url(client, Work.agent(), env, url) :: true
-  def set_oauth2_env_url(client, agent, env, url) when is_binary(env) and is_binary(url) do
-    WorkAgent.fetch_agent_cache_id!(client, agent)
-    |> Cache.put_cache({:oauth2_env_url, env}, url)
-  end
-
-  @spec get_oauth2_env_url(client, env) :: nil | url
-  def get_oauth2_env_url(client, env) do
-    Cache.get_cache(client.appid(), {:oauth2_env_url, env})
-  end
-
-  @spec get_oauth2_env_url(client, Work.agent(), env) :: nil | url
-  def get_oauth2_env_url(client, agent, env) do
-    WorkAgent.fetch_agent_cache_id!(client, agent)
-    |> Cache.get_cache({:oauth2_env_url, env})
   end
 
   @doc """

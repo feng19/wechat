@@ -1,86 +1,98 @@
 defmodule WeChat.Setup do
-  @moduledoc false
-  alias WeChat.Work.Agent, as: WorkAgent
+  @moduledoc "Setup WeChat clients"
+  alias WeChat.{Work, HubClient, HubServer}
+  alias Work.Agent, as: WorkAgent
 
   @type options :: %{
-          optional(:hub_springboard_url) => WeChat.hub_springboard_url(),
-          optional(:oauth2_callbacks) => WeChat.oauth2_callbacks()
+          optional(:hub_springboard_url) => HubClient.hub_springboard_url(),
+          optional(:oauth2_callbacks) => HubServer.oauth2_callbacks()
         }
+  @type work_options :: %{all: options} | [all: options] | [{Work.agent(), options}]
 
   @app :wechat
 
+  @spec setup_clients([{WeChat.client(), options | work_options}]) :: list
   def setup_clients(clients) do
-    for {client, settings} <- clients, is_atom(client) do
+    for {client, options} <- clients, is_atom(client) do
       if match?(:work, client.app_type()) do
-        setup_work_client(client, _agents = settings)
+        setup_work_client(client, _agents = options)
       else
-        setup_client(client, settings)
+        setup_client(client, options)
       end
     end
   end
 
-  def setup_client(client, settings) do
+  @spec setup_client(WeChat.client(), options | work_options) :: :ok
+  def setup_client(client, options) do
     %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks} =
-      replace_app(settings, client)
+      replace_app(options, client)
 
     # hub_springboard_url set for hub client
     if hub_springboard_url do
-      WeChat.set_hub_springboard_url(client, hub_springboard_url)
+      HubClient.set_hub_springboard_url(client, hub_springboard_url)
     end
 
     # oauth2_callbacks set for hub server
     if oauth2_callbacks do
-      WeChat.set_oauth2_callbacks(client, oauth2_callbacks)
+      HubServer.set_oauth2_callbacks(client, oauth2_callbacks)
     end
+
+    :ok
   end
 
-  def setup_work_client(client, %{all: settings}) do
-    setup_work_client(client, all: settings)
+  @spec setup_work_client(WeChat.client(), work_options) :: :ok
+  def setup_work_client(client, %{all: options}) do
+    setup_work_client(client, all: options)
   end
 
-  def setup_work_client(client, all: settings) do
-    agents = Enum.map(client.agents(), fn %{id: id, name: name} -> {name || id, settings} end)
+  def setup_work_client(client, all: options) do
+    agents = Enum.map(client.agents(), fn %{id: id, name: name} -> {name || id, options} end)
     setup_work_client(client, agents)
   end
 
   def setup_work_client(client, agents) do
     WorkAgent.maybe_init_work_agents(client)
 
-    for {agent, settings} <- agents do
-      setup_work_agent(client, agent, settings)
+    for {agent, options} <- agents do
+      setup_work_agent(client, agent, options)
     end
+
+    :ok
   end
 
-  def setup_work_agent(client, agent, settings) when is_struct(agent, WorkAgent) do
-    setup_work_agent(client, agent.name || agent.id, settings)
+  @spec setup_work_agent(WeChat.client(), Work.agent() | WorkAgent.t(), options) :: :ok
+  def setup_work_agent(client, agent, options) when is_struct(agent, WorkAgent) do
+    setup_work_agent(client, agent.name || agent.id, options)
   end
 
-  def setup_work_agent(client, agent, settings) do
+  def setup_work_agent(client, agent, options) do
     %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks} =
-      settings |> replace_app(client) |> replace_agent(agent)
+      options |> replace_app(client) |> replace_agent(agent)
 
     # hub_springboard_url set for hub client
     if hub_springboard_url do
-      WeChat.set_hub_springboard_url(client, agent, hub_springboard_url)
+      HubClient.set_hub_springboard_url(client, agent, hub_springboard_url)
     end
 
     # oauth2_callbacks set for hub server
     if oauth2_callbacks do
-      WeChat.set_oauth2_callbacks(client, agent, oauth2_callbacks)
+      HubServer.set_oauth2_callbacks(client, agent, oauth2_callbacks)
     end
+
+    :ok
   end
 
-  def replace_app(settings, client) do
+  defp replace_app(options, client) do
     env = Application.get_env(@app, :env, "dev") |> to_string()
 
-    settings
+    options
     |> Map.new()
     |> Enum.into(%{hub_springboard_url: nil, oauth2_callbacks: nil})
     |> replace(":app", client.code_name())
     |> replace_hub_springboard_url(":env", env)
   end
 
-  def replace_agent(settings, agent), do: replace(settings, ":agent", to_string(agent))
+  defp replace_agent(options, agent), do: replace(options, ":agent", to_string(agent))
 
   defp replace(
          %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks},
@@ -102,15 +114,15 @@ defmodule WeChat.Setup do
     %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks}
   end
 
-  def replace_hub_springboard_url(
-        %{hub_springboard_url: hub_springboard_url} = settings,
-        match,
-        replacement
-      ) do
+  defp replace_hub_springboard_url(
+         %{hub_springboard_url: hub_springboard_url} = options,
+         match,
+         replacement
+       ) do
     if hub_springboard_url do
-      %{settings | hub_springboard_url: String.replace(hub_springboard_url, match, replacement)}
+      %{options | hub_springboard_url: String.replace(hub_springboard_url, match, replacement)}
     else
-      settings
+      options
     end
   end
 end

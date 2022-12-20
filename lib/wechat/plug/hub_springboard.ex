@@ -28,6 +28,7 @@ if Code.ensure_loaded?(Plug) do
           init_opts: [clients: [Client, ...]]
     """
     import WeChat.Plug.Helper
+    alias WeChat.HubServer
 
     @doc false
     def init(opts) do
@@ -52,9 +53,9 @@ if Code.ensure_loaded?(Plug) do
     def oauth2_callback(conn, client, agent, env, callback_path) do
       env_url =
         if agent do
-          WeChat.get_oauth2_env_url(client, agent.id, env)
+          HubServer.get_oauth2_env_url(client, agent.id, env)
         else
-          WeChat.get_oauth2_env_url(client, env)
+          HubServer.get_oauth2_env_url(client, env)
         end
 
       if env_url do
