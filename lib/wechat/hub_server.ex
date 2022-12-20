@@ -3,8 +3,8 @@ defmodule WeChat.HubServer do
   alias WeChat.{Work, Storage.Cache}
   alias Work.Agent, as: WorkAgent
 
-  @typep env :: String.t()
-  @typep url :: String.t()
+  @type env :: String.t()
+  @type url :: String.t()
   @type oauth2_callbacks :: %{env => url}
 
   @spec set_oauth2_callbacks(WeChat.client(), oauth2_callbacks) :: [true]

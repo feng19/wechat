@@ -3,15 +3,14 @@ defmodule WeChat.HubClient do
   alias WeChat.{Work, Storage.Cache}
   alias Work.Agent, as: WorkAgent
 
-  @typep url :: String.t()
-  @type hub_springboard_url :: url
+  @type hub_springboard_url :: String.t()
 
-  @spec set_hub_springboard_url(WeChat.client(), url) :: true
+  @spec set_hub_springboard_url(WeChat.client(), hub_springboard_url) :: true
   def set_hub_springboard_url(client, url) when is_binary(url) do
     Cache.put_cache(client.appid(), :hub_springboard_url, url)
   end
 
-  @spec set_hub_springboard_url(WeChat.client(), Work.agent(), url) :: true
+  @spec set_hub_springboard_url(WeChat.client(), Work.agent(), hub_springboard_url) :: true
   def set_hub_springboard_url(client, agent, url) when is_binary(url) do
     WorkAgent.fetch_agent_cache_id!(client, agent)
     |> Cache.put_cache(:hub_springboard_url, url)
