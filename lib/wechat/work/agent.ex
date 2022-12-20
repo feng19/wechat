@@ -134,6 +134,27 @@ defmodule WeChat.Work.Agent do
     end
   end
 
+  def append_agent(client, agent) when is_struct(agent, __MODULE__) do
+    with {_, nil} <- {:exist, find_agent(client, agent.id)},
+         {_, nil} <- {:exist, find_agent(client, agent.name)},
+         {:ok, configs} <- Application.fetch_env(:wechat, client),
+         {:ok, agents} <- Keyword.fetch(configs, :agents) do
+      agent =
+        unless agent.cache_id do
+          corp_id = client.appid()
+          Map.put(agent, :cache_id, "#{corp_id}_#{agent.id}")
+        else
+          agent
+        end
+
+      Keyword.put(configs, :agents, agents ++ [agent])
+      |> then(&Application.put_env(:wechat, client, &1))
+    else
+      {:exist, agent} -> {:error, {:already_exists, agent}}
+      config -> {:error, {:wrong_env_config, config}}
+    end
+  end
+
   defp transfer_aes_key(agent) do
     if is_nil(agent.aes_key) and agent.encoding_aes_key do
       aes_key = Encryptor.aes_key(agent.encoding_aes_key)

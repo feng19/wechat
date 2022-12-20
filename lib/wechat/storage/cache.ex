@@ -18,22 +18,34 @@ defmodule WeChat.Storage.Cache do
   def set_client(client) do
     appid = client.appid()
     code_name = client.code_name()
-    Enum.uniq([appid, code_name]) |> Enum.map(&{{&1, :client}, client}) |> put_caches()
+    app_list = Enum.uniq([appid, code_name])
+    Enum.map(app_list, &{{&1, :client}, client}) |> put_caches()
 
     if match?(:work, client.app_type()) do
-      app_list = [appid, code_name]
-
-      Enum.flat_map(client.agents(), fn agent ->
-        agent_id = agent.id
-        name = agent.name
-        agent_list = Enum.uniq([agent_id, to_string(agent_id), name, to_string(name)])
-        value = {client, agent}
-
-        for app_flag <- app_list, agent_flag <- agent_list do
-          {{app_flag, agent_flag}, value}
-        end
-      end)
+      Enum.flat_map(client.agents(), &agent_cache_list(app_list, client, &1))
       |> put_caches()
+    end
+  end
+
+  @spec set_work_agent(WeChat.client(), Work.Agent.t()) :: true
+  def set_work_agent(client, agent) do
+    appid = client.appid()
+    code_name = client.code_name()
+
+    Enum.uniq([appid, code_name])
+    |> agent_cache_list(client, agent)
+    |> List.flatten()
+    |> put_caches()
+  end
+
+  defp agent_cache_list(app_list, client, agent) do
+    agent_id = agent.id
+    name = agent.name
+    agent_list = Enum.uniq([agent_id, to_string(agent_id), name, to_string(name)])
+    value = {client, agent}
+
+    for app_flag <- app_list, agent_flag <- agent_list do
+      {{app_flag, agent_flag}, value}
     end
   end
 

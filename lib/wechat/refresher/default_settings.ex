@@ -139,35 +139,38 @@ defmodule WeChat.Refresher.DefaultSettings do
   """
   @spec work_refresh_options(WeChat.client()) :: refresh_options
   def work_refresh_options(client) do
-    Enum.flat_map(client.agents(), fn %{
-                                        id: agent_id,
-                                        cache_id: cache_id,
-                                        secret: secret,
-                                        refresh_list: refresh_list
-                                      } ->
-      unless secret do
-        raise RuntimeError,
-              "Please set :secret for agent:#{agent_id} when defining #{inspect(client)}."
-      end
+    Enum.flat_map(client.agents(), &work_refresh_options(client, &1))
+  end
 
-      list =
-        refresh_list
-        |> List.wrap()
-        |> Enum.map(fn
-          store_key = :js_api_ticket ->
-            {cache_id, store_key,
-             &__MODULE__.refresh_work_jsapi_ticket(&1, cache_id, agent_id, store_key, false)}
+  @spec work_refresh_options(WeChat.client(), Work.Agent.t()) :: refresh_options
+  def work_refresh_options(client, %Work.Agent{
+        id: agent_id,
+        cache_id: cache_id,
+        secret: secret,
+        refresh_list: refresh_list
+      }) do
+    unless secret do
+      raise RuntimeError,
+            "Please set :secret for agent:#{agent_id} when defining #{inspect(client)}."
+    end
 
-          store_key = :agent_js_api_ticket ->
-            {cache_id, store_key,
-             &__MODULE__.refresh_work_jsapi_ticket(&1, cache_id, agent_id, store_key, true)}
-        end)
+    list =
+      refresh_list
+      |> List.wrap()
+      |> Enum.map(fn
+        store_key = :js_api_ticket ->
+          {cache_id, store_key,
+           &__MODULE__.refresh_work_jsapi_ticket(&1, cache_id, agent_id, store_key, false)}
 
-      [
-        {cache_id, :access_token, &__MODULE__.refresh_work_access_token(&1, cache_id, agent_id)}
-        | list
-      ]
-    end)
+        store_key = :agent_js_api_ticket ->
+          {cache_id, store_key,
+           &__MODULE__.refresh_work_jsapi_ticket(&1, cache_id, agent_id, store_key, true)}
+      end)
+
+    [
+      {cache_id, :access_token, &__MODULE__.refresh_work_access_token(&1, cache_id, agent_id)}
+      | list
+    ]
   end
 
   @spec refresh_access_token(WeChat.client()) :: refresh_fun_result

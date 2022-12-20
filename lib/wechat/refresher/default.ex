@@ -40,7 +40,7 @@ defmodule WeChat.Refresher.Default do
   use GenServer
   require Logger
   alias WeChat.Storage.Adapter, as: StorageAdapter
-  alias WeChat.{Utils, Storage.Cache, Refresher.DefaultSettings}
+  alias WeChat.{Utils, TokenChecker, Storage.Cache, Refresher.DefaultSettings}
 
   # 过期前 30 分钟刷新
   @refresh_before_expired 30 * 60
@@ -88,6 +88,11 @@ defmodule WeChat.Refresher.Default do
   @spec add(WeChat.client(), client_setting) :: :ok
   def add(client, opts \\ %{}) do
     GenServer.call(__MODULE__, {:add, client, Map.new(opts)})
+  end
+
+  @spec append_work_agent(WeChat.client(), WeChat.Work.Agent.t()) :: :ok | :client_not_in
+  def append_work_agent(client, agent) do
+    GenServer.call(__MODULE__, {:append_work_agent, client, agent})
   end
 
   @spec remove(WeChat.client()) :: :ok | :not_found
@@ -201,6 +206,15 @@ defmodule WeChat.Refresher.Default do
       |> add_client(client, options)
 
     {:reply, :ok, state}
+  end
+
+  def handle_call({:append_work_agent, client, agent}, _from, state) do
+    if client in state.clients do
+      state = append_client_agent(state, client, agent)
+      {:reply, :ok, state}
+    else
+      {:reply, :client_not_in, state}
+    end
   end
 
   def handle_call({:remove, client}, _from, state) do
@@ -373,25 +387,9 @@ defmodule WeChat.Refresher.Default do
     Logger.info("Monitoring WeChat Client: #{inspect(client)}.")
     options = Map.get(state, client)
     {refresh_options, state} = filter_duplicate_component(client, options.refresh_options, state)
-
-    refresh_options =
-      for {{store_id, store_key}, fun, _timer} <- refresh_options do
-        timer =
-          case restore_and_cache(store_id, store_key, client) do
-            false ->
-              refresh_token(store_id, store_key, fun, client, options)
-
-            {true, expires_in} ->
-              ((expires_in - options.refresh_before_expired) * 1000)
-              |> max(0)
-              |> start_refresh_token_timer(store_id, store_key, client)
-          end
-
-        {{store_id, store_key}, fun, timer}
-      end
-
+    refresh_options = start_refresh_timers(client, options, refresh_options)
     options = %{options | refresh_options: refresh_options}
-    WeChat.TokenChecker.maybe_add_client(client, refresh_options)
+    TokenChecker.maybe_add_client(client, refresh_options)
     Map.put(state, client, options)
   end
 
@@ -523,6 +521,23 @@ defmodule WeChat.Refresher.Default do
     |> start_refresh_token_timer(store_id, store_key, client)
   end
 
+  defp start_refresh_timers(client, options, refresh_options) do
+    for {{store_id, store_key}, fun, _timer} <- refresh_options do
+      timer =
+        case restore_and_cache(store_id, store_key, client) do
+          false ->
+            refresh_token(store_id, store_key, fun, client, options)
+
+          {true, expires_in} ->
+            ((expires_in - options.refresh_before_expired) * 1000)
+            |> max(0)
+            |> start_refresh_token_timer(store_id, store_key, client)
+        end
+
+      {{store_id, store_key}, fun, timer}
+    end
+  end
+
   defp start_refresh_token_timer(time, store_id, store_key, client) do
     Logger.info("Start Refresh Timer for appid: #{store_id}, key: #{store_key}, time: #{time}s.")
     info = %{store_id: store_id, store_key: store_key, client: client}
@@ -577,5 +592,28 @@ defmodule WeChat.Refresher.Default do
     end
 
     %{state | clients: clients}
+  end
+
+  defp append_client_agent(state, client, agent) do
+    options = Map.fetch!(state, client)
+    Cache.set_work_agent(client, agent)
+
+    refresh_options =
+      DefaultSettings.work_refresh_options(client, agent)
+      |> Enum.map(fn {store_id, store_key, fun} ->
+        {{store_id, store_key}, fun, nil}
+      end)
+
+    if state.wait_for_signal do
+      Map.put(options, :refresh_options, options.refresh_options ++ refresh_options)
+      |> then(&Map.put(state, client, &1))
+    else
+      Logger.info("Monitoring WeChat work agent: #{agent.name} for Client: #{inspect(client)}.")
+      refresh_options = start_refresh_timers(client, options, refresh_options)
+      TokenChecker.maybe_add_client(client, refresh_options)
+
+      Map.put(options, :refresh_options, options.refresh_options ++ refresh_options)
+      |> then(&Map.put(state, client, &1))
+    end
   end
 end

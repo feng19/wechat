@@ -127,6 +127,25 @@ defmodule WeChat.Work do
     end
   end
 
+  @doc "动态启动 client"
+  @spec start_client(client, WeChat.start_options()) :: :ok
+  defdelegate start_client(client, options \\ %{}), to: WeChat
+
+  @doc "动态启动 agent"
+  @spec start_agent(client, Agent.t(), WeChat.Setup.options()) ::
+          :ok | :client_not_in | {atom, term()}
+  def start_agent(client, agent, options \\ %{}) do
+    case Agent.append_agent(client, agent) do
+      :ok ->
+        WeChat.Setup.setup_work_agent(client, agent, options)
+        refresher = WeChat.refresher()
+        refresher.append_work_agent(client, agent)
+
+      {:error, error} ->
+        error
+    end
+  end
+
   @doc """
   获取 access_token - [官方文档](#{@doc_link}/91039){:target="_blank"}
   """

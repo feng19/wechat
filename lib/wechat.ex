@@ -61,7 +61,7 @@ defmodule WeChat do
 
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
-  alias WeChat.{Work, Storage.Cache}
+  alias WeChat.{Work, Refresher, Storage.Cache}
   alias WeChat.Work.Agent, as: WorkAgent
 
   @typedoc """
@@ -122,6 +122,8 @@ defmodule WeChat do
   @typep app :: atom
   @typep env :: String.t()
   @typep url :: String.t()
+  @type hub_springboard_url :: url
+  @type oauth2_callbacks :: %{env => url}
 
   @typedoc """
   参数
@@ -168,6 +170,13 @@ defmodule WeChat do
   @type client :: module()
   @type requester :: module()
   @type response :: Tesla.Env.result()
+  @type start_options :: %{
+          optional(:hub_springboard_url) => hub_springboard_url,
+          optional(:oauth2_callbacks) => oauth2_callbacks,
+          optional(:refresh_before_expired) => Refresher.Default.refresh_before_expired(),
+          optional(:refresh_retry_interval) => Refresher.Default.refresh_retry_interval(),
+          optional(:refresh_options) => Refresher.DefaultSettings.refresh_options()
+        }
 
   @doc false
   defmacro __using__(options \\ []) do
@@ -204,6 +213,14 @@ defmodule WeChat do
     end
   end
 
+  @doc "动态启动 client"
+  @spec start_client(client, start_options) :: :ok
+  def start_client(client, options \\ %{}) do
+    {options, refresher_setting} = Map.split(options, [:hub_springboard_url, :oauth2_callbacks])
+    WeChat.Setup.setup_client(client, options)
+    add_to_refresher(client, refresher_setting)
+  end
+
   # hub_url
 
   @doc "set hub_springboard_url for hub client"
@@ -233,6 +250,22 @@ defmodule WeChat do
   # oauth2_env_url
 
   @doc "set oauth2_env_url for hub server"
+  @spec set_oauth2_callbacks(client, oauth2_callbacks) :: [true]
+  def set_oauth2_callbacks(client, oauth2_callbacks) do
+    for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
+      set_oauth2_env_url(client, env, url)
+    end
+  end
+
+  @doc "set oauth2_env_url for hub server"
+  @spec set_oauth2_callbacks(client, Work.agent(), oauth2_callbacks) :: [true]
+  def set_oauth2_callbacks(client, agent, oauth2_callbacks) do
+    for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do
+      set_oauth2_env_url(client, agent, env, url)
+    end
+  end
+
+  @doc "set oauth2_env_url for hub server"
   @spec set_oauth2_env_url(client, env, url) :: true
   def set_oauth2_env_url(client, env, url) when is_binary(env) and is_binary(url) do
     Cache.put_cache(client.appid(), {:oauth2_env_url, env}, url)
@@ -256,12 +289,20 @@ defmodule WeChat do
     |> Cache.get_cache({:oauth2_env_url, env})
   end
 
+  @doc """
+  刷新器
+    
+  默认为 `WeChat.Refresher.Default`
+  """
+  @spec refresher :: module
   def refresher do
-    Application.get_env(:wechat, :refresher, WeChat.Refresher.Default)
+    Application.get_env(:wechat, :refresher, Refresher.Default)
   end
 
+  @doc "将 client 添加到刷新器"
+  @spec add_to_refresher(client, Refresher.Default.client_setting()) :: :ok
   def add_to_refresher(client, options \\ %{}) do
-    m = refresher()
-    m.add(client, options)
+    module = refresher()
+    module.add(client, options)
   end
 end

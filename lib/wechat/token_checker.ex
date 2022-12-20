@@ -35,7 +35,7 @@ defmodule WeChat.TokenChecker do
   def add_client(client) do
     refresher = WeChat.refresher()
 
-    with %{refresh_options: refresh_options} <- refresher.client_options() do
+    with %{refresh_options: refresh_options} <- refresher.client_options(client) do
       add_client(client, refresh_options)
     end
   end
