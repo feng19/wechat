@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work}
 
-  @version "0.12.3"
+  @version "0.12.4"
   @source_url "https://github.com/feng19/wechat"
 
   def project do
@@ -33,7 +33,7 @@ defmodule WeChat.MixProject do
   defp deps do
     [
       {:tesla, "~> 1.4"},
-      {:finch, "~> 0.5"},
+      {:finch, "~> 0.9"},
       {:jason, "~> 1.2"},
       {:saxy, "~> 1.2", optional: true},
       {:plug, "~> 1.11", optional: true},

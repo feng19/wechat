@@ -155,7 +155,7 @@ forward "/wx/event", WeChat.Plug.EventHandler,
 
 ## Copyright and License
 
-Copyright (c) 2022 feng19
+Copyright (c) 2023 feng19
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
