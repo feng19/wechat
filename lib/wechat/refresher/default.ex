@@ -539,7 +539,7 @@ defmodule WeChat.Refresher.Default do
   end
 
   defp start_refresh_token_timer(time, store_id, store_key, client) do
-    Logger.info("Start Refresh Timer for appid: #{store_id}, key: #{store_key}, time: #{time}s.")
+    Logger.info("Start Refresh Timer for appid: #{store_id}, key: #{store_key}, time: #{time}ms.")
     info = %{store_id: store_id, store_key: store_key, client: client}
     :erlang.start_timer(time, self(), {:refresh_token, info})
   end
