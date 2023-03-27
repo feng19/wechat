@@ -81,6 +81,7 @@ defmodule WeChat.BatchSends do
   第一篇编号为1，该字段不填或填0会删除全部文章
   """
   @type article_idx :: non_neg_integer
+  @type url :: String.t()
   @typedoc """
   群发的消息类型
 
@@ -234,6 +235,19 @@ defmodule WeChat.BatchSends do
     client.post(
       "/cgi-bin/message/mass/delete",
       json_map(msg_id: msg_id, article_idx: article_idx),
+      query: [access_token: client.get_access_token()]
+    )
+  end
+
+  @doc """
+  删除群发【订阅号与服务号认证后均可用】 -
+  [官方文档](#{@doc_link}#4){:target="_blank"}
+
+  群发之后，随时可以通过该接口删除群发。
+  """
+  @spec delete_by_url(WeChat.client(), url) :: WeChat.response()
+  def delete_by_url(client, url) do
+    client.post("/cgi-bin/message/mass/delete", json_map(url: url),
       query: [access_token: client.get_access_token()]
     )
   end
