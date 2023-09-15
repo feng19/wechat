@@ -8,8 +8,8 @@ defmodule WeChat.Requester.Pay do
   @middleware [
     {BaseUrl, "https://api.mch.weixin.qq.com"},
     {Headers, [{"accept", "application/json"}, {"user-agent", "Tesla"}]},
-    Logger,
-    JSON
+    JSON,
+    Logger
   ]
   @adapter_options [pool_timeout: 5_000, receive_timeout: 5_000]
 
