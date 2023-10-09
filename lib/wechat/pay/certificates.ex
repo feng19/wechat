@@ -1,14 +1,17 @@
 defmodule WeChat.Pay.Certificates do
+  import WeChat.Utils, only: [pay_doc_link_prefix: 0]
   @moduledoc """
   微信支付 - 平台证书
 
-  [官方文档](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/wechatpay-certificates.html){:target="_blank"}
+  - [平台证书简介](#{pay_doc_link_prefix()}/merchant/development/interface-rules/wechatpay-certificates.html){:target="_blank"}
+  - [平台证书更新指引](#{pay_doc_link_prefix()}/merchant/development/interface-rules/wechatpay-certificates-rotation.html){:target="_blank"}
+  - [证书相关问题](#{pay_doc_link_prefix()}/merchant/development/interface-rules/certificate-faqs.html){:target="_blank"}
   """
   alias WeChat.Pay.Utils
 
   @doc """
   下载平台证书 -
-  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/platform-certificate/api-v3-get-certificates/get.html){:target="_blank"}
+  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/platform-certificate/api-v3-get-certificates/get.html){:target="_blank"}
   """
   def certificates(client) do
     with {:ok, %{body: %{data: certificates}}} when is_list(certificates) <-

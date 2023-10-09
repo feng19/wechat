@@ -2,7 +2,7 @@ defmodule WeChat do
   @moduledoc """
   WeChat SDK for Elixir
 
-  ## 定义 `Client` 模块
+  ## 定义 Client 模块
 
   ### 公众号(默认)
 
@@ -34,16 +34,7 @@ defmodule WeChat do
           component_appid: "wx-third-appid", # 第三方 appid
       end
 
-  ### 企业微信
-
-      defmodule YourApp.WeChatAppCodeName do
-        @moduledoc "CodeName"
-        use WeChat.Work,
-          corp_id: "corp_id",
-          agents: [%Work.Agent{name: :agent_name, id: 10000, secret: "your_secret"}, ...]
-      end
-
-  ## 参数说明
+  ## 定义参数说明
 
   请看 `t:options/0`
 
@@ -59,6 +50,13 @@ defmodule WeChat do
 
     `WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)`
 
+  ## 企业微信
+
+  详情请看 `WeChat.Work`
+
+  ## 微信支付
+
+  详情请看 `WeChat.Pay`
   """
   import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Refresher, HubClient, HubServer}

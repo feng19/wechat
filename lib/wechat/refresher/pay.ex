@@ -1,6 +1,9 @@
 defmodule WeChat.Refresher.Pay do
-  @moduledoc false
-  # 每天检查更新证书
+  @moduledoc """
+  微信支付 - 刷新器
+
+  每天检查更新证书
+  """
   use GenServer
   require Logger
   alias WeChat.Pay.Certificates

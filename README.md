@@ -19,10 +19,10 @@
 
 ### Links
 
-- [开发前必读](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Getting_Started_Guide.html)
-- [在线文档](https://hex.pm/packages/wechat_sdk)
-- [WeChat SDK 使用指南](https://feng19.com/2022/07/08/wechat_for_elixir_usage/)
-- [示例项目](https://github.com/feng19/wechat_demo)
+- [WeChat SDK 使用指南](https://feng19.com/2022/07/08/wechat_for_elixir_usage/)(by Feng19)
+- [示例项目 - github - feng19/wechat_demo](https://github.com/feng19/wechat_demo)
+- [微信官方文档 - 开发前必读](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Getting_Started_Guide.html)
+- [微信官方文档 - 在线文档](https://hex.pm/packages/wechat_sdk)
 
 ## Installation
 
@@ -38,7 +38,7 @@ end
 
 ## Usage
 
-### 定义公众号 `Client` 模块
+### 定义公众号 Client 模块
 
 ```elixir
 defmodule YourApp.WeChatAppCodeName do
@@ -51,9 +51,9 @@ end
 
 其他类型定义请看 [WeChat](https://hexdocs.pm/wechat_sdk/WeChat.html#module-定义-client-模块)
 
-详细参数说明请看 [options](https://hexdocs.pm/wechat_sdk/WeChat.html#t:options/0)
+定义参数说明请看 [Options](https://hexdocs.pm/wechat_sdk/WeChat.html#t:options/0)
 
-### 自动刷新 `AccessToken`
+### 自动刷新 AccessToken
 
 在调用接口之前，必须先获取 [`AccessToken`](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html) 才能 调用接口，
 [官方说明](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Getting_Started_Guide.html#_1-5-%E9%87%8D%E8%A6%81%E4%BA%8B%E6%83%85%E6%8F%90%E5%89%8D%E4%BA%A4%E4%BB%A3)

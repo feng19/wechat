@@ -2,11 +2,9 @@ defmodule WeChat.Pay do
   @moduledoc """
   微信支付
 
-  [官方文档](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml)
-
   ** 注意 ** 未经上线测试，请谨慎使用
 
-  ## 定义 `Client` 模块
+  ## 定义 Client 模块
 
       defmodule YourApp.WeChatAppCodeName do
         @moduledoc "CodeName"
@@ -17,35 +15,59 @@ defmodule WeChat.Pay do
           client_key: "client_key"
       end
 
-  ## 启动 `client`
+  定义参数说明请看 `t:options/0`
+
+  ## 启动支付 Client 进程
 
       defmodule YourApp.Application do
         def start(_type, _args) do
+          start_options = [serial_no: "serial_no", cacerts: ["cacert1", "cacert2"]]
+
           children = [
             # ...
-            YourApp.WeChatAppCodeName,
+            {YourApp.WeChatAppCodeName, start_options},
             # ...
           ]
 
           Supervisor.start_link(children, strategy: :one_for_one, name: YourApp.Supervisor)
         end
       end
+
+  启动参数说明请看 `t:start_options/0`
   """
+  import WeChat.Utils, only: [pay_doc_link_prefix: 0]
 
   @typedoc "商户号"
   @type mch_id :: binary
-  @typedoc "平台证书的序列号"
+  @typedoc """
+  平台证书的序列号 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/certificate-faqs.html){:target="_blank"}
+  """
   @type serial_no :: binary
-  @typedoc "平台证书列表"
-  @type cacerts :: [binary]
-  @typedoc "商户 API 证书"
+  @typedoc """
+  平台证书列表 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/wechatpay-certificates.html){:target="_blank"}
+  """
+  @type cacerts :: list(binary)
+  @typedoc """
+  商户 API 证书 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/privatekey-and-certificate.html){:target="_blank"}
+  """
   @type client_cert :: binary
-  @typedoc "商户 API 私钥"
+  @typedoc """
+  商户 API 私钥 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/privatekey-and-certificate.html){:target="_blank"}
+  """
   @type client_key :: binary
-  @type client :: module()
+  @typedoc """
+  API v3密钥 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/apiv3key.html){:target="_blank"}
+  """
+  @type api_secret_key :: binary
+  @type client :: module
 
   @typedoc """
-  参数
+  构建参数
 
   ## 参数说明
 
@@ -68,6 +90,25 @@ defmodule WeChat.Pay do
           client_key: client_key,
           requester: module,
           storage: module
+        ]
+
+  @typedoc """
+  启动参数
+
+  ## 参数说明
+
+  - `cacerts`: `t:cacerts/0` - 必填
+  - `serial_no`: `t:serial_no/0` - 必填
+  - `refresher`: 刷新器 - `t:module/0`
+
+  ## 默认参数:
+
+  - `refresher`: `WeChat.Refresher.Pay`
+  """
+  @type start_options :: [
+          cacerts: cacerts,
+          serial_no: serial_no,
+          refresher: module
         ]
   @type requester_id :: :A | :B
   @type requester_opts :: %{
@@ -153,7 +194,7 @@ defmodule WeChat.Pay do
     %{spec | id: id}
   end
 
-  # [平台证书更新指引](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/wechatpay-certificates-rotation.html)
+  # [平台证书更新指引](#{pay_doc_link_prefix()}/merchant/development/interface-rules/wechatpay-certificates-rotation.html)
   # * 证书切换
   #  * 通过 Supervisor 开启新的 Finch 进程
   #  * 然后 将新的 Finch 进程名写入到 :persistent_term 保存

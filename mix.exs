@@ -202,6 +202,12 @@ defmodule WeChat.MixProject do
          Work.WeDrive.FileManagement,
          Work.WeDrive.SpaceACL,
          Work.WeDrive.SpaceManagement
+       ]},
+      {"微信支付",
+       [
+         WeChat.Pay,
+         WeChat.Pay.Authorization,
+         WeChat.Pay.Certificates
        ]}
     ]
   end
