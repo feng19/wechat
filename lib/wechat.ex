@@ -163,8 +163,8 @@ defmodule WeChat do
           token: token | env_option,
           requester: module
         ]
-  @type client :: module()
-  @type requester :: module()
+  @type client :: module
+  @type requester :: module
   @type response :: Tesla.Env.result()
   @type start_options :: %{
           optional(:hub_springboard_url) => HubClient.hub_springboard_url(),

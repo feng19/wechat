@@ -14,7 +14,7 @@
   - [小程序](https://developers.weixin.qq.com/miniprogram/dev/framework/)
   - [第三方应用](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/getting_started/how_to_read.html)
   - [企业微信](https://developer.work.weixin.qq.com/document/path/90556)
-  - [微信支付](https://pay.weixin.qq.com/wiki/doc/apiv3/index.shtml)
+  - [微信支付](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml)
 - WIP: 企业微信服务商
 
 ### Links

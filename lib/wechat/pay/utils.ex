@@ -1,7 +1,7 @@
 defmodule WeChat.Pay.Utils do
   @moduledoc false
 
-  # [证书和回调报文解密](https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay4_2.shtml)
+  # [证书和回调报文解密](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/certificate-callback-decryption.html)
   # {
   #     "serial_no": "5157F09EFDC096DE15EBE81A47057A7232F1B8E1",
   #     "effective_time ": "2018-06-08T10:34:56+08:00",

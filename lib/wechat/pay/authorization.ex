@@ -2,7 +2,7 @@ defmodule WeChat.Pay.Authorization do
   @moduledoc """
   微信支付 V3 Authorization 签名生成
 
-  [官方文档](https://pay.weixin.qq.com/wiki/doc/apiv3/wechatpay/wechatpay4_0.shtml){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/signature-generation.html){:target="_blank"}
   """
   @behaviour Tesla.Middleware
   alias WeChat.Pay.Utils

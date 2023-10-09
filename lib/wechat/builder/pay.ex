@@ -1,7 +1,8 @@
 defmodule WeChat.Builder.Pay do
   @moduledoc false
   defmacro __using__(options \\ []) do
-    options = Map.new(options)
+    check_options!(options, __CALLER__.module)
+    options = options |> Macro.prewalk(&Macro.expand(&1, __CALLER__)) |> Map.new()
     requester = Map.get(options, :requester, WeChat.Requester.Pay)
     storage = Map.get(options, :storage, WeChat.Storage.PayFile)
     public_key = WeChat.Pay.Utils.decode_key(options.client_cert)
@@ -48,6 +49,24 @@ defmodule WeChat.Builder.Pay do
       def client_key, do: unquote(options.client_key)
       def public_key, do: unquote(public_key)
       # def private_key, do: unquote(private_key)
+    end
+  end
+
+  defp check_options!(options, client) do
+    unless Keyword.get(options, :mch_id) |> is_binary() do
+      raise ArgumentError, "please set mch_id option for #{inspect(client)}"
+    end
+
+    unless Keyword.get(options, :api_secret_key) |> is_binary() do
+      raise ArgumentError, "please set api_secret_key option for #{inspect(client)}"
+    end
+
+    unless Keyword.get(options, :client_cert) |> is_binary() do
+      raise ArgumentError, "please set client_cert option for #{inspect(client)}"
+    end
+
+    unless Keyword.get(options, :client_key) |> is_binary() do
+      raise ArgumentError, "please set client_key option for #{inspect(client)}"
     end
   end
 end
