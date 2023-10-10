@@ -1,5 +1,6 @@
-defmodule WeChat.Pay.Authorization do
+defmodule WeChat.Pay.AuthorizationMiddleware do
   import WeChat.Utils, only: [pay_doc_link_prefix: 0]
+
   @moduledoc """
   微信支付 V3 Authorization 签名生成
 
@@ -9,19 +10,25 @@ defmodule WeChat.Pay.Authorization do
   - [签名相关问题](#{pay_doc_link_prefix()}/merchant/development/interface-rules/signature-faqs.html){:target="_blank"}
   """
   @behaviour Tesla.Middleware
-  alias WeChat.Pay.Utils
+  alias WeChat.Pay.Crypto
 
   @impl Tesla.Middleware
   def call(env, next, options) do
     mch_id = Keyword.fetch!(options, :mch_id)
     serial_no = Keyword.fetch!(options, :serial_no)
     private_key = Keyword.fetch!(options, :private_key)
-    token = Utils.get_token(mch_id, serial_no, private_key, env)
+    token = gen_token(mch_id, serial_no, private_key, env)
 
     env
-    |> Tesla.put_headers([
-      {"Authorization", "WECHATPAY2-SHA256-RSA2048 #{token}"}
-    ])
+    |> Tesla.put_headers([{"Authorization", "WECHATPAY2-SHA256-RSA2048 #{token}"}])
     |> Tesla.run(next)
+  end
+
+  def gen_token(mch_id, serial_no, private_key, env) do
+    timestamp = WeChat.Utils.now_unix()
+    nonce_str = :crypto.strong_rand_bytes(32) |> Base.url_encode64()
+    signature = Crypto.sign(env, timestamp, nonce_str, private_key)
+
+    ~s(mchid="#{mch_id}",nonce_str="#{nonce_str}",timestamp="#{timestamp}",serial_no="#{serial_no}",signature="#{signature}")
   end
 end

@@ -5,8 +5,8 @@ defmodule WeChat.Builder.Pay do
     options = options |> Macro.prewalk(&Macro.expand(&1, __CALLER__)) |> Map.new()
     requester = Map.get(options, :requester, WeChat.Requester.Pay)
     storage = Map.get(options, :storage, WeChat.Storage.PayFile)
-    public_key = WeChat.Pay.Utils.decode_key(options.client_cert)
-    # private_key = WeChat.Pay.Utils.decode_key(options.client_key)
+    public_key = WeChat.Pay.Crypto.decode_key(options.client_cert)
+    private_key = WeChat.Pay.Crypto.decode_key(options.client_key)
 
     quote do
       use Supervisor
@@ -57,8 +57,17 @@ defmodule WeChat.Builder.Pay do
       def client_cert, do: unquote(options.client_cert)
       @spec client_key() :: WeChat.Pay.client_key()
       def client_key, do: unquote(options.client_key)
+
       def public_key, do: unquote(public_key)
-      # def private_key, do: unquote(private_key)
+      def private_key, do: unquote(private_key)
+
+      def encrypt_secret_data(data) do
+        WeChat.Pay.Crypto.encrypt_secret_data(data, unquote(public_key))
+      end
+
+      def decrypt_secret_data(cipher_text) do
+        WeChat.Pay.Crypto.decrypt_secret_data(cipher_text, unquote(private_key))
+      end
     end
   end
 

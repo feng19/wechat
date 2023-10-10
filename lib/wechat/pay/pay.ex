@@ -158,20 +158,6 @@ defmodule WeChat.Pay do
     :persistent_term.get({:wechat, {client, :requester_opts}})
   end
 
-  # 保存平台证书 serial_no => cert 的对应关系
-  def put_cert(client, serial_no, cert) do
-    :persistent_term.put({:wechat, {client, serial_no}}, cert)
-  end
-
-  # 获取平台证书 serial_no 对应的 cert
-  def get_cert(client, serial_no) do
-    :persistent_term.get({:wechat, {client, serial_no}})
-  end
-
-  def remove_cert(client, serial_no) do
-    :persistent_term.erase({:wechat, {client, serial_no}})
-  end
-
   defp finch_name(client, id), do: :"#{client}.Finch.#{id}"
 
   def get_requester_spec(id, client, cacerts) when is_atom(id) do
@@ -201,16 +187,20 @@ defmodule WeChat.Pay do
   #  * 请求的时候，从 :persistent_term 获取 Finch 进程名，然后再请求
   def start_next_requester(client, opts) do
     %{id: now_id} = get_requester_opts(client)
-    id = List.delete([:A, :B], now_id) |> hd()
-    finch_spec = get_requester_spec(id, client, opts.cacerts)
+    new_id = List.delete([:A, :B], now_id) |> hd()
+    finch_spec = get_requester_spec(new_id, client, opts.cacerts)
     sup = :"#{client}.Supervisor"
 
-    with :ok <- Supervisor.terminate_child(sup, id),
-         :ok <- Supervisor.delete_child(sup, id),
+    with :ok <- Supervisor.terminate_child(sup, new_id),
+         :ok <- Supervisor.delete_child(sup, new_id),
          {:ok, _} = return <- Supervisor.start_child(sup, finch_spec) do
-      put_requester_opts(client, id, opts.serial_no)
+      put_requester_opts(client, new_id, opts.serial_no)
       return
     end
+  end
+
+  def init_cacerts() do
+
   end
 
   def init_cacerts2storage(client, cacerts) do

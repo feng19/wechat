@@ -31,26 +31,22 @@ defmodule WeChat.Refresher.Pay do
   @impl true
   def handle_info({:timeout, _timer, :update_certs}, %{client: client} = state) do
     storage = client.storage()
-    # [%{
-    #   "serial_no" => serial_no,
-    #   "effective_timestamp" => effective_time,
-    #   "expire_timestamp" => expire_time,
-    #   "certificate" => certificate
-    # }]
-    old_certs = storage.restore(client.mch_id(), :cacerts)
+    mch_id = client.mch_id()
 
     timer =
-      client
-      |> Certificates.certificates()
-      |> case do
-        {:ok, new_certs} when is_list(new_certs) ->
-          with {serial_no, certs} <- merge_certs(new_certs, old_certs, client) do
-            WeChat.Pay.start_next_requester(client, serial_no: serial_no, cacerts: certs)
-          end
+      case storage.restore(mch_id, :cacerts) do
+        {:ok, old_certs} ->
+          download_certificates(old_certs, state)
 
-          state.update_interval
+        # 无记录
+        {:error, :enoent} ->
+          download_certificates([], state)
 
-        _ ->
+        error ->
+          Logger.warning(
+            "Update certs failed! Call #{inspect(storage)}.restore(#{mch_id}, :cacerts) error: #{inspect(error)}, will be retry again #{state.retry_interval}ms later."
+          )
+
           state.retry_interval
       end
       |> start_update_timer(client)
@@ -58,21 +54,30 @@ defmodule WeChat.Refresher.Pay do
     {:noreply, %{state | timer: timer}}
   end
 
-  defp merge_certs(new_certs, old_certs, client) do
+  # [%{
+  #   "serial_no" => serial_no,
+  #   "effective_timestamp" => effective_time,
+  #   "expire_timestamp" => expire_time,
+  #   "certificate" => certificate
+  # }]
+  defp merge_cacerts(new_certs, old_certs, client) do
     now = WeChat.Utils.now_unix()
     old_certs = remove_expired_cert(old_certs, client, now)
     old_serial_no_list = Enum.map(old_certs, & &1["serial_no"])
-    new_certs = Enum.filter(new_certs, &(&1["serial_no"] not in old_serial_no_list))
 
-    if Enum.empty?(new_certs) do
-      false
-    else
-      Enum.each(new_certs, fn cert ->
-        WeChat.Pay.put_cert(client, cert["serial_no"], cert["certificate"])
-      end)
+    new_certs
+    |> Enum.filter(&(&1["serial_no"] not in old_serial_no_list))
+    |> case do
+      [] ->
+        false
 
-      serial_no = get_latest_effective_serial_no(new_certs, now)
-      {serial_no, new_certs ++ old_certs}
+      new_certs ->
+        for cert <- new_certs do
+          Certificates.put_cert(client, cert["serial_no"], cert["certificate"])
+        end
+
+        serial_no = get_latest_effective_serial_no(new_certs, now)
+        {serial_no, new_certs ++ old_certs}
     end
   end
 
@@ -89,7 +94,7 @@ defmodule WeChat.Refresher.Pay do
   defp remove_expired_cert(certs, client, now) do
     Enum.reject(certs, fn cert ->
       if now >= cert["expire_timestamp"] do
-        WeChat.Pay.remove_cert(client, cert["serial_no"])
+        Certificates.remove_cert(client, cert["serial_no"])
         true
       else
         false
@@ -100,5 +105,37 @@ defmodule WeChat.Refresher.Pay do
   defp start_update_timer(time, client) do
     Logger.info("Start Update Certs Timer for #{inspect(client)}, time: #{time}s.")
     :erlang.start_timer(time, self(), :update_certs)
+  end
+
+  defp download_certificates(old_certs, %{
+         client: client,
+         update_interval: update_interval,
+         retry_interval: retry_interval
+       }) do
+    storage = client.storage()
+    mch_id = client.mch_id()
+
+    case Certificates.certificates(client) do
+      {:ok, new_certs} when is_list(new_certs) ->
+        with {serial_no, cacerts} <- merge_cacerts(new_certs, old_certs, client) do
+          result = storage.store(mch_id, :cacerts, cacerts)
+
+          Logger.info(
+            "Call #{inspect(storage)}.store(#{mch_id}, :cacerts, #{inspect(cacerts)}) => #{inspect(result)}."
+          )
+
+          cacerts = Enum.map(cacerts, & &1["certificate"])
+          WeChat.Pay.start_next_requester(client, serial_no: serial_no, cacerts: cacerts)
+        end
+
+        update_interval
+
+      error ->
+        Logger.warning(
+          "Refresh certificates error: #{inspect(error)}, will be retry again #{retry_interval}ms later."
+        )
+
+        retry_interval
+    end
   end
 end

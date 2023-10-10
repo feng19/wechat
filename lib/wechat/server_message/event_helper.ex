@@ -153,7 +153,7 @@ if Code.ensure_loaded?(Plug) do
         result = storage.store(store_id, store_key, store_map)
 
         Logger.info(
-          "Call #{inspect(storage)}.restore(#{store_id}, #{store_key}) => #{inspect(result)}."
+          "Call #{inspect(storage)}.store(#{store_id}, #{store_key}, #{inspect(store_map)}) => #{inspect(result)}."
         )
       end
 

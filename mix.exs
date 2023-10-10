@@ -206,8 +206,10 @@ defmodule WeChat.MixProject do
       {"微信支付",
        [
          WeChat.Pay,
-         WeChat.Pay.Authorization,
-         WeChat.Pay.Certificates
+         WeChat.Pay.Crypto,
+         WeChat.Pay.Certificates,
+         WeChat.Pay.AuthorizationMiddleware,
+         WeChat.Pay.VerifySignatureMiddleware
        ]}
     ]
   end
