@@ -10,15 +10,14 @@ defmodule WeChat.Refresher.Pay do
   require Logger
   alias WeChat.Pay.Certificates
 
-  def start_link(client, settings \\ %{}) do
-    GenServer.start_link(__MODULE__, {client, settings}, name: name(client))
+  def start_link(settings = %{client: client}) when is_map(settings) do
+    GenServer.start_link(__MODULE__, settings, name: name(client))
   end
 
   defp name(client), do: :"#{client}.Refresher"
 
   @impl true
-  def init({client, settings}) do
-    settings = Map.new(settings)
+  def init(settings = %{client: client}) do
     settings = Map.merge(%{update_interval: 43200, retry_interval: 60}, settings)
 
     time_settings =
@@ -77,8 +76,6 @@ defmodule WeChat.Refresher.Pay do
           Logger.info(
             "Call #{inspect(storage)}.store(#{mch_id}, :cacerts, #{inspect(cacerts)}) => #{inspect(result)}."
           )
-
-          WeChat.Pay.start_next_requester(client, cacerts: cacerts)
         end
 
         update_interval

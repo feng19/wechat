@@ -8,6 +8,7 @@ defmodule WeChat.Pay.Certificates do
   - [平台证书更新指引](#{pay_doc_link_prefix()}/merchant/development/interface-rules/wechatpay-certificates-rotation.html){:target="_blank"}
   - [证书相关问题](#{pay_doc_link_prefix()}/merchant/development/interface-rules/certificate-faqs.html){:target="_blank"}
   """
+  alias WeChat.Pay
   alias WeChat.Pay.Crypto
 
   @doc """
@@ -41,17 +42,20 @@ defmodule WeChat.Pay.Certificates do
   end
 
   @doc "保存平台证书 serial_no => cert 的对应关系"
+  @spec put_cert(Pay.client(), Pay.platform_serial_no(), cert :: binary()) :: :ok
   def put_cert(client, serial_no, cert) do
     public_key = cert |> X509.Certificate.from_pem!() |> X509.Certificate.public_key()
     :persistent_term.put({:wechat, {client, serial_no}}, public_key)
   end
 
   @doc "获取 serial_no 对应的 平台证书"
+  @spec get_cert(Pay.client(), Pay.platform_serial_no()) :: X509.PublicKey.t()
   def get_cert(client, serial_no) do
     :persistent_term.get({:wechat, {client, serial_no}}, nil)
   end
 
   @doc "移除 serial_no 对应的 平台证书"
+  @spec remove_cert(Pay.client(), Pay.platform_serial_no()) :: boolean
   def remove_cert(client, serial_no) do
     :persistent_term.erase({:wechat, {client, serial_no}})
   end
@@ -94,12 +98,5 @@ defmodule WeChat.Pay.Certificates do
         false
       end
     end)
-  end
-
-  @doc "Converts certificates from PEM to DER (binary) format."
-  def convert_cacerts(cacerts) do
-    for cert <- cacerts do
-      cert["certificate"] |> X509.Certificate.from_pem!() |> X509.Certificate.to_der()
-    end
   end
 end

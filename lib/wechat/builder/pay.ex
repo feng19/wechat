@@ -19,21 +19,19 @@ defmodule WeChat.Builder.Pay do
 
       @impl true
       def init(opts) do
-        cacerts =
-          Keyword.get_lazy(opts, :cacerts, fn ->
-            # Load Cacerts From Storage
-            {:ok, cacerts} = unquote(storage).restore(unquote(options.mch_id), :cacerts)
-            cacerts
-          end)
-
-        # is need requester_spec ???
-        WeChat.Pay.Certificates.put_certs(cacerts, __MODULE__)
-        cacerts = WeChat.Pay.Certificates.convert_cacerts(cacerts)
-        requester_a = WeChat.Pay.get_requester_spec(:A, __MODULE__, cacerts)
-        requester_b = WeChat.Pay.get_requester_spec(:B, __MODULE__, cacerts)
-        WeChat.Pay.put_requester_opts(__MODULE__, :A)
         refresher = Map.get(opts, :refresher, WeChat.Refresher.Pay)
-        children = [{refresher, {__MODULE__, opts}}, requester_a, requester_b]
+
+        Map.get_lazy(opts, :cacerts, fn ->
+          # Load Cacerts From Storage
+          {:ok, cacerts} = unquote(storage).restore(unquote(options.mch_id), :cacerts)
+          cacerts
+        end)
+        |> WeChat.Pay.Certificates.put_certs(__MODULE__)
+
+        children = [
+          {refresher, Map.put(opts, :client, __MODULE__)},
+          WeChat.Pay.get_requester_spec(__MODULE__)
+        ]
 
         Supervisor.init(children, strategy: :one_for_one)
       end

@@ -142,54 +142,16 @@ defmodule WeChat.Pay do
     end
   end
 
-  defp finch_name(client, id), do: :"#{client}.Finch.#{id}"
+  @doc false
+  def finch_name(client), do: :"#{client}.Finch"
 
-  @doc "保存请求器配置"
-  @spec put_requester_opts(client, requester_id) :: :ok
-  def put_requester_opts(client, id) do
-    :persistent_term.put({:wechat, {client, :requester_opts}}, %{
-      id: id,
-      name: finch_name(client, id)
-    })
-  end
-
-  @doc "获取请求器配置"
-  @spec get_requester_opts(client) :: requester_opts
-  def get_requester_opts(client) do
-    :persistent_term.get({:wechat, {client, :requester_opts}})
-  end
-
-  def get_requester_spec(id, client, cacerts) when is_atom(id) do
-    name = finch_name(client, id)
-
-    finch_pool =
-      Application.get_env(:wechat, :finch_pool, size: 32, count: 8) ++
-        [conn_opts: [transport_opts: [cacerts: cacerts]]]
-
+  def get_requester_spec(client) do
+    name = finch_name(client)
+    # todo config finch_pool
+    finch_pool = Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
     options = [name: name, pools: %{:default => finch_pool}]
     spec = Finch.child_spec(options)
-    %{spec | id: id}
-  end
-
-  # [平台证书更新指引](#{pay_doc_link_prefix()}/merchant/development/interface-rules/wechatpay-certificates-rotation.html)
-  # * 证书切换
-  #  * 通过 Supervisor 开启新的 Finch 进程
-  #  * 然后 将新的 Finch 进程名写入到 :persistent_term 保存
-  #  * 请求的时候，从 :persistent_term 获取 Finch 进程名，然后再请求
-  @doc false
-  def start_next_requester(client, opts) do
-    %{id: now_id} = get_requester_opts(client)
-    new_id = List.delete([:A, :B], now_id) |> hd()
-    cacerts = Certificates.convert_cacerts(opts.cacerts)
-    finch_spec = get_requester_spec(new_id, client, cacerts)
-    sup = :"#{client}.Supervisor"
-
-    with :ok <- Supervisor.terminate_child(sup, new_id),
-         :ok <- Supervisor.delete_child(sup, new_id),
-         {:ok, _} = return <- Supervisor.start_child(sup, finch_spec) do
-      put_requester_opts(client, new_id)
-      return
-    end
+    %{spec | id: Finch}
   end
 
   @doc "初始化平台证书"

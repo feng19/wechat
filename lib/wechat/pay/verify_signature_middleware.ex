@@ -22,9 +22,9 @@ defmodule WeChat.Pay.VerifySignatureMiddleware do
            serial_no when is_binary(serial_no) <- Tesla.get_header(env, "wechatpay-serial"),
            public_key when not is_nil(public_key) <- Certificates.get_cert(client, serial_no),
            true <- Crypto.verify(signature, timestamp, nonce, body, public_key) do
-        {:ok, env}
+        Tesla.Middleware.JSON.decode(env, [])
       else
-        _ -> {:error, :invaild_response}
+        _error -> {:error, :invaild_response}
       end
     end
   end

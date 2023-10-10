@@ -13,14 +13,11 @@ defmodule WeChat.Pay.AuthorizationMiddleware do
   alias WeChat.Pay.Crypto
 
   @impl Tesla.Middleware
-  def call(env, next, options) do
-    mch_id = Keyword.fetch!(options, :mch_id)
-    serial_no = Keyword.fetch!(options, :serial_no)
-    private_key = Keyword.fetch!(options, :private_key)
-    token = gen_token(mch_id, serial_no, private_key, env)
+  def call(env, next, client) do
+    token = gen_token(client.mch_id(), client.client_serial_no(), client.private_key(), env)
 
     env
-    |> Tesla.put_headers([{"Authorization", "WECHATPAY2-SHA256-RSA2048 #{token}"}])
+    |> Tesla.put_headers([{"authorization", "WECHATPAY2-SHA256-RSA2048 #{token}"}])
     |> Tesla.run(next)
   end
 
