@@ -26,7 +26,7 @@ defmodule WeChat.Pay.AuthorizationMiddleware do
 
   def gen_token(mch_id, serial_no, private_key, env) do
     timestamp = WeChat.Utils.now_unix()
-    nonce_str = :crypto.strong_rand_bytes(32) |> Base.url_encode64()
+    nonce_str = :crypto.strong_rand_bytes(16) |> Base.encode16()
     signature = Crypto.sign(env, timestamp, nonce_str, private_key)
 
     ~s(mchid="#{mch_id}",nonce_str="#{nonce_str}",timestamp="#{timestamp}",serial_no="#{serial_no}",signature="#{signature}")

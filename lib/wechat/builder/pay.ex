@@ -5,22 +5,37 @@ defmodule WeChat.Builder.Pay do
     options = options |> Macro.prewalk(&Macro.expand(&1, __CALLER__)) |> Map.new()
     requester = Map.get(options, :requester, WeChat.Requester.Pay)
     storage = Map.get(options, :storage, WeChat.Storage.PayFile)
-    public_key = WeChat.Pay.Crypto.decode_key(options.client_cert)
-    private_key = WeChat.Pay.Crypto.decode_key(options.client_key)
+    private_key = WeChat.Pay.Crypto.load_pem!(options.client_key)
+    public_key = private_key |> X509.PublicKey.derive() |> Macro.escape()
+    private_key = Macro.escape(private_key)
 
     quote do
       use Supervisor
 
       @spec start_link(WeChat.Pay.start_options()) :: Supervisor.on_start()
       def start_link(opts) do
-        opts = Map.new(opts)
-        requester_a = WeChat.Pay.get_requester_spec(:A, __MODULE__, opts.cacerts)
-        requester_b = WeChat.Pay.get_requester_spec(:B, __MODULE__, opts.cacerts)
-        WeChat.Pay.put_requester_opts(__MODULE__, :A, opts.serial_no)
+        Supervisor.start_link(__MODULE__, Map.new(opts), name: :"#{__MODULE__}.Supervisor")
+      end
+
+      @impl true
+      def init(opts) do
+        cacerts =
+          Keyword.get_lazy(opts, :cacerts, fn ->
+            # Load Cacerts From Storage
+            {:ok, cacerts} = unquote(storage).restore(unquote(options.mch_id), :cacerts)
+            cacerts
+          end)
+
+        # is need requester_spec ???
+        WeChat.Pay.Certificates.put_certs(cacerts, __MODULE__)
+        cacerts = WeChat.Pay.Certificates.convert_cacerts(cacerts)
+        requester_a = WeChat.Pay.get_requester_spec(:A, __MODULE__, cacerts)
+        requester_b = WeChat.Pay.get_requester_spec(:B, __MODULE__, cacerts)
+        WeChat.Pay.put_requester_opts(__MODULE__, :A)
         refresher = Map.get(opts, :refresher, WeChat.Refresher.Pay)
         children = [{refresher, {__MODULE__, opts}}, requester_a, requester_b]
-        opts = [strategy: :one_for_one, name: :"#{__MODULE__}.Supervisor"]
-        Supervisor.start_link(children, opts)
+
+        Supervisor.init(children, strategy: :one_for_one)
       end
 
       @spec get(url :: binary) :: WeChat.response()
@@ -28,10 +43,7 @@ defmodule WeChat.Builder.Pay do
 
       @spec get(url :: binary, opts :: keyword) :: WeChat.response()
       def get(url, opts) do
-        %{name: name, serial_no: serial_no} = WeChat.Pay.get_requester_opts(__MODULE__)
-
-        __MODULE__
-        |> unquote(requester).new(__MODULE__, name, serial_no)
+        unquote(requester).new(__MODULE__)
         |> Tesla.get(url, opts)
       end
 
@@ -40,10 +52,7 @@ defmodule WeChat.Builder.Pay do
 
       @spec post(url :: binary, body :: any, opts :: keyword) :: WeChat.response()
       def post(url, body, opts) do
-        %{name: name, serial_no: serial_no} = WeChat.Pay.get_requester_opts(__MODULE__)
-
-        __MODULE__
-        |> unquote(requester).new(__MODULE__, name, serial_no)
+        unquote(requester).new(__MODULE__)
         |> Tesla.post(url, body, opts)
       end
 
@@ -51,6 +60,8 @@ defmodule WeChat.Builder.Pay do
       def mch_id, do: unquote(options.mch_id)
       @spec api_secret_key() :: WeChat.Pay.api_secret_key()
       def api_secret_key, do: unquote(options.api_secret_key)
+      @spec client_serial_no() :: WeChat.Pay.client_serial_no()
+      def client_serial_no, do: unquote(options.client_serial_no)
       @spec storage() :: WeChat.Storage.Adapter.t()
       def storage, do: unquote(storage)
       @spec client_cert() :: WeChat.Pay.client_cert()
@@ -76,16 +87,26 @@ defmodule WeChat.Builder.Pay do
       raise ArgumentError, "please set mch_id option for #{inspect(client)}"
     end
 
+    unless Keyword.get(options, :client_serial_no) |> is_binary() do
+      raise ArgumentError, "please set client_serial_no option for #{inspect(client)}"
+    end
+
     unless Keyword.get(options, :api_secret_key) |> is_binary() do
       raise ArgumentError, "please set api_secret_key option for #{inspect(client)}"
     end
 
-    unless Keyword.get(options, :client_cert) |> is_binary() do
+    unless Keyword.get(options, :client_cert) |> check_pem_file() do
       raise ArgumentError, "please set client_cert option for #{inspect(client)}"
     end
 
-    unless Keyword.get(options, :client_key) |> is_binary() do
+    unless Keyword.get(options, :client_key) |> check_pem_file() do
       raise ArgumentError, "please set client_key option for #{inspect(client)}"
     end
   end
+
+  defp check_pem_file({:app_dir, app, path}) when is_atom(app) and is_binary(path),
+    do: Application.app_dir(app, path) |> File.exists?()
+
+  defp check_pem_file({:file, path}) when is_binary(path), do: File.exists?(path)
+  defp check_pem_file(_), do: false
 end

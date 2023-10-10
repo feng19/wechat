@@ -14,7 +14,9 @@ defmodule WeChat.Storage.PayFile do
   @impl true
   @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any
   def store(store_id, store_key, value) do
-    get_file_name(store_id) |> store_to_file(store_id, store_key, value)
+    filename = get_file_name(store_id)
+    Path.dirname(filename) |> File.mkdir_p()
+    store_to_file(filename, store_id, store_key, value)
   end
 
   @impl true

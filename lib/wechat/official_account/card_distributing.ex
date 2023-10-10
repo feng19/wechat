@@ -33,7 +33,9 @@ defmodule WeChat.CardDistributing do
   """
   @spec create_landing_page(WeChat.client(), body :: map) :: WeChat.response()
   def create_landing_page(client, body) do
-    client.post("/card/landingpage/create", body, query: [access_token: client.get_access_token()])
+    client.post("/card/landingpage/create", body,
+      query: [access_token: client.get_access_token()]
+    )
   end
 
   @doc """

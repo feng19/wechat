@@ -31,7 +31,9 @@ defmodule WeChat.Work.Contacts.Tag do
         json_map(tagname: tag_name)
       end
 
-    client.post("/cgi-bin/tag/create", json, query: [access_token: client.get_access_token(agent)])
+    client.post("/cgi-bin/tag/create", json,
+      query: [access_token: client.get_access_token(agent)]
+    )
   end
 
   @doc """

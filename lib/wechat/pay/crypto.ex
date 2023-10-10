@@ -11,9 +11,12 @@ defmodule WeChat.Pay.Crypto do
           "serial_no" => serial_no,
           "effective_time" => effective_time,
           "expire_time" => expire_time,
-          "nonce" => iv,
-          "ciphertext" => ciphertext,
-          "associated_data" => associated_data
+          "encrypt_certificate" => %{
+            "algorithm" => "AEAD_AES_256_GCM",
+            "nonce" => iv,
+            "ciphertext" => ciphertext,
+            "associated_data" => associated_data
+          }
         },
         api_secret_key
       ) do
@@ -46,9 +49,8 @@ defmodule WeChat.Pay.Crypto do
   end
 
   @doc false
-  def load_pem!(path) do
-    path |> File.read!() |> decode_key()
-  end
+  def load_pem!({:app_dir, app, path}), do: load_pem!({:file, Application.app_dir(app, path)})
+  def load_pem!({:file, path}), do: path |> File.read!() |> decode_key()
 
   @doc false
   def decode_key(binary) do
@@ -86,11 +88,12 @@ defmodule WeChat.Pay.Crypto do
   """
   def sign(env, timestamp, nonce_str, private_key) do
     method = to_string(env.method) |> String.upcase()
+    %{path: path} = URI.parse(env.url)
 
     path =
       case env.query do
-        [] -> env.url
-        query -> env.url <> "?" <> URI.encode_query(query)
+        [] -> path
+        query -> path <> "?" <> URI.encode_query(query)
       end
 
     "#{method}\n#{path}\n#{timestamp}\n#{nonce_str}\n#{env.body}\n"

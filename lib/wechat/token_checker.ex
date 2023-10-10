@@ -13,8 +13,8 @@ defmodule WeChat.TokenChecker do
   use GenServer
   require Logger
 
-  @type check_fun :: (() -> WeChat.response())
-  @type refresh_fun :: (() -> any)
+  @type check_fun :: (-> WeChat.response())
+  @type refresh_fun :: (-> any)
   @typep id :: WeChat.Storage.Adapter.store_id()
   @typep refresh_options :: WeChat.Refresher.DefaultSettings.refresh_options()
 

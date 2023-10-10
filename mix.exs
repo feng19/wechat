@@ -37,6 +37,7 @@ defmodule WeChat.MixProject do
       {:jason, "~> 1.2"},
       {:saxy, "~> 1.2", optional: true},
       {:plug, "~> 1.11", optional: true},
+      {:x509, "~> 0.8", optional: true},
       {:ex_doc, ">= 0.0.0", only: [:docs, :dev], runtime: false}
     ]
   end
