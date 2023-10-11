@@ -11,13 +11,13 @@ if Code.ensure_loaded?(Plug) do
 
         post "/wx/pay/event", #{inspect(__MODULE__)},
           client: WxPay,
-          event_handler: &YourModule.handle_event/3
+          event_handler: &YourModule.handle_event/2
 
     before phoenix 1.17:
 
         forward "/wx/event/:app", #{inspect(__MODULE__)},
           client: WxPay,
-          event_handler: &YourModule.handle_event/3
+          event_handler: &YourModule.handle_event/2
 
     ## Options
 
@@ -39,8 +39,7 @@ if Code.ensure_loaded?(Plug) do
     """
     @type event_handler_return :: :ok | :error | {:error, any} | Plug.Conn.t()
     @typedoc "事件处理回调函数"
-    @type event_handler ::
-            (Plug.Conn.t(), WeChat.Pay.client(), message :: map -> event_handler_return)
+    @type event_handler :: (Plug.Conn.t(), message :: map -> event_handler_return)
 
     @doc false
     def init(opts) do
@@ -48,7 +47,7 @@ if Code.ensure_loaded?(Plug) do
 
       event_handler =
         with {:ok, handler} <- Map.fetch(opts, :event_handler),
-             true <- is_function(handler, 3) do
+             true <- is_function(handler, 2) do
           handler
         else
           :error ->
@@ -56,7 +55,7 @@ if Code.ensure_loaded?(Plug) do
 
           false ->
             raise ArgumentError,
-                  "the :event_handler must arg 3 function when using #{inspect(__MODULE__)}"
+                  "the :event_handler must arg 2 function when using #{inspect(__MODULE__)}"
         end
 
       case Map.fetch(opts, :client) do
@@ -99,10 +98,10 @@ if Code.ensure_loaded?(Plug) do
               }
             } = message ->
               data = Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv)
-              event_handler.(conn, client, Map.put(message, "data", data))
+              event_handler.(conn, Map.put(message, "data", data))
 
             message ->
-              event_handler.(conn, client, message)
+              event_handler.(conn, message)
           end
         rescue
           error ->
