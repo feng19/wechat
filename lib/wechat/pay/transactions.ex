@@ -4,18 +4,23 @@ defmodule WeChat.Pay.Transactions do
   """
   import Jason.Helpers
 
-  def jsapi(client, appid, out_trade_no, notify_url, amount, payer) do
-    client.post("/v3/pay/transactions/jsapi", %{
-      "appid" => appid,
-      "mchid" => client.mch_id(),
-      "out_trade_no" => out_trade_no,
-      "notify_url" => notify_url,
-      "amount" => %{
-        "total" => amount,
-        "currency" => "CNY"
-      },
-      "payer" => %{"openid" => payer}
-    })
+  def jsapi(client, appid, description, out_trade_no, notify_url, amount, payer) do
+    jsapi(
+      client,
+      json_map(
+        appid: appid,
+        mchid: client.mch_id(),
+        description: description,
+        out_trade_no: out_trade_no,
+        notify_url: notify_url,
+        amount: %{total: amount, currency: "CNY"},
+        payer: %{openid: payer}
+      )
+    )
+  end
+
+  def jsapi(client, body) do
+    client.post("/v3/pay/transactions/jsapi", body)
   end
 
   def query_by_out_trade_no(client, out_trade_no) do

@@ -1,13 +1,26 @@
 defmodule WeChat.Builder.Pay do
   @moduledoc false
   defmacro __using__(options \\ []) do
-    check_options!(options, __CALLER__.module)
+    client = __CALLER__.module
+    check_options!(options, client)
     options = options |> Macro.prewalk(&Macro.expand(&1, __CALLER__)) |> Map.new()
     requester = Map.get(options, :requester, WeChat.Requester.Pay)
     storage = Map.get(options, :storage, WeChat.Storage.PayFile)
     private_key = WeChat.Pay.Crypto.load_pem!(options.client_key)
     public_key = private_key |> X509.PublicKey.derive() |> Macro.escape()
     private_key = Macro.escape(private_key)
+
+    api_secret_key =
+      with :not_handle <-
+             WeChat.Builder.Utils.handle_env_option(
+               client,
+               :api_secret_key,
+               options.api_secret_key
+             ) do
+        quote do
+          def api_secret_key, do: unquote(options.api_secret_key)
+        end
+      end
 
     quote do
       use Supervisor
@@ -57,7 +70,7 @@ defmodule WeChat.Builder.Pay do
       @spec mch_id() :: WeChat.Pay.mch_id()
       def mch_id, do: unquote(options.mch_id)
       @spec api_secret_key() :: WeChat.Pay.api_secret_key()
-      def api_secret_key, do: unquote(options.api_secret_key)
+      unquote(api_secret_key)
       @spec client_serial_no() :: WeChat.Pay.client_serial_no()
       def client_serial_no, do: unquote(options.client_serial_no)
       @spec storage() :: WeChat.Storage.Adapter.t()
@@ -66,14 +79,17 @@ defmodule WeChat.Builder.Pay do
       def client_cert, do: unquote(options.client_cert)
       @spec client_key() :: WeChat.Pay.client_key()
       def client_key, do: unquote(options.client_key)
-
+      @doc false
       def public_key, do: unquote(public_key)
+      @doc false
       def private_key, do: unquote(private_key)
 
+      @doc "加密敏感信息"
       def encrypt_secret_data(data) do
         WeChat.Pay.Crypto.encrypt_secret_data(data, unquote(public_key))
       end
 
+      @doc "解密敏感信息"
       def decrypt_secret_data(cipher_text) do
         WeChat.Pay.Crypto.decrypt_secret_data(cipher_text, unquote(private_key))
       end
@@ -89,7 +105,9 @@ defmodule WeChat.Builder.Pay do
       raise ArgumentError, "please set client_serial_no option for #{inspect(client)}"
     end
 
-    unless Keyword.get(options, :api_secret_key) |> is_binary() do
+    api_secret_key = Keyword.get(options, :api_secret_key)
+
+    unless is_binary(api_secret_key) or WeChat.Builder.Utils.check_env_option?(api_secret_key) do
       raise ArgumentError, "please set api_secret_key option for #{inspect(client)}"
     end
 

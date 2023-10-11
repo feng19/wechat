@@ -78,7 +78,7 @@ defmodule WeChat.Pay do
   API v3密钥 -
   [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/apiv3key.html){:target="_blank"}
   """
-  @type api_secret_key :: binary
+  @type api_secret_key :: binary | WeChat.env_option()
   @type client :: module
   @typep pem_file :: {:file, Path.t()} | {:app_dir, Application.app(), Path.t()}
 

@@ -125,6 +125,12 @@ defmodule WeChat.Builder.Utils do
 
   defp ast_transform(ast, _acc), do: ast
 
+  def check_env_option?(:runtime_env), do: true
+  def check_env_option?({:runtime_env, app}) when is_atom(app), do: true
+  def check_env_option?(:compile_env), do: true
+  def check_env_option?({:compile_env, app}) when is_atom(app), do: true
+  def check_env_option?(_), do: false
+
   def handle_env_option(_client, key, :runtime_env) do
     quote do
       def unquote(key)(),

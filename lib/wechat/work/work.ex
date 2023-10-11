@@ -2,6 +2,8 @@ defmodule WeChat.Work do
   @moduledoc """
   企业微信
 
+  ** 注意 ** 未支持企业微信服务商
+
   定义 `Client` 模块
 
       defmodule YourApp.WeChatAppCodeName do
