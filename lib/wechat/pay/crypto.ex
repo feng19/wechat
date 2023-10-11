@@ -2,50 +2,20 @@ defmodule WeChat.Pay.Crypto do
   @moduledoc "用于支付加密相关"
   import WeChat.Utils, only: [pay_doc_link_prefix: 0]
 
-  @doc """
-  证书和回调报文解密 - 
-  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/certificate-callback-decryption.html){:target="_blank"}
-  """
-  def decrypt_certificate(
-        %{
-          "serial_no" => serial_no,
-          "effective_time" => effective_time,
-          "expire_time" => expire_time,
-          "encrypt_certificate" => %{
-            "algorithm" => "AEAD_AES_256_GCM",
-            "nonce" => iv,
-            "ciphertext" => ciphertext,
-            "associated_data" => associated_data
-          }
-        },
-        api_secret_key
-      ) do
+  def decrypt_aes_256_gcm(client, ciphertext, associated_data, iv) do
     data = Base.decode64!(ciphertext)
     len = byte_size(data) - 16
     <<data::binary-size(len), tag::binary-size(16)>> = data
 
-    certificate =
-      :crypto.crypto_one_time_aead(
-        :aes_256_gcm,
-        api_secret_key,
-        iv,
-        data,
-        associated_data,
-        tag,
-        false
-      )
-
-    {:ok, effective_datetime, _utc_offset} = DateTime.from_iso8601(effective_time)
-    {:ok, expire_datetime, _utc_offset} = DateTime.from_iso8601(expire_time)
-
-    %{
-      "serial_no" => serial_no,
-      "effective_time" => effective_time,
-      "effective_timestamp" => DateTime.to_unix(effective_datetime),
-      "expire_time" => expire_time,
-      "expire_timestamp" => DateTime.to_unix(expire_datetime),
-      "certificate" => certificate
-    }
+    :crypto.crypto_one_time_aead(
+      :aes_256_gcm,
+      client.api_secret_key(),
+      iv,
+      data,
+      associated_data,
+      tag,
+      false
+    )
   end
 
   @doc false

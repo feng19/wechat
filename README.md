@@ -10,11 +10,11 @@
 
 - 目前 `Elixir` 中支持最完善的微信SDK
 - 已支持: 
-  - [公众号](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
-  - [小程序](https://developers.weixin.qq.com/miniprogram/dev/framework/)
-  - [第三方应用](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/getting_started/how_to_read.html)
-  - [企业微信](https://developer.work.weixin.qq.com/document/path/90556)
-  - [微信支付](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml)
+  - `WeChat` => [公众号](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
+  - `WeChat` => [小程序](https://developers.weixin.qq.com/miniprogram/dev/framework/)
+  - `WeChat` => [第三方应用](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/getting_started/how_to_read.html)
+  - `WeChat.Work` => [企业微信](https://developer.work.weixin.qq.com/document/path/90556)
+  - `WeChat.Pay` => [微信支付](https://pay.weixin.qq.com/wiki/doc/apiv3/wxpay/pages/index.shtml)
 - WIP: 企业微信服务商
 
 ### Links

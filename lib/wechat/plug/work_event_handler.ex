@@ -24,6 +24,7 @@ if Code.ensure_loaded?(Plug) do
     alias WeChat.Work.Agent
     alias WeChat.Plug.EventHandler
     alias WeChat.ServerMessage.{EventHelper, Encryptor}
+    @behaviour Plug
 
     @typedoc "事件处理回调函数"
     @type event_handler ::

@@ -15,13 +15,13 @@ defmodule WeChat.Pay.Certificates do
   下载平台证书 -
   [官方文档](#{pay_doc_link_prefix()}/merchant/apis/platform-certificate/api-v3-get-certificates/get.html){:target="_blank"}
   """
+  @spec certificates(Pay.client(), first? :: boolean) :: {:ok, list(map)} | any
   def certificates(client, first? \\ false)
 
   def certificates(client, false) do
     with {:ok, %{body: %{"data" => certificates}}} when is_list(certificates) <-
            client.get("/v3/certificates") do
-      api_secret_key = client.api_secret_key()
-      {:ok, Enum.map(certificates, &Crypto.decrypt_certificate(&1, api_secret_key))}
+      {:ok, Enum.map(certificates, &decrypt_certificate(&1, client))}
     end
   end
 
@@ -29,9 +29,41 @@ defmodule WeChat.Pay.Certificates do
     with {:ok, %{body: %{"data" => certificates}}} when is_list(certificates) <-
            WeChat.Requester.Pay.first_time_download_certificates_client(client)
            |> Tesla.get("/v3/certificates", []) do
-      api_secret_key = client.api_secret_key()
-      {:ok, Enum.map(certificates, &Crypto.decrypt_certificate(&1, api_secret_key))}
+      {:ok, Enum.map(certificates, &decrypt_certificate(&1, client))}
     end
+  end
+
+  @doc """
+  证书和回调报文解密 - 
+  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/certificate-callback-decryption.html){:target="_blank"}
+  """
+  @spec decrypt_certificate(data :: map, Pay.client()) :: map
+  def decrypt_certificate(
+        %{
+          "serial_no" => serial_no,
+          "effective_time" => effective_time,
+          "expire_time" => expire_time,
+          "encrypt_certificate" => %{
+            "algorithm" => "AEAD_AES_256_GCM",
+            "nonce" => iv,
+            "ciphertext" => ciphertext,
+            "associated_data" => associated_data
+          }
+        },
+        client
+      ) do
+    certificate = Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv)
+    {:ok, effective_datetime, _utc_offset} = DateTime.from_iso8601(effective_time)
+    {:ok, expire_datetime, _utc_offset} = DateTime.from_iso8601(expire_time)
+
+    %{
+      "serial_no" => serial_no,
+      "effective_time" => effective_time,
+      "effective_timestamp" => DateTime.to_unix(effective_datetime),
+      "expire_time" => expire_time,
+      "expire_timestamp" => DateTime.to_unix(expire_datetime),
+      "certificate" => certificate
+    }
   end
 
   @doc false

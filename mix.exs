@@ -210,7 +210,8 @@ defmodule WeChat.MixProject do
          WeChat.Pay.Crypto,
          WeChat.Pay.Certificates,
          WeChat.Pay.AuthorizationMiddleware,
-         WeChat.Pay.VerifySignatureMiddleware
+         WeChat.Pay.VerifySignatureMiddleware,
+         WeChat.Pay.EventHandler
        ]}
     ]
   end

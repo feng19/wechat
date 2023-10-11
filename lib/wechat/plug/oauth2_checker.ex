@@ -52,6 +52,7 @@ if Code.ensure_loaded?(Plug) do
     import WeChat.Plug.Helper
     require Logger
     alias WeChat.{Utils, WebPage, Work, HubClient}
+    @behaviour Plug
 
     @typedoc "授权回调处理函数"
     @type oauth2_callback_fun ::

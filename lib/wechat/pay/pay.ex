@@ -113,7 +113,7 @@ defmodule WeChat.Pay do
   @typedoc """
   启动参数
 
-  - `refresher`: 刷新器 - `t:module/0`, 选填, 默认值: `WeChat.Refresher.Pay`
+  - `refresher`: 刷新器 - `t:module/0`, 可选, 默认值: `WeChat.Refresher.Pay`
   """
   @type start_options :: [refresher: module]
   @type requester_id :: :A | :B

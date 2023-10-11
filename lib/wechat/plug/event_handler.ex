@@ -42,6 +42,7 @@ if Code.ensure_loaded?(Plug) do
     import Plug.Conn
     require Logger
     alias WeChat.ServerMessage.EventHelper
+    @behaviour Plug
 
     @typep timestamp :: integer()
     @typedoc """
@@ -91,7 +92,7 @@ if Code.ensure_loaded?(Plug) do
 
           false ->
             raise ArgumentError,
-                  "the :event_handler must arg 4 function when using #{inspect(__MODULE__)}"
+                  "the :event_handler must arg 3 function when using #{inspect(__MODULE__)}"
         end
 
       event_parser =
