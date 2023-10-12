@@ -1,5 +1,7 @@
 defmodule WeChat.Builder.Pay do
   @moduledoc false
+  alias WeChat.Builder.Utils
+
   defmacro __using__(options \\ []) do
     client = __CALLER__.module
     check_options!(options, client)
@@ -11,12 +13,7 @@ defmodule WeChat.Builder.Pay do
     private_key = Macro.escape(private_key)
 
     api_secret_key =
-      with :not_handle <-
-             WeChat.Builder.Utils.handle_env_option(
-               client,
-               :api_secret_key,
-               options.api_secret_key
-             ) do
+      with :not_handle <- Utils.handle_env_option(client, :api_secret_key, options.api_secret_key) do
         quote do
           def api_secret_key, do: unquote(options.api_secret_key)
         end
@@ -107,22 +104,22 @@ defmodule WeChat.Builder.Pay do
 
     api_secret_key = Keyword.get(options, :api_secret_key)
 
-    unless is_binary(api_secret_key) or WeChat.Builder.Utils.check_env_option?(api_secret_key) do
+    unless is_binary(api_secret_key) or Utils.check_env_option?(api_secret_key) do
       raise ArgumentError, "please set api_secret_key option for #{inspect(client)}"
     end
 
-    unless Keyword.get(options, :client_cert) |> check_pem_file() do
+    unless Keyword.get(options, :client_cert) |> check_pem_file?() do
       raise ArgumentError, "please set client_cert option for #{inspect(client)}"
     end
 
-    unless Keyword.get(options, :client_key) |> check_pem_file() do
+    unless Keyword.get(options, :client_key) |> check_pem_file?() do
       raise ArgumentError, "please set client_key option for #{inspect(client)}"
     end
   end
 
-  defp check_pem_file({:app_dir, app, path}) when is_atom(app) and is_binary(path),
+  defp check_pem_file?({:app_dir, app, path}) when is_atom(app) and is_binary(path),
     do: Application.app_dir(app, path) |> File.exists?()
 
-  defp check_pem_file({:file, path}) when is_binary(path), do: File.exists?(path)
-  defp check_pem_file(_), do: false
+  defp check_pem_file?({:file, path}) when is_binary(path), do: File.exists?(path)
+  defp check_pem_file?(_), do: false
 end

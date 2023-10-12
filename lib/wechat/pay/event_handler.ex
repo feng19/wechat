@@ -97,7 +97,10 @@ if Code.ensure_loaded?(Plug) do
                 "associated_data" => associated_data
               }
             } = message ->
-              data = Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv) |> Jason.decode!()
+              data =
+                Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv)
+                |> Jason.decode!()
+
               event_handler.(conn, Map.put(message, "data", data))
 
             message ->
@@ -135,20 +138,20 @@ if Code.ensure_loaded?(Plug) do
 
     defp check_and_read_body(%{body_params: body_params} = conn) do
       case body_params do
+        b when is_struct(b) ->
+          with {:ok, body, conn} when is_binary(body) <- read_body(conn),
+               {:ok, body_map} when is_map(body_map) <- Jason.encode(body) do
+            {:ok, body, body_map, conn}
+          else
+            _ -> :bad_request
+          end
+
         body_map when is_map(body_map) ->
           {:ok, Jason.encode!(body_map), body_map, conn}
 
         body when is_binary(body) ->
           case Jason.encode(body) do
             {:ok, body_map} when is_map(body_map) -> {:ok, body, body_map, conn}
-            _ -> :bad_request
-          end
-
-        b when is_struct(b) ->
-          with {:ok, body, conn} when is_binary(body) <- read_body(conn),
-               {:ok, body_map} when is_map(body_map) <- Jason.encode(body) do
-            {:ok, body, body_map, conn}
-          else
             _ -> :bad_request
           end
       end
