@@ -40,6 +40,10 @@ defmodule WeChat.Pay do
       end
 
   启动参数说明请看 `t:start_options/0`
+
+  ## 处理回调消息
+
+  详情请看 `WeChat.Pay.EventHandler`
   """
   require Logger
   import WeChat.Utils, only: [pay_doc_link_prefix: 0]

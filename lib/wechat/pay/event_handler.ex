@@ -3,11 +3,47 @@ if Code.ensure_loaded?(Plug) do
     @moduledoc """
     微信支付 回调通知处理器
 
-    ** 注意 **, 定义 `client` 时必须设置: `encoding_aes_key` & `token`
-
     ## Usage
 
-    将下面的代码加到 `router` 里面：
+    ### For Plug
+
+        defmodule YourAppWeb.PayEventRouter do
+          use Plug.Router
+          plug :match
+          plug :dispatch
+
+          post "/api/pay/callback",
+            to: #{inspect(__MODULE__)},
+            init_opts: [client: WxPay, event_handler: &YourModule.handle_event/2]
+
+          match _, do: conn
+        end
+
+    ### For Phoenix
+
+    建议是定义一个上方的 `PayEventRouter`, 然后接入到 `endpoint` 中 `plug Plug.Parsers` 的上一行:
+
+        defmodule YourAppWeb.Endpoint do
+          # ...
+          plug Plug.RequestId
+          plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+          plug YourAppWeb.PayEventRouter # <<== add to here, before Plug.Parsers
+
+          plug Plug.Parsers,
+            parsers: [:urlencoded, :multipart, :json],
+            pass: ["*/*"],
+            json_decoder: Phoenix.json_library()
+
+          plug Plug.MethodOverride
+          plug Plug.Head
+          plug Plug.Session, @session_options
+          plug YourAppWeb.Router
+          # ...
+        end
+
+    ** 注意 **, `Plug.Parsers` 会解析 `body`, 请确保此 `plug` 传入的 `body` 为 `binary` 格式, 否则将会导致验签失败
+
+    如果确认 `body` 未被解析, 亦可使用下面方式接入到 `router` 里面:
 
         post "/wx/pay/event", #{inspect(__MODULE__)},
           client: WxPay,
@@ -15,7 +51,7 @@ if Code.ensure_loaded?(Plug) do
 
     before phoenix 1.17:
 
-        forward "/wx/event/:app", #{inspect(__MODULE__)},
+        forward "/wx/pay/event", #{inspect(__MODULE__)},
           client: WxPay,
           event_handler: &YourModule.handle_event/2
 
