@@ -136,7 +136,7 @@ if Code.ensure_loaded?(Plug) do
     defp check_and_read_body(%{body_params: body_params} = conn) do
       case body_params do
         body_map when is_map(body_map) ->
-          {:ok, Jason.encode(body_map), body_map, conn}
+          {:ok, Jason.encode!(body_map), body_map, conn}
 
         body when is_binary(body) ->
           case Jason.encode(body) do
