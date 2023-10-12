@@ -97,7 +97,7 @@ if Code.ensure_loaded?(Plug) do
                 "associated_data" => associated_data
               }
             } = message ->
-              data = Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv)
+              data = Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv) |> Jason.decode!()
               event_handler.(conn, Map.put(message, "data", data))
 
             message ->
