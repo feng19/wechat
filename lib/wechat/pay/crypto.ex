@@ -48,8 +48,13 @@ defmodule WeChat.Pay.Crypto do
   [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/signature-verification.html){:target="_blank"}
   """
   def verify(signature, timestamp, nonce, body, public_key) do
-    signature = Base.decode64!(signature, padding: false)
-    :public_key.verify("#{timestamp}\n#{nonce}\n#{body}\n", :sha256, signature, public_key)
+    case Base.decode64(signature, padding: false) do
+      {:ok, signature} ->
+        :public_key.verify("#{timestamp}\n#{nonce}\n#{body}\n", :sha256, signature, public_key)
+
+      _ ->
+        false
+    end
   end
 
   @doc """
