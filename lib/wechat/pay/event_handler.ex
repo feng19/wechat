@@ -140,20 +140,24 @@ if Code.ensure_loaded?(Plug) do
       case body_params do
         b when is_struct(b) ->
           with {:ok, body, conn} when is_binary(body) <- read_body(conn),
-               {:ok, body_map} when is_map(body_map) <- Jason.encode(body) do
+               {:ok, body_map} when is_map(body_map) <- Jason.decode(body) do
             {:ok, body, body_map, conn}
           else
             _ -> :bad_request
           end
 
-        body_map when is_map(body_map) ->
-          {:ok, Jason.encode!(body_map), body_map, conn}
-
         body when is_binary(body) ->
-          case Jason.encode(body) do
+          case Jason.decode(body) do
             {:ok, body_map} when is_map(body_map) -> {:ok, body, body_map, conn}
             _ -> :bad_request
           end
+
+        body when is_map(body) ->
+          Logger.warning(
+            "#{inspect(__MODULE__)} handle parsed body: #{inspect(body)}, please use origin body."
+          )
+
+          :bad_request
       end
     end
   end

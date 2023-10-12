@@ -3,7 +3,7 @@ defmodule WeChat.Pay.Crypto do
   import WeChat.Utils, only: [pay_doc_link_prefix: 0]
 
   def decrypt_aes_256_gcm(client, ciphertext, associated_data, iv) do
-    data = Base.decode64!(ciphertext)
+    data = Base.decode64!(ciphertext, padding: false)
     len = byte_size(data) - 16
     <<data::binary-size(len), tag::binary-size(16)>> = data
 
@@ -48,7 +48,7 @@ defmodule WeChat.Pay.Crypto do
   [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/signature-verification.html){:target="_blank"}
   """
   def verify(signature, timestamp, nonce, body, public_key) do
-    signature = Base.decode64!(signature)
+    signature = Base.decode64!(signature, padding: false)
     :public_key.verify("#{timestamp}\n#{nonce}\n#{body}\n", :sha256, signature, public_key)
   end
 
