@@ -3,6 +3,7 @@ defmodule WeChat.Pay.Transactions do
   微信支付 - 交易
   """
   import Jason.Helpers
+  @currency "CNY"
 
   def jsapi(client, appid, description, out_trade_no, notify_url, amount, payer) do
     jsapi(
@@ -13,7 +14,7 @@ defmodule WeChat.Pay.Transactions do
         description: description,
         out_trade_no: out_trade_no,
         notify_url: notify_url,
-        amount: %{total: amount, currency: "CNY"},
+        amount: %{total: amount, currency: @currency},
         payer: %{openid: payer}
       )
     )
@@ -51,6 +52,60 @@ defmodule WeChat.Pay.Transactions do
 
   def query_by_id(client, transaction_id) do
     client.get("/v3/pay/transactions/id/#{transaction_id}", query: [mchid: client.mch_id()])
+  end
+
+  def refund_by_out_trade_no(
+        client,
+        out_trade_no,
+        out_refund_no,
+        refund_amount,
+        total_amount,
+        notify_url,
+        reason \\ "系统退回"
+      ) do
+    refund(
+      client,
+      json_map(
+        out_trade_no: out_trade_no,
+        out_refund_no: out_refund_no,
+        reason: reason,
+        notify_url: notify_url,
+        amount: %{
+          refund: refund_amount,
+          total: total_amount,
+          currency: @currency
+        }
+      )
+    )
+  end
+
+  def refund_by_id(
+        client,
+        transaction_id,
+        out_refund_no,
+        refund_amount,
+        total_amount,
+        notify_url,
+        reason \\ "系统退回"
+      ) do
+    refund(
+      client,
+      json_map(
+        transaction_id: transaction_id,
+        out_refund_no: out_refund_no,
+        reason: reason,
+        notify_url: notify_url,
+        amount: %{
+          refund: refund_amount,
+          total: total_amount,
+          currency: @currency
+        }
+      )
+    )
+  end
+
+  def refund(client, body) do
+    client.post("/v3/refund/domestic/refunds", body)
   end
 
   def close(client, out_trade_no) do
