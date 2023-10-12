@@ -84,10 +84,10 @@ if Code.ensure_loaded?(Plug) do
            timestamp when is_binary(timestamp) <- get_header(conn, "wechatpay-timestamp"),
            serial_no when is_binary(serial_no) <- get_header(conn, "wechatpay-serial"),
            public_key when not is_nil(public_key) <- Certificates.get_cert(client, serial_no),
-           {:ok, body, conn} <- check_and_read_body(conn),
+           {:ok, body, body_map, conn} <- check_and_read_body(conn),
            true <- Crypto.verify(signature, timestamp, nonce, body, public_key) do
         try do
-          case Jason.decode!(body) do
+          case body_map do
             %{
               "resource_type" => "encrypt-resource",
               "resource" => %{
@@ -133,9 +133,25 @@ if Code.ensure_loaded?(Plug) do
       conn |> put_resp_content_type("application/json") |> send_resp(status, Jason.encode!(data))
     end
 
-    defp check_and_read_body(%{body_params: body_params} = conn) when is_struct(body_params),
-      do: read_body(conn)
+    defp check_and_read_body(%{body_params: body_params} = conn) do
+      case body_params do
+        body_map when is_map(body_map) ->
+          {:ok, Jason.encode(body_map), body_map, conn}
 
-    defp check_and_read_body(conn), do: {:ok, conn.body_params, conn}
+        body when is_binary(body) ->
+          case Jason.encode(body) do
+            {:ok, body_map} when is_map(body_map) -> {:ok, body, body_map, conn}
+            _ -> :bad_request
+          end
+
+        b when is_struct(b) ->
+          with {:ok, body, conn} when is_binary(body) <- read_body(conn),
+               {:ok, body_map} when is_map(body_map) <- Jason.encode(body) do
+            {:ok, body, body_map, conn}
+          else
+            _ -> :bad_request
+          end
+      end
+    end
   end
 end
