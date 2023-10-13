@@ -1,8 +1,8 @@
 defmodule WeChat.MixProject do
   use Mix.Project
-  alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work}
+  alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work, Pay}
 
-  @version "0.12.8"
+  @version "0.13.0"
   @source_url "https://github.com/feng19/wechat"
 
   def project do
@@ -68,7 +68,8 @@ defmodule WeChat.MixProject do
         Work.Customer,
         Work.KF,
         Work.OA,
-        Work.WeDrive
+        Work.WeDrive,
+        Pay
       ]
     ]
   end
@@ -206,12 +207,16 @@ defmodule WeChat.MixProject do
        ]},
       {"微信支付",
        [
-         WeChat.Pay,
-         WeChat.Pay.Crypto,
-         WeChat.Pay.Certificates,
-         WeChat.Pay.AuthorizationMiddleware,
-         WeChat.Pay.VerifySignatureMiddleware,
-         WeChat.Pay.EventHandler
+         Pay,
+         Pay.Crypto,
+         Pay.Certificates,
+         Pay.AuthorizationMiddleware,
+         Pay.VerifySignatureMiddleware,
+         Pay.EventHandler,
+         Pay.Transactions,
+         Pay.Refund,
+         Pay.CombineTransactions,
+         Pay.Bill
        ]}
     ]
   end

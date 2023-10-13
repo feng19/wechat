@@ -1,6 +1,6 @@
 defmodule WeChat.Pay do
   @moduledoc """
-  微信支付
+  微信支付(V3版)
 
   ** 注意 ** 未经上线测试，请谨慎使用
 
