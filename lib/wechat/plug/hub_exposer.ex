@@ -24,6 +24,7 @@ if Code.ensure_loaded?(Plug) do
     """
     import WeChat.Plug.Helper
     alias WeChat.Work.Agent, as: WorkAgent
+    @behaviour Plug
 
     @valid_keys [
       "access_token",

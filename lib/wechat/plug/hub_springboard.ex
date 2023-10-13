@@ -29,6 +29,7 @@ if Code.ensure_loaded?(Plug) do
     """
     import WeChat.Plug.Helper
     alias WeChat.HubServer
+    @behaviour Plug
 
     @doc false
     def init(opts) do

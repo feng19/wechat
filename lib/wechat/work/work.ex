@@ -2,17 +2,24 @@ defmodule WeChat.Work do
   @moduledoc """
   企业微信
 
-  [官方文档](https://developer.work.weixin.qq.com/document/path/90556)
+  ** 注意 ** 未支持企业微信服务商
 
-      use WeChat.Work,
-        corp_id: "corp_id",
-        agents: [
-          contacts_agent(secret: "contacts_secret"),
-          customer_agent(secret: "customer_secret"),
-          kf_agent(secret: "customer_secret"),
-          agent(10000, name: :agent_name, secret: "agent_secret"),
-          ...
-        ]
+  定义 `Client` 模块
+
+      defmodule YourApp.WeChatAppCodeName do
+        @moduledoc "CodeName"
+        use WeChat.Work,
+          corp_id: "corp_id",
+          agents: [
+            contacts_agent(secret: "contacts_secret"),
+            customer_agent(secret: "customer_secret"),
+            kf_agent(secret: "customer_secret"),
+            agent(10000, name: :agent_name, secret: "agent_secret"),
+            ...
+          ]
+      end
+
+  定义参数说明请看 `t:options/0`
   """
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.{Utils, Work.Agent}

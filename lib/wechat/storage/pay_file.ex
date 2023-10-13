@@ -1,5 +1,9 @@
 defmodule WeChat.Storage.PayFile do
-  @moduledoc false
+  @moduledoc """
+  微信支付 - 文件存储器(default)
+
+  数据存储在 `wechat/priv/wechat_pay_cacerts_xxx.json` 文件下
+  """
   import WeChat.Storage.File, only: [store_to_file: 4, restore_from_file: 3]
   alias WeChat.Storage.Adapter
   @behaviour WeChat.Storage.Adapter
@@ -10,7 +14,9 @@ defmodule WeChat.Storage.PayFile do
   @impl true
   @spec store(Adapter.store_id(), Adapter.store_key(), Adapter.value()) :: :ok | any
   def store(store_id, store_key, value) do
-    get_file_name(store_id) |> store_to_file(store_id, store_key, value)
+    filename = get_file_name(store_id)
+    Path.dirname(filename) |> File.mkdir_p()
+    store_to_file(filename, store_id, store_key, value)
   end
 
   @impl true

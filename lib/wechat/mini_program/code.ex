@@ -98,7 +98,7 @@ defmodule WeChat.MiniProgram.Code do
     )
   end
 
-  @spec download(file_path :: Path.t(), create_fun :: (() -> WeChat.response())) ::
+  @spec download(file_path :: Path.t(), create_fun :: (-> WeChat.response())) ::
           WeChat.response() | :ok | {:error, File.posix()}
   def download(file_path, create_fun) do
     file_path
