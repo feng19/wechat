@@ -32,8 +32,11 @@ if Code.ensure_loaded?(Plug) do
 
         defmodule YourAppWeb.PayEventRouter do
           use Plug.Router
+
           plug :match
           plug :dispatch
+
+          Code.ensure_compiled!(WechatPayDemo.PayClient)
 
           post "/api/pay/callback",
             to: #{inspect(__MODULE__)},

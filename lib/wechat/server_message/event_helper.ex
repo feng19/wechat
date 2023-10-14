@@ -12,6 +12,7 @@ if Code.ensure_loaded?(Plug) do
     require Logger
     alias WeChat.{Work, Utils, Component, Storage.Cache}
     alias WeChat.ServerMessage.{Encryptor, XmlParser, ReplyMessage}
+    @compile {:no_warn_undefined, XmlParser}
 
     @type data_type :: :plaqin_text | :encrypted_xml | :encrypted_json
     @type encrypt_content :: String.t()

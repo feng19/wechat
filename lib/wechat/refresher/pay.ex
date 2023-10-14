@@ -18,6 +18,7 @@ defmodule WeChat.Refresher.Pay do
 
   @impl true
   def init(settings = %{client: client}) do
+    make_sure_cacerts(client)
     settings = Map.merge(%{update_interval: 43200, retry_interval: 60}, settings)
 
     time_settings =
@@ -65,12 +66,11 @@ defmodule WeChat.Refresher.Pay do
          update_interval: update_interval,
          retry_interval: retry_interval
        }) do
-    storage = client.storage()
-    mch_id = client.mch_id()
-
     case Certificates.certificates(client) do
       {:ok, new_certs} when is_list(new_certs) ->
         with {:ok, cacerts} <- Certificates.merge_cacerts(new_certs, old_certs, client) do
+          storage = client.storage()
+          mch_id = client.mch_id()
           result = storage.store(mch_id, :cacerts, cacerts)
 
           Logger.info(
@@ -86,6 +86,16 @@ defmodule WeChat.Refresher.Pay do
         )
 
         retry_interval
+    end
+  end
+
+  defp make_sure_cacerts(client) do
+    storage = client.storage()
+    mch_id = client.mch_id()
+    # Load Cacerts From Storage
+    case storage.restore(mch_id, :cacerts) do
+      {:ok, cacerts} -> Certificates.put_certs(cacerts, client)
+      _error -> WeChat.Pay.init_cacerts(client)
     end
   end
 end

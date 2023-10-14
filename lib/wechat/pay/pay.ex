@@ -12,15 +12,10 @@ defmodule WeChat.Pay do
           mch_id: "mch_id",
           api_secret_key: "api_secret_key",
           client_serial_no: "client_serial_no",
-          client_cert: "client_cert",
           client_key: "client_key"
       end
 
   定义参数说明请看 `t:options/0`
-
-  ## 初始化平台证书
-      
-      WeChat.Pay.init_cacerts(YourApp.WeChatAppCodeName)
 
   ## 启动支付 Client 进程
 
@@ -69,11 +64,6 @@ defmodule WeChat.Pay do
   """
   @type cacerts :: list(binary)
   @typedoc """
-  商户 API 证书 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/privatekey-and-certificate.html){:target="_blank"}
-  """
-  @type client_cert :: pem_file
-  @typedoc """
   商户 API 私钥 -
   [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/privatekey-and-certificate.html){:target="_blank"}
   """
@@ -94,7 +84,6 @@ defmodule WeChat.Pay do
   - `mch_id`: `t:mch_id/0` - 必填
   - `api_secret_key`: `t:binary/0` - 必填
   - `client_serial_no`: `t:client_serial_no/0` - 必填
-  - `client_cert`: `t:client_cert/0` - 必填
   - `client_key`: `t:client_key/0` - 必填
   - `storage`: `t:WeChat.Storage.Adapter.t()`
   - `requester`: 请求客户端 - `t:module/0`
@@ -108,7 +97,6 @@ defmodule WeChat.Pay do
           mch_id: mch_id,
           api_secret_key: binary,
           client_serial_no: client_serial_no,
-          client_cert: client_cert,
           client_key: client_key,
           requester: module,
           storage: module
