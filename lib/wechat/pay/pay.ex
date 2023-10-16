@@ -4,6 +4,15 @@ defmodule WeChat.Pay do
 
   ** 注意 ** 未经上线测试，请谨慎使用
 
+  ## 引入 x509 依赖
+
+      def deps do
+        [
+          {:wechat, "~> x.x", hex: :wechat_sdk}，
+          {:x509, "~> x.x"}
+        ]
+      end
+
   ## 定义 Client 模块
 
       defmodule YourApp.WeChatAppCodeName do

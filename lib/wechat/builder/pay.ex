@@ -1,8 +1,13 @@
 defmodule WeChat.Builder.Pay do
   @moduledoc false
   alias WeChat.Builder.Utils
+  @compile {:no_warn_undefined, X509.PublicKey}
 
   defmacro __using__(options \\ []) do
+    unless Code.ensure_loaded?(X509) do
+      raise ArgumentError, "Please add :x509 to deps before use WeChatPay!!!"
+    end
+
     client = __CALLER__.module
     options = check_options!(options, client, __CALLER__)
     requester = Map.get(options, :requester, WeChat.Requester.Pay)
@@ -75,11 +80,11 @@ defmodule WeChat.Builder.Pay do
     options = options |> Macro.prewalk(&Macro.expand(&1, caller)) |> Map.new()
 
     unless Map.get(options, :mch_id) |> is_binary() do
-      raise ArgumentError, "please set mch_id option for #{inspect(client)}"
+      raise ArgumentError, "Please set mch_id option for #{inspect(client)}"
     end
 
     unless Map.get(options, :client_serial_no) |> is_binary() do
-      raise ArgumentError, "please set client_serial_no option for #{inspect(client)}"
+      raise ArgumentError, "Please set client_serial_no option for #{inspect(client)}"
     end
 
     api_secret_key =
@@ -93,28 +98,28 @@ defmodule WeChat.Builder.Pay do
           with :not_handle <-
                  Utils.handle_env_option(client, :api_secret_key, options.api_secret_key) do
             raise ArgumentError,
-                  "bad api_secret_key: #{inspect(api_secret_key)} option for #{inspect(client)}"
+                  "Bad api_secret_key: #{inspect(api_secret_key)} option for #{inspect(client)}"
           end
 
         api_secret_key when is_tuple(api_secret_key) ->
           with :not_handle <-
                  Utils.handle_env_option(client, :api_secret_key, options.api_secret_key) do
             raise ArgumentError,
-                  "bad api_secret_key: #{inspect(api_secret_key)} option for #{inspect(client)}"
+                  "Bad api_secret_key: #{inspect(api_secret_key)} option for #{inspect(client)}"
           end
 
         _ ->
-          raise ArgumentError, "please set api_secret_key option for #{inspect(client)}"
+          raise ArgumentError, "Please set api_secret_key option for #{inspect(client)}"
       end
 
     client_key =
       case Map.get(options, :client_key) |> check_pem_file() do
         {:bad_arg, pem_file} ->
           raise ArgumentError,
-                "bad client_key: #{inspect(pem_file)} option for #{inspect(client)}"
+                "Bad client_key: #{inspect(pem_file)} option for #{inspect(client)}"
 
         :unset ->
-          raise ArgumentError, "please set client_key option for #{inspect(client)}"
+          raise ArgumentError, "Please set client_key option for #{inspect(client)}"
 
         pem_file ->
           pem_file

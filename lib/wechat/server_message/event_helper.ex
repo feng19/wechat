@@ -7,6 +7,18 @@ if Code.ensure_loaded?(Plug) do
       * [接入概述](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Access_Overview.html){:target="_blank"}
       * [接入指引](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html){:target="_blank"}
       * [接入技术方案](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Technical_Plan.html){:target="_blank"}
+
+    ## 增加 saxy 依赖
+
+      **注意: 公众号推送消息格式为 xml**
+
+        def deps do
+          [
+            {:wechat, "~> x.x", hex: :wechat_sdk},
+            {:saxy, "~> x.x"}
+          ]
+        end
+
     """
     import WeChat.Utils, only: [doc_link_prefix: 0]
     require Logger
