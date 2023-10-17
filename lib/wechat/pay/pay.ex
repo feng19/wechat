@@ -83,7 +83,8 @@ defmodule WeChat.Pay do
   """
   @type api_secret_key :: binary | WeChat.env_option()
   @type client :: module
-  @typep pem_file :: {:file, Path.t()} | {:app_dir, Application.app(), Path.t()}
+  @typep pem_file ::
+           {:binary, binary} | {:file, Path.t()} | {:app_dir, Application.app(), Path.t()}
 
   @typedoc """
   构建参数

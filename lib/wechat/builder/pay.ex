@@ -51,14 +51,12 @@ defmodule WeChat.Builder.Pay do
 
       @spec mch_id() :: WeChat.Pay.mch_id()
       def mch_id, do: unquote(options.mch_id)
-      @spec api_secret_key() :: WeChat.Pay.api_secret_key()
-      unquote(options.api_secret_key)
       @spec client_serial_no() :: WeChat.Pay.client_serial_no()
       def client_serial_no, do: unquote(options.client_serial_no)
       @spec storage() :: WeChat.Storage.Adapter.t()
       def storage, do: unquote(storage)
-      @spec client_key() :: WeChat.Pay.client_key()
-      def client_key, do: unquote(options.client_key)
+      @doc false
+      unquote(options.api_secret_key)
       @doc false
       def public_key, do: unquote(options.public_key)
       @doc false
@@ -112,7 +110,7 @@ defmodule WeChat.Builder.Pay do
           raise ArgumentError, "Please set api_secret_key option for #{inspect(client)}"
       end
 
-    client_key =
+    private_key =
       case Map.get(options, :client_key) |> check_pem_file() do
         {:bad_arg, pem_file} ->
           raise ArgumentError,
@@ -122,13 +120,12 @@ defmodule WeChat.Builder.Pay do
           raise ArgumentError, "Please set client_key option for #{inspect(client)}"
 
         pem_file ->
-          pem_file
+          WeChat.Pay.Crypto.load_pem!(pem_file)
       end
 
-    private_key = WeChat.Pay.Crypto.load_pem!(client_key)
-    public_key = private_key |> X509.PublicKey.derive()
+    public_key = X509.PublicKey.derive(private_key)
 
-    %{options | api_secret_key: api_secret_key, client_key: Macro.escape(client_key)}
+    %{options | api_secret_key: api_secret_key}
     |> Map.put(:private_key, Macro.escape(private_key))
     |> Map.put(:public_key, Macro.escape(public_key))
   end
@@ -149,5 +146,6 @@ defmodule WeChat.Builder.Pay do
     do: Application.app_dir(app, path) |> File.exists?()
 
   defp check_pem_file?({:file, path}) when is_binary(path), do: File.exists?(path)
+  defp check_pem_file?({:binary, binary}) when is_binary(binary), do: true
   defp check_pem_file?(_), do: false
 end

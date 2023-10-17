@@ -21,6 +21,7 @@ defmodule WeChat.Pay.Crypto do
   @doc false
   def load_pem!({:app_dir, app, path}), do: load_pem!({:file, Application.app_dir(app, path)})
   def load_pem!({:file, path}), do: path |> File.read!() |> decode_key()
+  def load_pem!({:binary, binary}), do: decode_key(binary)
 
   @doc false
   def decode_key(binary) do
