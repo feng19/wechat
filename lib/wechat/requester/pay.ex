@@ -39,4 +39,32 @@ defmodule WeChat.Requester.Pay do
       {Tesla.Adapter.Finch, [{:name, WeChat.Finch} | @adapter_options]}
     )
   end
+
+  @doc false
+  def download_url(client, url) do
+    %{path: path, query: query} = URI.parse(url)
+    query = URI.decode_query(query) |> Map.to_list()
+
+    token =
+      Pay.AuthorizationMiddleware.gen_token(
+        client.mch_id(),
+        client.client_serial_no(),
+        client.private_key(),
+        %{url: path, query: query, method: "GET", body: ""}
+      )
+
+    Tesla.client(
+      [
+        {Middleware.Headers,
+         [
+           {"accept", "*/*"},
+           {"user-agent", "Tesla"},
+           {"authorization", "WECHATPAY2-SHA256-RSA2048 #{token}"}
+         ]},
+        Tesla.Middleware.DecompressResponse
+      ],
+      {Tesla.Adapter.Finch, [{:name, WeChat.Finch} | @adapter_options]}
+    )
+    |> Tesla.get(url)
+  end
 end
