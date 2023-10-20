@@ -7,6 +7,8 @@ defmodule WeChat.CardManaging do
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.Card
+  @typep count :: integer
+  @typep offset :: integer
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Managing_Coupons_Vouchers_and_Cards.html"
 
@@ -48,7 +50,9 @@ defmodule WeChat.CardManaging do
   批量查询卡券列表 -
   [官方文档](#{@doc_link}#3){:target="_blank"}
   """
-  @spec batch_get_cards(WeChat.client(), count :: integer, offset :: integer) :: WeChat.response()
+  @spec batch_get_cards(WeChat.client(), count, offset) :: WeChat.response()
+  def batch_get_cards(client, count \\ 10, offset \\ 0)
+
   def batch_get_cards(client, count, offset) when count <= 50 do
     client.post(
       "/card/batchget",
@@ -61,13 +65,7 @@ defmodule WeChat.CardManaging do
   批量查询卡券列表 - 只获取指定状态 -
   [官方文档](#{@doc_link}#3){:target="_blank"}
   """
-  @spec batch_get_cards(
-          WeChat.client(),
-          [Card.card_status()],
-          count :: integer,
-          offset :: integer
-        ) ::
-          WeChat.response()
+  @spec batch_get_cards(WeChat.client(), [Card.card_status()], count, offset) :: WeChat.response()
   def batch_get_cards(client, status_list, count, offset) when count <= 50 do
     client.post(
       "/card/batchget",
@@ -161,8 +159,7 @@ defmodule WeChat.CardManaging do
           Card.card_id(),
           Card.card_code(),
           reason :: String.t()
-        ) ::
-          WeChat.response()
+        ) :: WeChat.response()
   def unavailable_card_code(client, card_id, code, reason) do
     client.post(
       "/card/code/unavailable",
@@ -180,8 +177,7 @@ defmodule WeChat.CardManaging do
           begin_date :: Card.date(),
           end_date :: Card.date(),
           Card.cond_source()
-        ) ::
-          WeChat.response()
+        ) :: WeChat.response()
   def get_card_bizuin_info(client, begin_date, end_date, cond_source \\ 1)
       when cond_source in 0..1 do
     client.post(
@@ -200,8 +196,7 @@ defmodule WeChat.CardManaging do
           begin_date :: Card.date(),
           end_date :: Card.date(),
           Card.cond_source()
-        ) ::
-          WeChat.response()
+        ) :: WeChat.response()
   def get_card_analysis(client, begin_date, end_date, cond_source) when cond_source in 0..1 do
     client.post(
       "/datacube/getcardcardinfo",

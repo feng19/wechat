@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work, Pay}
 
-  @version "0.13.4"
+  @version "0.13.5"
   @source_url "https://github.com/feng19/wechat"
 
   def project do
@@ -76,52 +76,18 @@ defmodule WeChat.MixProject do
 
   defp groups_for_modules do
     [
-      {
-        "用户管理 APIs",
-        [
-          # 用户管理
-          WeChat.User,
-          # 用户管理 - 标签管理
-          WeChat.UserTag,
-          # 用户管理 - 黑名单管理
-          WeChat.UserBlacklist
-        ]
-      },
-      {
-        "素材管理 APIs",
-        [
-          WeChat.Material.Article,
-          WeChat.Material,
-          WeChat.DraftBox,
-          WeChat.Publish
-        ]
-      },
-      {
-        "消息管理 APIs",
-        [
-          # 消息管理 - 客服消息
-          WeChat.CustomMessage,
-          # 消息管理 - 客服帐号管理
-          WeChat.CustomService,
-          # 订阅信息
-          WeChat.SubscribeMessage,
-          # 消息管理 - 模板消息
-          WeChat.Template,
-          # 消息管理 - 群发接口和原创效验
-          WeChat.BatchSends
-        ]
-      },
-      {"微信卡券 APIs",
+      {"用户管理 APIs", [WeChat.User, WeChat.UserTag, WeChat.UserBlacklist]},
+      {"素材管理 APIs", [WeChat.Material.Article, WeChat.Material, WeChat.DraftBox, WeChat.Publish]},
+      {"消息管理 APIs",
        [
-         # 微信卡券(WIP)
-         WeChat.Card,
-         # 微信卡券 - 管理卡券
-         WeChat.CardManaging,
-         # 微信卡券 - 投放卡券
-         WeChat.CardDistributing,
-         # 微信卡券 - 会员卡
-         WeChat.MemberCard
+         WeChat.CustomMessage,
+         WeChat.CustomService,
+         WeChat.SubscribeMessage,
+         WeChat.Template,
+         WeChat.BatchSends
        ]},
+      {"微信卡券 APIs",
+       [WeChat.Card, WeChat.CardManaging, WeChat.CardDistributing, WeChat.MemberCard]},
       {"事件推送",
        [
          WeChat.Plug.EventHandler,
@@ -131,14 +97,12 @@ defmodule WeChat.MixProject do
          ServerMessage.ReplyMessage,
          ServerMessage.XmlParser
        ]},
-      {"网页开发",
-       [
-         WeChat.WebPage,
-         WeChat.Plug.OAuth2Checker,
-         WeChat.Plug.HubSpringboard
-       ]},
+      {"网页开发", [WeChat.WebPage, WeChat.Plug.OAuth2Checker, WeChat.Plug.HubSpringboard]},
+      {"Hub", [WeChat.HubClient, WeChat.HubServer, WeChat.Plug.HubExposer]},
       {"Other APIs",
        [
+         # 微信门店
+         WeChat.POI,
          # 自定义菜单
          WeChat.Menu,
          # 图文消息留言管理
@@ -154,6 +118,7 @@ defmodule WeChat.MixProject do
          MiniProgram.Code,
          MiniProgram.UrlScheme,
          MiniProgram.NearbyPOI,
+         MiniProgram.Store,
          MiniProgram.Search,
          MiniProgram.OCR,
          MiniProgram.Security,
@@ -217,7 +182,12 @@ defmodule WeChat.MixProject do
          Pay.Refund,
          Pay.CombineTransactions,
          Pay.Bill
-       ]}
+       ]},
+      {"Access Token",
+       [Refresher.Default, Refresher.DefaultSettings, Refresher.Pay, WeChat.TokenChecker]},
+      {"请求客户端", [Requester.OfficialAccount, Requester.Work, Requester.Pay]},
+      {"存储器",
+       [Storage.Adapter, Storage.Cache, Storage.File, Storage.HttpForHubClient, Storage.PayFile]}
     ]
   end
 

@@ -7,6 +7,7 @@ defmodule WeChat.CardDistributing do
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Card, User}
+  @typep body :: map
 
   @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html"
 
@@ -20,7 +21,7 @@ defmodule WeChat.CardDistributing do
 
   获取二维码ticket后，开发者可用[换取二维码图片详情](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)。
   """
-  @spec create_qrcode(WeChat.client(), body :: map) :: WeChat.response()
+  @spec create_qrcode(WeChat.client(), body) :: WeChat.response()
   def create_qrcode(client, body) do
     client.post("/card/qrcode/create", body, query: [access_token: client.get_access_token()])
   end
@@ -31,7 +32,7 @@ defmodule WeChat.CardDistributing do
 
   开发者需调用该接口创建货架链接，用于卡券投放。创建货架时需填写投放路径的场景字段。
   """
-  @spec create_landing_page(WeChat.client(), body :: map) :: WeChat.response()
+  @spec create_landing_page(WeChat.client(), body) :: WeChat.response()
   def create_landing_page(client, body) do
     client.post("/card/landingpage/create", body,
       query: [access_token: client.get_access_token()]
