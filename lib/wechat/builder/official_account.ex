@@ -44,7 +44,8 @@ defmodule WeChat.Builder.OfficialAccount do
     WeChat.UserBlacklist,
     WeChat.Account,
     WeChat.Comment,
-    WeChat.WebPage
+    WeChat.WebPage,
+    WeChat.POI
   ]
 
   @mini_program_modules [
@@ -53,6 +54,7 @@ defmodule WeChat.Builder.OfficialAccount do
     MiniProgram.UrlScheme,
     MiniProgram.NearbyPOI,
     MiniProgram.Search,
+    MiniProgram.Store,
     MiniProgram.OCR,
     MiniProgram.Security,
     MiniProgram.Live.Room,
