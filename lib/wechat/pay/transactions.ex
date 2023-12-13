@@ -88,6 +88,7 @@ defmodule WeChat.Pay.Transactions do
       |> Base.encode64()
 
     %{
+      "appId" => appid,
       "timeStamp" => timestamp,
       "nonceStr" => nonce_str,
       "package" => package,

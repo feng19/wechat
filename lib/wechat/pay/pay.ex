@@ -8,7 +8,7 @@ defmodule WeChat.Pay do
 
       def deps do
         [
-          {:wechat, "~> x.x", hex: :wechat_sdk}，
+          {:wechat, "~> x.x", hex: :wechat_sdk},
           {:x509, "~> x.x"}
         ]
       end
@@ -149,8 +149,16 @@ defmodule WeChat.Pay do
 
   def get_requester_spec(client) do
     name = finch_name(client)
-    # todo config finch_pool
-    finch_pool = Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
+
+    finch_pool =
+      with {:ok, config} <- Application.fetch_env(:wechat, client),
+           finch_pool when not is_nil(finch_pool) <- config[:finch_pool] do
+        finch_pool
+      else
+        _ ->
+          Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
+      end
+
     options = [name: name, pools: %{:default => finch_pool}]
     spec = Finch.child_spec(options)
     %{spec | id: Finch}
