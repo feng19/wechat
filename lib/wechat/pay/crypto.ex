@@ -1,15 +1,16 @@
 defmodule WeChat.Pay.Crypto do
   @moduledoc "用于支付加密相关"
-  import WeChat.Utils, only: [pay_doc_link_prefix: 0]
+  import WeChat.Utils, only: [pay_doc_link_prefix: 0, pay_v2_doc_link_prefix: 0]
+  @compile {:no_warn_undefined, Plug.Crypto}
 
-  def decrypt_aes_256_gcm(client, ciphertext, associated_data, iv) do
+  def decrypt_aes_256_gcm(api_secret_key, ciphertext, associated_data, iv) do
     data = Base.decode64!(ciphertext, padding: false)
     len = byte_size(data) - 16
     <<data::binary-size(len), tag::binary-size(16)>> = data
 
     :crypto.crypto_one_time_aead(
       :aes_256_gcm,
-      client.api_secret_key(),
+      api_secret_key,
       iv,
       data,
       associated_data,
@@ -75,5 +76,53 @@ defmodule WeChat.Pay.Crypto do
     "#{method}\n#{path}\n#{timestamp}\n#{nonce_str}\n#{env.body}\n"
     |> :public_key.sign(:sha256, private_key)
     |> Base.encode64()
+  end
+
+  @doc """
+  签名(v2) -
+  [官方文档](#{pay_v2_doc_link_prefix()}/api/micropay.php?chapter=4_3){:target="_blank"}
+  """
+  @spec v2_sign(data :: map, key :: binary) :: signature :: binary
+  def v2_sign(params, key) when is_map(params) do
+    method = Map.get(params, "sign_type", "MD5")
+    v2_sign(params, method, key)
+  end
+
+  @spec v2_sign(data :: binary | map, method :: binary, key :: binary) :: signature :: binary
+  def v2_sign(plain_text, method, key)
+
+  def v2_sign(plain_text, "HMAC-SHA256", key) when is_binary(plain_text) do
+    :crypto.mac(:hmac, :sha256, key, plain_text <> "&key=#{key}") |> Base.encode16()
+  end
+
+  def v2_sign(plain_text, "MD5", key) when is_binary(plain_text) do
+    (plain_text <> "&key=#{key}") |> :erlang.md5() |> Base.encode16()
+  end
+
+  def v2_sign(params, method, key) do
+    params
+    |> Enum.sort_by(&elem(&1, 0))
+    |> Enum.filter(fn
+      {_k, ""} -> false
+      {k, v} when is_binary(k) and is_binary(v) -> true
+      {k, v} when is_binary(k) and is_list(v) -> true
+      {k, v} when is_binary(k) and is_integer(v) -> true
+      {k, v} when is_binary(k) and is_map(v) -> true
+      _ -> false
+    end)
+    |> Enum.map(fn
+      {k, v} when is_list(v) -> "#{k}=#{Jason.encode!(v)}"
+      {k, v} when is_map(v) -> "#{k}=#{Jason.encode!(v)}"
+      {k, v} -> "#{k}=#{v}"
+    end)
+    |> Enum.join("&")
+    |> v2_sign(method, key)
+  end
+
+  def v2_verify(params, method, key) do
+    {signature, params} = Map.pop!(params, "sign")
+
+    v2_sign(params, method, key)
+    |> Plug.Crypto.secure_compare(signature)
   end
 end

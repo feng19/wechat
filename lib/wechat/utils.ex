@@ -25,6 +25,7 @@ defmodule WeChat.Utils do
   def work_doc_link_prefix, do: "https://developer.work.weixin.qq.com/document/path"
   def work_kf_doc_link_prefix, do: "https://open.work.weixin.qq.com/kf/doc/92512/93143"
   def pay_doc_link_prefix, do: "https://pay.weixin.qq.com/docs"
+  def pay_v2_doc_link_prefix, do: "https://pay.weixin.qq.com/wiki/doc"
 
   @spec sha1([String.t()] | String.t()) :: signature :: String.t()
   def sha1(list) when is_list(list) do

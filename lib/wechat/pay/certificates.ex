@@ -54,7 +54,9 @@ defmodule WeChat.Pay.Certificates do
         },
         client
       ) do
-    certificate = Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv)
+    certificate =
+      Crypto.decrypt_aes_256_gcm(client.api_secret_key(), ciphertext, associated_data, iv)
+
     {:ok, effective_datetime, _utc_offset} = DateTime.from_iso8601(effective_time)
     {:ok, expire_datetime, _utc_offset} = DateTime.from_iso8601(expire_time)
 
@@ -70,9 +72,19 @@ defmodule WeChat.Pay.Certificates do
 
   @doc false
   def put_certs(certs, client) do
-    for cert <- certs do
-      put_cert(client, cert["serial_no"], cert["certificate"])
-    end
+    certs =
+      for cert <- certs do
+        certificate = cert["certificate"]
+        put_cert(client, cert["serial_no"], certificate)
+        certificate
+      end
+
+    :persistent_term.put({:wechat, {client, :certs}}, certs)
+  end
+
+  @doc false
+  def get_certs(client) do
+    :persistent_term.get({:wechat, {client, :certs}})
   end
 
   @doc "保存平台证书 serial_no => cert 的对应关系"
@@ -101,12 +113,12 @@ defmodule WeChat.Pay.Certificates do
   #   "certificate" => certificate
   # }]
   @doc false
-  def merge_cacerts(new_certs, [], client) do
+  def merge_certs(new_certs, [], client) do
     put_certs(new_certs, client)
     {:ok, new_certs}
   end
 
-  def merge_cacerts(new_certs, old_certs, client) do
+  def merge_certs(new_certs, old_certs, client) do
     now = WeChat.Utils.now_unix()
     old_certs = remove_expired_cert(old_certs, client, now)
     old_serial_no_list = Enum.map(old_certs, & &1["serial_no"])

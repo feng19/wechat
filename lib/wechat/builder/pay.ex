@@ -26,27 +26,27 @@ defmodule WeChat.Builder.Pay do
         refresher = Map.get(opts, :refresher, WeChat.Refresher.Pay)
 
         children = [
-          {refresher, Map.put(opts, :client, __MODULE__)},
-          WeChat.Pay.get_requester_spec(__MODULE__)
+          {refresher, Map.put(opts, :client, __MODULE__)}
+          | WeChat.Pay.get_requester_specs(__MODULE__)
         ]
 
         Supervisor.init(children, strategy: :one_for_one)
       end
 
-      @spec get(url :: binary) :: WeChat.response()
-      def get(url), do: get(url, [])
-
       @spec get(url :: binary, opts :: keyword) :: WeChat.response()
-      def get(url, opts) do
-        unquote(requester).new(__MODULE__) |> Tesla.get(url, opts)
+      def get(url, opts \\ []) do
+        unquote(requester).client(__MODULE__) |> Tesla.get(url, opts)
       end
 
-      @spec post(url :: binary, body :: any) :: WeChat.response()
-      def post(url, body), do: post(url, body, [])
-
       @spec post(url :: binary, body :: any, opts :: keyword) :: WeChat.response()
-      def post(url, body, opts) do
-        unquote(requester).new(__MODULE__) |> Tesla.post(url, body, opts)
+      def post(url, body, opts \\ []) do
+        unquote(requester).client(__MODULE__) |> Tesla.post(url, body, opts)
+      end
+
+      @spec v2_post(url :: binary, body :: any, opts :: keyword) :: WeChat.response()
+      def v2_post(url, body, opts \\ []) do
+        {ssl?, opts} = Keyword.pop(opts, :ssl?, false)
+        unquote(requester).client_v2(__MODULE__, ssl?) |> Tesla.post(url, body, opts)
       end
 
       @spec mch_id() :: WeChat.Pay.mch_id()
@@ -57,6 +57,8 @@ defmodule WeChat.Builder.Pay do
       def storage, do: unquote(storage)
       @doc false
       unquote(options.api_secret_key)
+      @doc false
+      unquote(options.api_secret_v2_key)
       @doc false
       def public_key, do: unquote(options.public_key)
       @doc false
@@ -85,30 +87,10 @@ defmodule WeChat.Builder.Pay do
       raise ArgumentError, "Please set client_serial_no option for #{inspect(client)}"
     end
 
-    api_secret_key =
-      case Map.get(options, :api_secret_key) do
-        api_secret_key when is_binary(api_secret_key) ->
-          quote do
-            def api_secret_key, do: unquote(options.api_secret_key)
-          end
+    api_secret_key = Map.get(options, :api_secret_key) |> check_api_key(:api_secret_key, client)
 
-        api_secret_key when is_atom(api_secret_key) ->
-          with :not_handle <-
-                 Utils.handle_env_option(client, :api_secret_key, options.api_secret_key) do
-            raise ArgumentError,
-                  "Bad api_secret_key: #{inspect(api_secret_key)} option for #{inspect(client)}"
-          end
-
-        api_secret_key when is_tuple(api_secret_key) ->
-          with :not_handle <-
-                 Utils.handle_env_option(client, :api_secret_key, options.api_secret_key) do
-            raise ArgumentError,
-                  "Bad api_secret_key: #{inspect(api_secret_key)} option for #{inspect(client)}"
-          end
-
-        _ ->
-          raise ArgumentError, "Please set api_secret_key option for #{inspect(client)}"
-      end
+    api_secret_v2_key =
+      Map.get(options, :api_secret_v2_key) |> check_api_key(:api_secret_v2_key, client)
 
     private_key =
       case Map.get(options, :client_key) |> check_pem_file() do
@@ -125,9 +107,32 @@ defmodule WeChat.Builder.Pay do
 
     public_key = X509.PublicKey.derive(private_key)
 
-    %{options | api_secret_key: api_secret_key}
+    %{options | api_secret_key: api_secret_key, api_secret_v2_key: api_secret_v2_key}
     |> Map.put(:private_key, Macro.escape(private_key))
     |> Map.put(:public_key, Macro.escape(public_key))
+  end
+
+  defp check_api_key(nil, fun_name, client) do
+    raise ArgumentError, "Please set #{fun_name} option for #{inspect(client)}"
+  end
+
+  defp check_api_key(api_key, fun_name, _client) when is_binary(api_key) do
+    quote do
+      def unquote(fun_name)(), do: unquote(api_key)
+    end
+  end
+
+  defp check_api_key(api_key, fun_name, client) when is_atom(api_key) or is_tuple(api_key) do
+    with :not_handle <-
+           Utils.handle_env_option(client, fun_name, api_key) do
+      raise ArgumentError,
+            "Bad #{fun_name}: #{inspect(api_key)} option for #{inspect(client)}"
+    end
+  end
+
+  defp check_api_key(api_key, fun_name, client) do
+    raise ArgumentError,
+          "Bad #{fun_name}: #{inspect(api_key)} option for #{inspect(client)}"
   end
 
   defp check_pem_file(quoted = {:{}, opts, list}) when is_list(opts) and is_list(list) do

@@ -160,7 +160,12 @@ if Code.ensure_loaded?(Plug) do
               }
             } = message ->
               data =
-                Crypto.decrypt_aes_256_gcm(client, ciphertext, associated_data, iv)
+                Crypto.decrypt_aes_256_gcm(
+                  client.api_secret_key(),
+                  ciphertext,
+                  associated_data,
+                  iv
+                )
                 |> Jason.decode!()
 
               event_handler.(conn, Map.put(message, "data", data))

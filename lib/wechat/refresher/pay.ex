@@ -18,7 +18,7 @@ defmodule WeChat.Refresher.Pay do
 
   @impl true
   def init(settings = %{client: client}) do
-    make_sure_cacerts(client)
+    make_sure_certs(client)
     settings = Map.merge(%{update_interval: 43200, retry_interval: 60}, settings)
 
     time_settings =
@@ -36,7 +36,7 @@ defmodule WeChat.Refresher.Pay do
     mch_id = client.mch_id()
 
     timer =
-      case storage.restore(mch_id, :cacerts) do
+      case storage.restore(mch_id, :certs) do
         {:ok, old_certs} ->
           download_certificates(old_certs, state)
 
@@ -46,7 +46,7 @@ defmodule WeChat.Refresher.Pay do
 
         error ->
           Logger.warning(
-            "Update certs failed! Call #{inspect(storage)}.restore(#{mch_id}, :cacerts) error: #{inspect(error)}, will be retry again #{state.retry_interval}ms later."
+            "Update certs failed! Call #{inspect(storage)}.restore(#{mch_id}, :certs) error: #{inspect(error)}, will be retry again #{state.retry_interval}ms later."
           )
 
           state.retry_interval
@@ -68,13 +68,13 @@ defmodule WeChat.Refresher.Pay do
        }) do
     case Certificates.certificates(client) do
       {:ok, new_certs} when is_list(new_certs) ->
-        with {:ok, cacerts} <- Certificates.merge_cacerts(new_certs, old_certs, client) do
+        with {:ok, certs} <- Certificates.merge_certs(new_certs, old_certs, client) do
           storage = client.storage()
           mch_id = client.mch_id()
-          result = storage.store(mch_id, :cacerts, cacerts)
+          result = storage.store(mch_id, :certs, certs)
 
           Logger.info(
-            "Call #{inspect(storage)}.store(#{mch_id}, :cacerts, #{inspect(cacerts)}) => #{inspect(result)}."
+            "Call #{inspect(storage)}.store(#{mch_id}, :certs, #{inspect(certs)}) => #{inspect(result)}."
           )
         end
 
@@ -89,13 +89,13 @@ defmodule WeChat.Refresher.Pay do
     end
   end
 
-  defp make_sure_cacerts(client) do
+  defp make_sure_certs(client) do
     storage = client.storage()
     mch_id = client.mch_id()
-    # Load Cacerts From Storage
-    case storage.restore(mch_id, :cacerts) do
-      {:ok, cacerts} -> Certificates.put_certs(cacerts, client)
-      _error -> WeChat.Pay.init_cacerts(client)
+    # Load certs From Storage
+    case storage.restore(mch_id, :certs) do
+      {:ok, certs} -> Certificates.put_certs(certs, client)
+      _error -> WeChat.Pay.init_certs(client)
     end
   end
 end

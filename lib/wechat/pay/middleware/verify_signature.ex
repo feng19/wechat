@@ -1,4 +1,4 @@
-defmodule WeChat.Pay.VerifySignatureMiddleware do
+defmodule WeChat.Pay.Middleware.VerifySignature do
   import WeChat.Utils, only: [pay_doc_link_prefix: 0]
 
   @moduledoc """
@@ -14,7 +14,7 @@ defmodule WeChat.Pay.VerifySignatureMiddleware do
 
   @impl Tesla.Middleware
   def call(env, next, client) do
-    with {:ok, %{status: 200, body: body}} when is_binary(body) <- Tesla.run(env, next) do
+    with {:ok, %{status: 200, body: body} = env} when is_binary(body) <- Tesla.run(env, next) do
       with nonce when is_binary(nonce) <- Tesla.get_header(env, "wechatpay-nonce"),
            signature when is_binary(signature) <- Tesla.get_header(env, "wechatpay-signature"),
            timestamp when is_binary(timestamp) <- Tesla.get_header(env, "wechatpay-timestamp"),

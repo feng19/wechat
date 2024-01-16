@@ -69,7 +69,8 @@ defmodule WeChat.MixProject do
         Work.KF,
         Work.OA,
         Work.WeDrive,
-        Pay
+        Pay,
+        Pay.Middleware
       ]
     ]
   end
@@ -175,8 +176,10 @@ defmodule WeChat.MixProject do
          Pay,
          Pay.Crypto,
          Pay.Certificates,
-         Pay.AuthorizationMiddleware,
-         Pay.VerifySignatureMiddleware,
+         Pay.Middleware.Authorization,
+         Pay.Middleware.VerifySignature,
+         Pay.Middleware.XMLBuilder,
+         Pay.Middleware.XMLParser,
          Pay.EventHandler,
          Pay.Transactions,
          Pay.Refund,

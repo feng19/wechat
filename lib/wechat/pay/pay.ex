@@ -1,6 +1,6 @@
 defmodule WeChat.Pay do
   @moduledoc """
-  微信支付(V3版)
+  微信支付
 
   ** 注意 ** 未经上线测试，请谨慎使用
 
@@ -9,6 +9,7 @@ defmodule WeChat.Pay do
       def deps do
         [
           {:wechat, "~> x.x", hex: :wechat_sdk},
+          {:saxy, "~> 1.2"},
           {:x509, "~> x.x"}
         ]
       end
@@ -19,12 +20,20 @@ defmodule WeChat.Pay do
         @moduledoc "CodeName"
         use WeChat.Pay,
           mch_id: "mch_id",
+          api_secret_v2_key: "api_secret_v2_key",
           api_secret_key: "api_secret_key",
           client_serial_no: "client_serial_no",
           client_key: "client_key"
       end
 
   定义参数说明请看 `t:options/0`
+
+  ## v2 配置
+
+  使用到 v2 的接口，如：付款码支付 & 撤销订单 需要配置证书
+
+      config :wechat, YourApp.WeChatAppCodeName,
+        v2_ssl: [cert: cert, key: key]
 
   ## 启动支付 Client 进程
 
@@ -83,8 +92,8 @@ defmodule WeChat.Pay do
   """
   @type api_secret_key :: binary | WeChat.env_option()
   @type client :: module
-  @typep pem_file ::
-           {:binary, binary} | {:file, Path.t()} | {:app_dir, Application.app(), Path.t()}
+  @type pem_file ::
+          {:binary, binary} | {:file, Path.t()} | {:app_dir, Application.app(), Path.t()}
 
   @typedoc """
   构建参数
@@ -92,7 +101,8 @@ defmodule WeChat.Pay do
   ## 参数说明
 
   - `mch_id`: `t:mch_id/0` - 必填
-  - `api_secret_key`: `t:binary/0` - 必填
+  - `api_secret_v2_key`: `t:api_secret_key/0` - 必填
+  - `api_secret_key`: `t:api_secret_key/0` - 必填
   - `client_serial_no`: `t:client_serial_no/0` - 必填
   - `client_key`: `t:client_key/0` - 必填
   - `storage`: `t:WeChat.Storage.Adapter.t()`
@@ -105,7 +115,8 @@ defmodule WeChat.Pay do
   """
   @type options :: [
           mch_id: mch_id,
-          api_secret_key: binary,
+          api_secret_v2_key: api_secret_key,
+          api_secret_key: api_secret_key,
           client_serial_no: client_serial_no,
           client_key: client_key,
           requester: module,
@@ -145,34 +156,71 @@ defmodule WeChat.Pay do
   end
 
   @doc false
+  # v3
   def finch_name(client), do: :"#{client}.Finch"
+  @doc false
+  def v2_finch_name(client), do: :"#{client}.v2.Finch"
 
-  def get_requester_spec(client) do
-    name = finch_name(client)
-
-    finch_pool =
-      with {:ok, config} <- Application.fetch_env(:wechat, client),
-           finch_pool when not is_nil(finch_pool) <- config[:finch_pool] do
-        finch_pool
-      else
-        _ ->
-          Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
+  @spec get_requester_specs(client) :: [map]
+  def get_requester_specs(client) do
+    client_config =
+      case Application.fetch_env(:wechat, client) do
+        {:ok, config} -> config
+        _ -> %{}
       end
 
-    options = [name: name, pools: %{:default => finch_pool}]
-    spec = Finch.child_spec(options)
-    %{spec | id: Finch}
+    finch_pool =
+      case client_config[:finch_pool] do
+        finch_pool when is_list(finch_pool) or is_map(finch_pool) -> finch_pool
+        _ -> Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
+      end
+
+    # v3
+    v3_spec =
+      Finch.child_spec(name: finch_name(client), pools: %{:default => finch_pool})
+      |> Map.put(:id, Finch)
+
+    v2_spec =
+      case client_config[:v2_ssl] do
+        ssl when is_list(ssl) ->
+          certfile =
+            Keyword.get_lazy(ssl, :certfile, fn ->
+              raise ArgumentError,
+                    "error, missing certfile for v2_ssl in config :wechat, #{client}"
+            end)
+
+          keyfile =
+            Keyword.get_lazy(ssl, :keyfile, fn ->
+              raise ArgumentError,
+                    "error, missing keyfile for v2_ssl in config :wechat, #{client}"
+            end)
+
+          v2_finch_pool =
+            finch_pool ++ [conn_opts: [transport_opts: [certfile: certfile, keyfile: keyfile]]]
+
+          Finch.child_spec(name: v2_finch_name(client), pools: %{:default => v2_finch_pool})
+          |> Map.put(:id, V2.Finch)
+
+        _ ->
+          nil
+      end
+
+    if v2_spec do
+      [v3_spec, v2_spec]
+    else
+      [v3_spec]
+    end
   end
 
   @doc "初始化平台证书"
-  @spec init_cacerts(client) :: {:ok, cacerts :: list(map)}
-  def init_cacerts(client) do
-    with {:ok, cacerts} when is_list(cacerts) <- Certificates.certificates(client, true) do
-      Certificates.put_certs(cacerts, client)
+  @spec init_certs(client) :: {:ok, cacerts :: list(map)}
+  def init_certs(client) do
+    with {:ok, certs} when is_list(certs) <- Certificates.certificates(client, true) do
+      Certificates.put_certs(certs, client)
       storage = client.storage()
-      result = storage.store(client.mch_id(), :cacerts, cacerts)
+      result = storage.store(client.mch_id(), :certs, certs)
       Logger.info("store cacerts for mch_id:#{client.mch_id()} result: #{inspect(result)}.")
-      {:ok, cacerts}
+      {:ok, certs}
     else
       error ->
         Logger.warning("Init certificates error: #{inspect(error)}.")

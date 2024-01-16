@@ -1,4 +1,4 @@
-defmodule WeChat.Pay.AuthorizationMiddleware do
+defmodule WeChat.Pay.Middleware.Authorization do
   import WeChat.Utils, only: [pay_doc_link_prefix: 0]
 
   @moduledoc """

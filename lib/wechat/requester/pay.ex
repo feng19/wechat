@@ -7,17 +7,45 @@ defmodule WeChat.Requester.Pay do
   alias Tesla.Middleware
 
   @adapter_options [pool_timeout: 5_000, receive_timeout: 5_000]
+  @base_url "https://api.mch.weixin.qq.com"
+  @user_agent "Tesla"
 
-  def new(client) do
+  # v3
+  def client(client) do
     name = WeChat.Pay.finch_name(client)
 
     Tesla.client(
       [
-        {Middleware.BaseUrl, "https://api.mch.weixin.qq.com"},
-        {Middleware.Headers, [{"accept", "application/json"}, {"user-agent", "Tesla"}]},
+        {Middleware.BaseUrl, @base_url},
+        {Middleware.Headers, [{"accept", "application/json"}, {"user-agent", @user_agent}]},
         Middleware.EncodeJson,
-        {Pay.AuthorizationMiddleware, client},
-        {Pay.VerifySignatureMiddleware, client},
+        {Pay.Middleware.Authorization, client},
+        {Pay.Middleware.VerifySignature, client},
+        Middleware.Logger
+      ],
+      {Tesla.Adapter.Finch, [{:name, name} | @adapter_options]}
+    )
+  end
+
+  def client_v2(client, ssl? \\ false) do
+    name =
+      if ssl? do
+        WeChat.Pay.v2_finch_name(client)
+      else
+        WeChat.Pay.finch_name(client)
+      end
+
+    Tesla.client(
+      [
+        {Middleware.BaseUrl, @base_url},
+        {Middleware.Headers,
+         [
+           {"accept", "application/xml"},
+           {"content-type", "application/xml"},
+           {"user-agent", @user_agent}
+         ]},
+        {Pay.Middleware.XMLBuilder, client},
+        {Pay.Middleware.XMLParser, client},
         Middleware.Logger
       ],
       {Tesla.Adapter.Finch, [{:name, name} | @adapter_options]}
@@ -29,10 +57,10 @@ defmodule WeChat.Requester.Pay do
     # 第一次下载平台证书 跳过验签: https://github.com/wechatpay-apiv3/CertificateDownloader#如何第一次下载证书
     Tesla.client(
       [
-        {Middleware.BaseUrl, "https://api.mch.weixin.qq.com"},
-        {Middleware.Headers, [{"accept", "application/json"}, {"user-agent", "Tesla"}]},
+        {Middleware.BaseUrl, @base_url},
+        {Middleware.Headers, [{"accept", "application/json"}, {"user-agent", @user_agent}]},
         Middleware.EncodeJson,
-        {Pay.AuthorizationMiddleware, client},
+        {Pay.Middleware.Authorization, client},
         Middleware.DecodeJson,
         Middleware.Logger
       ],
@@ -46,7 +74,7 @@ defmodule WeChat.Requester.Pay do
     query = URI.decode_query(query) |> Map.to_list()
 
     token =
-      Pay.AuthorizationMiddleware.gen_token(
+      Pay.Middleware.Authorization.gen_token(
         client.mch_id(),
         client.client_serial_no(),
         client.private_key(),
@@ -58,7 +86,7 @@ defmodule WeChat.Requester.Pay do
         {Middleware.Headers,
          [
            {"accept", "*/*"},
-           {"user-agent", "Tesla"},
+           {"user-agent", @user_agent},
            {"authorization", "WECHATPAY2-SHA256-RSA2048 #{token}"}
          ]},
         Tesla.Middleware.DecompressResponse
