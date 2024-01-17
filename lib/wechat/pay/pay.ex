@@ -2,7 +2,7 @@ defmodule WeChat.Pay do
   @moduledoc """
   微信支付
 
-  ** 注意 ** 未经上线测试，请谨慎使用
+  **注意**: 未经上线测试，请谨慎使用
 
   ## 引入 x509 依赖
 
@@ -19,21 +19,21 @@ defmodule WeChat.Pay do
       defmodule YourApp.WeChatAppCodeName do
         @moduledoc "CodeName"
         use WeChat.Pay,
-          mch_id: "mch_id",
+          mch_id: "1900000109",
           api_secret_v2_key: "api_secret_v2_key",
-          api_secret_key: "api_secret_key",
+          api_secret_key: "api_secret_v3_key",
           client_serial_no: "client_serial_no",
-          client_key: "client_key"
+          client_key: {:file, "apiclient_key.pem"}
       end
 
   定义参数说明请看 `t:options/0`
 
-  ## v2 配置
+  ## V2 SSL 配置
 
-  使用到 v2 的接口，如：付款码支付 & 撤销订单 需要配置证书
+  使用到 v2 的接口，如：撤销订单 需要配置证书
 
       config :wechat, YourApp.WeChatAppCodeName,
-        v2_ssl: [cert: cert, key: key]
+        v2_ssl: [certfile: "apiclient_cert.pem", keyfile: "apiclient_key.pem"]
 
   ## 启动支付 Client 进程
 
@@ -43,10 +43,8 @@ defmodule WeChat.Pay do
             # ...
             YourApp.WeChatAppCodeName,
             # or
-            {YourApp.WeChatAppCodeName, start_options},
-            # ...
+            {YourApp.WeChatAppCodeName, start_options}
           ]
-
 
           Supervisor.start_link(children, strategy: :one_for_one, name: YourApp.Supervisor)
         end
@@ -87,7 +85,7 @@ defmodule WeChat.Pay do
   """
   @type client_key :: pem_file
   @typedoc """
-  API v3密钥 -
+  API 密钥 -
   [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/apiv3key.html){:target="_blank"}
   """
   @type api_secret_key :: binary | WeChat.env_option()
@@ -100,12 +98,12 @@ defmodule WeChat.Pay do
 
   ## 参数说明
 
-  - `mch_id`: `t:mch_id/0` - 必填
-  - `api_secret_v2_key`: `t:api_secret_key/0` - 必填
-  - `api_secret_key`: `t:api_secret_key/0` - 必填
-  - `client_serial_no`: `t:client_serial_no/0` - 必填
-  - `client_key`: `t:client_key/0` - 必填
-  - `storage`: `t:WeChat.Storage.Adapter.t()`
+  - `mch_id`: 商户ID `t:mch_id/0` - 必填
+  - `api_secret_v2_key`: API v2密钥 `t:api_secret_key/0` - 必填
+  - `api_secret_key`: API v3密钥 `t:api_secret_key/0` - 必填
+  - `client_serial_no`: 客户端证书序列哈 `t:client_serial_no/0` - 必填
+  - `client_key`: 客户端私钥 `t:client_key/0` - 必填
+  - `storage`: 存储器 `t:WeChat.Storage.Adapter.t/0`
   - `requester`: 请求客户端 - `t:module/0`
 
   ## 默认参数:
@@ -196,7 +194,12 @@ defmodule WeChat.Pay do
             end)
 
           v2_finch_pool =
-            finch_pool ++ [conn_opts: [transport_opts: [certfile: certfile, keyfile: keyfile]]]
+            finch_pool ++
+              [
+                conn_opts: [
+                  transport_opts: [certfile: certfile, keyfile: keyfile, versions: [:"tlsv1.2"]]
+                ]
+              ]
 
           Finch.child_spec(name: v2_finch_name(client), pools: %{:default => v2_finch_pool})
           |> Map.put(:id, V2.Finch)

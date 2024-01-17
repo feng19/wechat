@@ -143,6 +143,8 @@ defmodule WeChat.Pay.Transactions do
   撤销订单(v2) -
   [官方文档](#{pay_v2_doc_link_prefix()}/api/micropay.php?chapter=9_11){:target="_blank"}
 
+  **需要配置证书**
+
   支付交易返回失败或支付系统超时，调用该接口撤销交易
 
     - 如果此订单用户支付失败，微信支付系统会将此订单关闭；

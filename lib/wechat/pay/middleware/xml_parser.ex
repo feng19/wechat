@@ -21,7 +21,7 @@ defmodule WeChat.Pay.Middleware.XMLParser do
                Crypto.v2_verify(xml, method, client.api_secret_v2_key()) do
             {:ok, %{env | body: xml}}
           else
-            {:error, :invaild_response}
+            {:error, xml}
           end
         else
           {:ok, %{env | body: xml}}

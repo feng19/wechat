@@ -129,7 +129,7 @@ defmodule WeChat do
   - `code_name`: `t:code_name/0`, 如不指定，默认为模块名最后一个名称的全小写格式
   - `by_component?`: `t:by_component?/0`
   - `server_role`: `t:server_role/0`
-  - `storage`: `t:WeChat.Storage.Adapter.t()`
+  - `storage`: `t:WeChat.Storage.Adapter.t/0`
   - `appsecret`: `t:appsecret/0` - 仅在 `by_component?` 设定为 `false` 时才有效
   - `component_appid`: `t:component_appid/0` - 仅在 `by_component?` 设定为 `true` 时才有效
   - `component_appsecret`: `t:component_appsecret/0` - 仅在 `by_component?` 设定为 `true` 时才有效
