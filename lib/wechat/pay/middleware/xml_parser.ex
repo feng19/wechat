@@ -4,11 +4,11 @@ defmodule WeChat.Pay.Middleware.XMLParser do
 
   Tesla Middleware
   """
-  @behaviour Tesla.Middleware
-  @compile {:no_warn_undefined, XmlParser}
-
   alias WeChat.ServerMessage.XmlParser
   alias WeChat.Pay.Crypto
+
+  @behaviour Tesla.Middleware
+  @compile {:no_warn_undefined, XmlParser}
 
   @impl Tesla.Middleware
   def call(env, next, client) do
