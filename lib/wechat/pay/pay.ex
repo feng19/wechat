@@ -33,7 +33,10 @@ defmodule WeChat.Pay do
   使用到 v2 的接口，如：撤销订单 需要配置证书
 
       config :wechat, YourApp.WeChatAppCodeName,
-        v2_ssl: [certfile: "apiclient_cert.pem", keyfile: "apiclient_key.pem"]
+        v2_ssl: [
+          certfile: "apiclient_cert.pem", # or {:app_dir, App, "priv/cert/apiclient_cert.pem"}
+          keyfile: "apiclient_key.pem" # or {:app_dir, App, "priv/cert/apiclient_key.pem"}
+        ]
 
   ## 启动支付 Client 进程
 
@@ -58,6 +61,7 @@ defmodule WeChat.Pay do
   """
   require Logger
   import WeChat.Utils, only: [pay_doc_link_prefix: 0]
+  alias WeChat.Utils
   alias WeChat.Pay.Certificates
 
   @typedoc "商户号"
@@ -183,15 +187,29 @@ defmodule WeChat.Pay do
         ssl when is_list(ssl) ->
           certfile =
             Keyword.get_lazy(ssl, :certfile, fn ->
-              raise ArgumentError,
-                    "error, missing certfile for v2_ssl in config :wechat, #{client}"
+              raise ArgumentError, "missing :certfile for v2_ssl in config :wechat, #{client}"
             end)
+            |> Utils.expand_file()
+            |> case do
+              {:ok, file} ->
+                file
+
+              {:error, error} ->
+                raise ArgumentError, "certfile #{error} for v2_ssl in config :wechat, #{client}"
+            end
 
           keyfile =
             Keyword.get_lazy(ssl, :keyfile, fn ->
-              raise ArgumentError,
-                    "error, missing keyfile for v2_ssl in config :wechat, #{client}"
+              raise ArgumentError, "missing :keyfile for v2_ssl in config :wechat, #{client}"
             end)
+            |> Utils.expand_file()
+            |> case do
+              {:ok, file} ->
+                file
+
+              {:error, error} ->
+                raise ArgumentError, "keyfile #{error} for v2_ssl in config :wechat, #{client}"
+            end
 
           v2_finch_pool =
             finch_pool ++

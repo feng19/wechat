@@ -51,42 +51,42 @@ defmodule WeChat.Utils do
     end
   end
 
-  def transfer_clients(opts, plug) do
+  def transform_clients(opts, plug) do
     Map.get(opts, :clients)
     |> List.wrap()
     |> case do
       [] -> raise ArgumentError, "please set clients when using #{inspect(plug)}"
       list -> list
     end
-    |> Enum.reduce(%{}, &transfer_client/2)
+    |> Enum.reduce(%{}, &transform_client/2)
   end
 
-  def transfer_clients(clients) do
-    Enum.reduce(clients, %{}, &transfer_client/2)
+  def transform_clients(clients) do
+    Enum.reduce(clients, %{}, &transform_client/2)
   end
 
-  def transfer_client(client) do
-    transfer_client(client, [])
+  def transform_client(client) do
+    transform_client(client, [])
   end
 
-  defp transfer_client(client, acc) when is_atom(client) do
+  defp transform_client(client, acc) when is_atom(client) do
     if match?(:work, client.app_type()) do
-      transfer_client({client, :all}, acc)
+      transform_client({client, :all}, acc)
     else
-      transfer_client({client, nil}, acc)
+      transform_client({client, nil}, acc)
     end
   end
 
-  defp transfer_client({client, :all}, acc) do
+  defp transform_client({client, :all}, acc) do
     agents = Enum.map(client.agents(), & &1.id)
-    transfer_client({client, agents}, acc)
+    transform_client({client, agents}, acc)
   end
 
-  defp transfer_client({client, agents}, acc) do
+  defp transform_client({client, agents}, acc) do
     value =
       if match?(:work, client.app_type()) do
         agents = agents |> List.wrap() |> Enum.uniq()
-        agent_flag_list = transfer_agents(client, agents) |> Enum.sort()
+        agent_flag_list = transform_agents(client, agents) |> Enum.sort()
 
         if Enum.empty?(agent_flag_list) do
           raise ArgumentError, "please set agents for client: #{inspect(client)}"
@@ -100,7 +100,7 @@ defmodule WeChat.Utils do
     Enum.into([{client.appid(), value}, {client.code_name(), value}], acc)
   end
 
-  defp transfer_agents(client, agents) when is_list(agents) do
+  defp transform_agents(client, agents) when is_list(agents) do
     Enum.reduce(client.agents(), [], fn agent, acc ->
       agent_id = agent.id
       name = agent.name
@@ -116,4 +116,26 @@ defmodule WeChat.Utils do
   def uniq_and_sort(list) do
     list |> Enum.uniq() |> Enum.sort()
   end
+
+  def expand_file({:app_dir, app, path}) do
+    file = Application.app_dir(app, path)
+
+    if File.exists?(file) do
+      {:ok, file}
+    else
+      {:error, :not_exists}
+    end
+  end
+
+  def expand_file(path) when is_binary(path) do
+    file = Path.expand(path)
+
+    if File.exists?(file) do
+      {:ok, file}
+    else
+      {:error, :not_exists}
+    end
+  end
+
+  def expand_file(_path), do: {:error, :bad_arg}
 end

@@ -86,13 +86,13 @@ if Code.ensure_loaded?(Plug) do
 
     def init_plug_clients(opts = %{client: client, agents: agents}, _plug)
         when is_atom(client) and (is_list(agents) or agents == :all) do
-      [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transfer_client({client, agents})
+      [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transform_client({client, agents})
       %{opts | agents: agent_flag_list}
     end
 
     def init_plug_clients(opts = %{client: client}, _plug) when is_atom(client) do
       if match?(:work, client.app_type()) do
-        [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transfer_client({client, :all})
+        [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transform_client({client, :all})
         Map.put(opts, :agents, agent_flag_list)
       else
         opts
@@ -121,7 +121,7 @@ if Code.ensure_loaded?(Plug) do
 
           {persistent_id, clients}
         else
-          {nil, Utils.transfer_clients(clients)}
+          {nil, Utils.transform_clients(clients)}
         end
 
       %{runtime: runtime, persistent_id: persistent_id, clients: clients}
@@ -141,7 +141,9 @@ if Code.ensure_loaded?(Plug) do
         ) do
       agents =
         with nil <- :persistent_term.get(persistent_id, nil) do
-          [{_client_flag, {_client, agent_flag_list}} | _] = Utils.transfer_client({client, :all})
+          [{_client_flag, {_client, agent_flag_list}} | _] =
+            Utils.transform_client({client, :all})
+
           :persistent_term.put(persistent_id, agent_flag_list)
           agent_flag_list
         end
@@ -160,7 +162,7 @@ if Code.ensure_loaded?(Plug) do
     def setup_plug(conn, %{runtime: true, persistent_id: persistent_id} = options) do
       clients =
         with nil <- :persistent_term.get(persistent_id, nil) do
-          Utils.transfer_clients(options.clients)
+          Utils.transform_clients(options.clients)
           |> tap(&:persistent_term.put(persistent_id, &1))
         end
 

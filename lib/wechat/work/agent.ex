@@ -88,29 +88,33 @@ defmodule WeChat.Work.Agent do
   @doc "构建应用(agent)"
   @spec agent(agent_id, options) :: t
   def agent(id, options \\ []) do
-    struct(%__MODULE__{id: id, name: id}, options)
-    |> transfer_aes_key()
+    %__MODULE__{id: id, name: id}
+    |> struct(options)
+    |> transform_aes_key()
   end
 
   @doc "构建[通讯录]应用(agent)"
   @spec contacts_agent(options) :: t
   def contacts_agent(options \\ []) do
-    struct(%__MODULE__{id: :contacts, name: :contacts}, options)
-    |> transfer_aes_key()
+    %__MODULE__{id: :contacts, name: :contacts}
+    |> struct(options)
+    |> transform_aes_key()
   end
 
   @doc "构建[客户联系]应用(agent)"
   @spec customer_agent(options) :: t
   def customer_agent(options \\ []) do
-    struct(%__MODULE__{id: :customer, name: :customer}, options)
-    |> transfer_aes_key()
+    %__MODULE__{id: :customer, name: :customer}
+    |> struct(options)
+    |> transform_aes_key()
   end
 
   @doc "构建[微信客服]应用(agent)"
   @spec kf_agent(options) :: t
   def kf_agent(options \\ []) do
-    struct(%__MODULE__{id: :kf, name: :kf}, options)
-    |> transfer_aes_key()
+    %__MODULE__{id: :kf, name: :kf}
+    |> struct(options)
+    |> transform_aes_key()
   end
 
   def maybe_init_work_agents(client) do
@@ -155,7 +159,7 @@ defmodule WeChat.Work.Agent do
     end
   end
 
-  defp transfer_aes_key(agent) do
+  defp transform_aes_key(agent) do
     if is_nil(agent.aes_key) and agent.encoding_aes_key do
       aes_key = Encryptor.aes_key(agent.encoding_aes_key)
       %{agent | aes_key: aes_key}

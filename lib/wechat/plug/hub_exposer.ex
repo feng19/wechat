@@ -59,7 +59,7 @@ if Code.ensure_loaded?(Plug) do
 
           {persistent_id, clients}
         else
-          {nil, transfer_clients(clients)}
+          {nil, transform_clients(clients)}
         end
 
       %{runtime: runtime, persistent_id: persistent_id, clients: clients}
@@ -72,7 +72,7 @@ if Code.ensure_loaded?(Plug) do
           persistent_id = options.persistent_id
 
           with nil <- :persistent_term.get(persistent_id, nil) do
-            transfer_clients(options.clients)
+            transform_clients(options.clients)
             |> tap(&:persistent_term.put(persistent_id, &1))
           end
         else
@@ -104,15 +104,15 @@ if Code.ensure_loaded?(Plug) do
 
     def call(conn, _), do: not_found(conn)
 
-    defp transfer_clients(clients) do
-      Enum.reduce(clients, %{}, &transfer_client/2)
+    defp transform_clients(clients) do
+      Enum.reduce(clients, %{}, &transform_client/2)
     end
 
-    defp transfer_client(client, acc) when is_atom(client) do
-      transfer_client({client, :all}, acc)
+    defp transform_client(client, acc) when is_atom(client) do
+      transform_client({client, :all}, acc)
     end
 
-    defp transfer_client({client, :all}, acc) do
+    defp transform_client({client, :all}, acc) do
       if match?(:work, client.app_type()) do
         Enum.into(client.agents(), acc, &{&1.cache_id, :all})
       else
@@ -120,7 +120,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp transfer_client({client, scope_list}, acc) when is_list(scope_list) do
+    defp transform_client({client, scope_list}, acc) when is_list(scope_list) do
       if match?(:work, client.app_type()) do
         Enum.into(scope_list, acc, fn
           {agent, :all} ->
