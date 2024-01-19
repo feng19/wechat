@@ -30,7 +30,7 @@ defmodule WeChat.Requester.Pay do
   def client_v2(client, ssl? \\ false) do
     name =
       if ssl? do
-        WeChat.Pay.v2_finch_name(client)
+        WeChat.Pay.v2_ssl_finch_name(client)
       else
         WeChat.Pay.finch_name(client)
       end

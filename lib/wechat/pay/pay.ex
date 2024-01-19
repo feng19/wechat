@@ -161,7 +161,7 @@ defmodule WeChat.Pay do
   # v3
   def finch_name(client), do: :"#{client}.Finch"
   @doc false
-  def v2_finch_name(client), do: :"#{client}.v2.Finch"
+  def v2_ssl_finch_name(client), do: :"#{client}.v2ssl.Finch"
 
   @spec get_requester_specs(client) :: [map]
   def get_requester_specs(client) do
@@ -219,7 +219,7 @@ defmodule WeChat.Pay do
                 ]
               ]
 
-          Finch.child_spec(name: v2_finch_name(client), pools: %{:default => v2_finch_pool})
+          Finch.child_spec(name: v2_ssl_finch_name(client), pools: %{:default => v2_finch_pool})
           |> Map.put(:id, V2.Finch)
 
         _ ->
