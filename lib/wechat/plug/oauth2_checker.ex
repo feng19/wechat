@@ -14,11 +14,9 @@ if Code.ensure_loaded?(Plug) do
     可选参数:
 
     - `:oauth2_callback_fun`:
-      [定义](`t:#{inspect(__MODULE__)}.oauth2_callback_fun/0`),
-      默认值: [oauth2_callback/5](`#{inspect(__MODULE__)}.oauth2_callback/5`)
+      [定义](`t:oauth2_callback_fun/0`), 默认值: [&oauth2_callback/5](`oauth2_callback/5`)
     - `:authorize_url_fun`:
-      [定义](`t:#{inspect(__MODULE__)}.authorize_url_fun/0`),
-      默认值: [authorize_url_by_server_role/4](`#{inspect(__MODULE__)}.authorize_url_by_server_role/4`)
+      [定义](`t:authorize_url_fun/0`), 默认值: [&authorize_url_by_server_role/4](`authorize_url_by_server_role/4`)
 
     ** 注意 **: 服务器角色为 `hub_client` 时，请确保已经配置 `hub_springboard_url`:
 

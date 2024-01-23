@@ -5,7 +5,7 @@ if Code.ensure_loaded?(Plug) do
 
     [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/jsapi-payment/payment-notice.html)
 
-        ** 注意 **
+        注意
 
         对后台通知交互时，如果微信收到应答不是成功或超时，微信认为通知失败，
         微信会通过一定的策略定期重新发起通知，尽可能提高通知的成功率，但微信不保证通知最终能成功
@@ -83,7 +83,7 @@ if Code.ensure_loaded?(Plug) do
 
     ## Options
 
-    - `event_handler`: 必填, [定义](`t:#{inspect(__MODULE__)}.event_handler/0`)
+    - `event_handler`: 必填, [定义](`t:event_handler/0`)
     - `client`: 必填, [定义](`t:WeChat.Pay.client/0`)
     """
     import Plug.Conn
@@ -101,7 +101,7 @@ if Code.ensure_loaded?(Plug) do
     """
     @type event_handler_return :: :ok | :error | {:error, any} | Plug.Conn.t()
     @typedoc "事件处理回调函数"
-    @type event_handler :: (Plug.Conn.t(), message :: map -> event_handler_return)
+    @type event_handler :: (Pay.client(), Plug.Conn.t(), message :: map -> event_handler_return)
 
     @doc false
     def init(opts) do
@@ -109,7 +109,7 @@ if Code.ensure_loaded?(Plug) do
 
       event_handler =
         with {:ok, handler} <- Map.fetch(opts, :event_handler),
-             true <- is_function(handler, 2) do
+             true <- is_function(handler, 3) do
           handler
         else
           :error ->
@@ -117,7 +117,7 @@ if Code.ensure_loaded?(Plug) do
 
           false ->
             raise ArgumentError,
-                  "the :event_handler must arg 2 function when using #{inspect(__MODULE__)}"
+                  "the :event_handler must arg 3 function when using #{inspect(__MODULE__)}"
         end
 
       case Map.fetch(opts, :client) do
@@ -149,16 +149,16 @@ if Code.ensure_loaded?(Plug) do
            {:ok, body, body_map, conn} <- check_and_read_body(conn),
            true <- Crypto.verify(signature, timestamp, nonce, body, public_key) do
         try do
-          case body_map do
-            %{
-              "resource_type" => "encrypt-resource",
-              "resource" => %{
-                "algorithm" => "AEAD_AES_256_GCM",
-                "nonce" => iv,
-                "ciphertext" => ciphertext,
-                "associated_data" => associated_data
-              }
-            } = message ->
+          message =
+            with %{
+                   "resource_type" => "encrypt-resource",
+                   "resource" => %{
+                     "algorithm" => "AEAD_AES_256_GCM",
+                     "nonce" => iv,
+                     "ciphertext" => ciphertext,
+                     "associated_data" => associated_data
+                   }
+                 } = message <- body_map do
               data =
                 Crypto.decrypt_aes_256_gcm(
                   client.api_secret_key(),
@@ -168,11 +168,10 @@ if Code.ensure_loaded?(Plug) do
                 )
                 |> Jason.decode!()
 
-              event_handler.(conn, Map.put(message, "data", data))
+              Map.put(message, "data", data)
+            end
 
-            message ->
-              event_handler.(conn, message)
-          end
+          event_handler.(client, conn, message)
         rescue
           error ->
             Logger.error(

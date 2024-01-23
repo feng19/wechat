@@ -13,10 +13,9 @@ if Code.ensure_loaded?(Plug) do
 
     ## Options
 
-    - `event_handler`: 必填, [定义](`t:#{inspect(__MODULE__)}.event_handler/0`)
-    - `event_parser`: 可选,
-      [定义](`t:#{inspect(__MODULE__)}.event_parser/0`),
-      默认值: [ServerMessage.EventHelper.parse_work_xml_event/4](`WeChat.ServerMessage.EventHelper.parse_work_xml_event/4`)
+    - `event_handler`: 必填, [定义](`t:event_handler/0`)
+    - `event_parser`: 可选, [定义](`t:event_parser/0`),
+      默认值: [&ServerMessage.EventHelper.parse_work_xml_event/4](`WeChat.ServerMessage.EventHelper.parse_work_xml_event/4`)
     """
 
     import Plug.Conn

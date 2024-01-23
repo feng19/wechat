@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work, Pay}
 
-  @version "0.13.7"
+  @version "0.13.8"
   @source_url "https://github.com/feng19/wechat"
 
   def project do
@@ -184,7 +184,8 @@ defmodule WeChat.MixProject do
          Pay.Transactions,
          Pay.Refund,
          Pay.CombineTransactions,
-         Pay.Bill
+         Pay.Bill,
+         Pay.Sandbox
        ]},
       {"Access Token",
        [Refresher.Default, Refresher.DefaultSettings, Refresher.Pay, WeChat.TokenChecker]},
