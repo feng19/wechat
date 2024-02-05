@@ -18,9 +18,8 @@
 
 ### Links
 
-- [WeChat SDK 使用指南](https://feng19.com/2022/07/08/wechat_for_elixir_usage/)
-- [示例项目 - wechat_demo](https://github.com/feng19/wechat_demo)
-- [示例项目(pay) - wechat_pay_demo](https://github.com/feng19/wechat_pay_demo)
+- [WeChat SDK 使用指南](https://feng19.com/2022/07/08/wechat_for_elixir_usage/) - [示例项目](https://github.com/feng19/wechat_demo)
+- [WeChat SDK(支付) 使用指南](https://feng19.com/2024/02/05/wechat-pay-for-elixir-usage/) - [示例项目](https://github.com/feng19/wechat_pay_demo)
 - [微信官方文档 - 开发前必读](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Getting_Started_Guide.html)
 - [微信官方文档 - 在线文档](https://hex.pm/packages/wechat_sdk)
 
