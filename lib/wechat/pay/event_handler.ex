@@ -40,7 +40,7 @@ if Code.ensure_loaded?(Plug) do
 
           post "/api/pay/callback",
             to: #{inspect(__MODULE__)},
-            init_opts: [client: WxPay, event_handler: &YourModule.handle_event/2]
+            init_opts: [client: WxPay, event_handler: &YourModule.handle_event/3]
 
           match _, do: conn
         end
@@ -73,13 +73,13 @@ if Code.ensure_loaded?(Plug) do
 
         post "/wx/pay/event", #{inspect(__MODULE__)},
           client: WxPay,
-          event_handler: &YourModule.handle_event/2
+          event_handler: &YourModule.handle_event/3
 
     before phoenix 1.17:
 
         forward "/wx/pay/event", #{inspect(__MODULE__)},
           client: WxPay,
-          event_handler: &YourModule.handle_event/2
+          event_handler: &YourModule.handle_event/3
 
     ## Options
 
