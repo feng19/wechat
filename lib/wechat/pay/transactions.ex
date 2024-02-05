@@ -81,11 +81,7 @@ defmodule WeChat.Pay.Transactions do
     timestamp = WeChat.Utils.now_unix() |> to_string()
     nonce_str = :crypto.strong_rand_bytes(24) |> Base.encode64()
     package = "prepay_id=#{prepay_id}"
-
-    sign =
-      "#{appid}\n#{timestamp}\n#{nonce_str}\n#{package}\n"
-      |> :public_key.sign(:sha256, client.private_key())
-      |> Base.encode64()
+    sign = request_sign(client, appid, timestamp, nonce_str, package)
 
     %{
       "appId" => appid,
@@ -95,6 +91,69 @@ defmodule WeChat.Pay.Transactions do
       "signType" => "RSA",
       "paySign" => sign
     }
+  end
+
+  defp request_sign(client, appid, timestamp, nonce_str, package) do
+    "#{appid}\n#{timestamp}\n#{nonce_str}\n#{package}\n"
+    |> :public_key.sign(:sha256, client.private_key())
+    |> Base.encode64()
+  end
+
+  @doc """
+  APP 下单 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/in-app-payment/direct-jsons/app-prepay.html){:target="_blank"}
+
+  商户系统先调用该接口在微信支付服务后台生成预支付交易单，返回正确的预支付交易会话标识后再按Native、JSAPI、APP等不同场景生成交易串调起支付
+  """
+  @spec app(Pay.client(), body) :: WeChat.response()
+  def app(client, body) do
+    client.post("/v3/pay/transactions/app", body)
+  end
+
+  @doc """
+  APP 调起支付 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/in-app-payment/app-transfer-payment.html){:target="_blank"}
+
+  通过App下单接口获取到发起支付的必要参数prepay_id，可以按照接口定义中的规则，使用微信支付提供的SDK调起App支付
+  """
+  @spec app_request_payment_args(Pay.client(), WeChat.appid(), prepay_id) :: map
+  def app_request_payment_args(client, appid, prepay_id) do
+    timestamp = WeChat.Utils.now_unix() |> to_string()
+    nonce_str = :crypto.strong_rand_bytes(24) |> Base.encode64()
+    sign = request_sign(client, appid, timestamp, nonce_str, prepay_id)
+
+    %{
+      "appid" => appid,
+      "partnerid" => client.mch_id(),
+      "prepayid" => prepay_id,
+      "package" => "Sign=WXPay",
+      "noncestr" => nonce_str,
+      "timestamp" => timestamp,
+      "sign" => sign
+    }
+  end
+
+  @doc """
+  H5 下单 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/h5-payment/direct-jsons/h5-prepay.html){:target="_blank"}
+
+  商户系统先调用该接口在微信支付服务后台生成预支付交易单，返回正确的预支付交易会话标识后再按Native、JSAPI、APP等不同场景生成交易串调起支付
+  """
+  @spec h5(Pay.client(), body) :: WeChat.response()
+  def h5(client, body) do
+    client.post("/v3/pay/transactions/h5", body)
+  end
+
+  @doc """
+  Native 下单 -
+  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/h5-payment/direct-jsons/h5-prepay.html){:target="_blank"}
+
+  通过本接口来生成支付链接参数code_url，然后将该参数值生成二维码图片展示给用户。
+  用户在使用微信客户端扫描二维码后，可以直接跳转到微信支付页面完成支付操作
+  """
+  @spec native(Pay.client(), body) :: WeChat.response()
+  def native(client, body) do
+    client.post("/v3/pay/transactions/native", body)
   end
 
   @spec query_by_out_trade_no(Pay.client(), out_trade_no) :: WeChat.response()

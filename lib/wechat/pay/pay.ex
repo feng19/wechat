@@ -2,9 +2,7 @@ defmodule WeChat.Pay do
   @moduledoc """
   微信支付
 
-  **注意**: 未经上线测试，请谨慎使用
-
-  ## 引入 x509 依赖
+  ## 添加依赖
 
       def deps do
         [
@@ -14,7 +12,7 @@ defmodule WeChat.Pay do
         ]
       end
 
-  ## 定义 Client 模块
+  ## 定义支付 Client 模块
 
       defmodule YourApp.WeChatAppCodeName do
         @moduledoc "CodeName"
@@ -30,7 +28,7 @@ defmodule WeChat.Pay do
 
   ## V2 SSL 配置
 
-  使用到 v2 的接口，如：撤销订单 需要配置证书
+  部分 v2 的接口请求时需要用到证书，如：撤销订单，因此如果有使用到这部分接口，必须添加下面的配置
 
       config :wechat, YourApp.WeChatAppCodeName,
         v2_ssl: [
