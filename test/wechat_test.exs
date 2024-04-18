@@ -1,7 +1,7 @@
 defmodule WeChatTest do
   use ExUnit.Case, async: true
   alias WeChat.Work.Agent, as: WorkAgent
-  alias WeChat.Test.{OfficialAccount, Work, Work2, Work3, DynamicSecretA, DynamicSecretB}
+  alias WeChat.Test.{OfficialAccount, Work, Work2, Work3, DynamicSecretA, DynamicSecretB, Pay3}
   doctest WeChat
 
   test "Auto generate functions(OfficialAccount)" do
@@ -37,6 +37,17 @@ defmodule WeChatTest do
 
     assert true = Enum.all?(1..3, &function_exported?(Work, :get, &1))
     assert true = Enum.all?(2..4, &function_exported?(Work, :post, &1))
+  end
+
+  test "Auto generate functions(Pay)" do
+    assert Pay3.mch_id() == "1555555888"
+    assert Pay3.client_serial_no() == "client_serial_no"
+    assert Pay3.storage() == WeChat.Storage.PayFile
+    assert function_exported?(Pay3, :public_key, 0)
+    assert function_exported?(Pay3, :private_key, 0)
+    assert true = Enum.all?(1..2, &function_exported?(Pay3, :get, &1))
+    assert true = Enum.all?(2..3, &function_exported?(Pay3, :post, &1))
+    assert true = Enum.all?(2..3, &function_exported?(Pay3, :v2_post, &1))
   end
 
   test "build official_account client" do

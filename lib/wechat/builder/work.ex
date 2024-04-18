@@ -64,12 +64,20 @@ defmodule WeChat.Builder.Work do
           |> WeChat.Storage.Cache.get_cache(:access_token)
         end
 
+        @spec get(url :: binary) :: WeChat.response()
         defdelegate get(url), to: unquote(requester)
+        @spec get(url :: binary, opts :: keyword) :: WeChat.response()
         defdelegate get(url, opts), to: unquote(requester)
-        defdelegate get(client, url, opts), to: unquote(requester)
+        @spec get(Tesla.Env.client(), url :: binary, opts :: keyword) :: WeChat.response()
+        defdelegate get(tesla_client, url, opts), to: unquote(requester)
+        @spec post(url :: binary, body :: any) :: WeChat.response()
         defdelegate post(url, body), to: unquote(requester)
+        @spec post(url :: binary, body :: any, opts :: keyword) :: WeChat.response()
         defdelegate post(url, body, opts), to: unquote(requester)
-        defdelegate post(client, url, body, opts), to: unquote(requester)
+
+        @spec post(Tesla.Env.client(), url :: binary, body :: any, opts :: keyword) ::
+                WeChat.response()
+        defdelegate post(tesla_client, url, body, opts), to: unquote(requester)
       end
 
     get_funs =

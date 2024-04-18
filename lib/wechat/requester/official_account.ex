@@ -10,23 +10,25 @@ defmodule WeChat.Requester.OfficialAccount do
   """
   use Tesla, only: [:get, :post]
 
+  @opts Application.compile_env(:wechat, __MODULE__, [])
+
   if Mix.env() == :test do
     adapter Tesla.Mock
   else
-    adapter Tesla.Adapter.Finch, name: WeChat.Finch, pool_timeout: 5_000, receive_timeout: 5_000
+    @adapter_options @opts
+                     |> Keyword.get(:adapter_options, pool_timeout: 5_000, receive_timeout: 5_000)
+                     |> Keyword.put(:name, WeChat.Finch)
+    adapter Tesla.Adapter.Finch, @adapter_options
     plug Tesla.Middleware.BaseUrl, "https://api.weixin.qq.com"
   end
 
-  plug Tesla.Middleware.Retry,
-    delay: 500,
-    max_retries: 3,
-    max_delay: 2_000,
-    should_retry: fn
-      {:ok, %{status: status}} when status in [400, 500] -> true
-      {:ok, _} -> false
-      {:error, _} -> true
-    end
-
+  @retry_options Keyword.get(@opts, :retry_options,
+                   delay: 500,
+                   max_retries: 3,
+                   max_delay: 2_000,
+                   should_retry: &WeChat.Utils.request_should_retry/1
+                 )
+  plug Tesla.Middleware.Retry, @retry_options
   plug Tesla.Middleware.JSON, decode_content_types: ["text/plain"]
   plug Tesla.Middleware.Logger
 end

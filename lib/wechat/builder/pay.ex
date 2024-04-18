@@ -34,20 +34,12 @@ defmodule WeChat.Builder.Pay do
       end
 
       @spec get(url :: binary, opts :: keyword) :: WeChat.response()
-      def get(url, opts \\ []) do
-        unquote(requester).client(__MODULE__) |> Tesla.get(url, opts)
-      end
-
+      def get(url, opts \\ []), do: unquote(requester).get(__MODULE__, url, opts)
       @spec post(url :: binary, body :: any, opts :: keyword) :: WeChat.response()
-      def post(url, body, opts \\ []) do
-        unquote(requester).client(__MODULE__) |> Tesla.post(url, body, opts)
-      end
-
+      def post(url, body, opts \\ []), do: unquote(requester).post(__MODULE__, url, body, opts)
       @spec v2_post(url :: binary, body :: any, opts :: keyword) :: WeChat.response()
-      def v2_post(url, body, opts \\ []) do
-        {ssl?, opts} = Keyword.pop(opts, :ssl?, false)
-        unquote(requester).client_v2(__MODULE__, ssl?) |> Tesla.post(url, body, opts)
-      end
+      def v2_post(url, body, opts \\ []),
+        do: unquote(requester).v2_post(__MODULE__, url, body, opts)
 
       @spec mch_id() :: WeChat.Pay.mch_id()
       def mch_id, do: unquote(options.mch_id)

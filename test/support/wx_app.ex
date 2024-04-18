@@ -80,3 +80,12 @@ defmodule WeChat.Test.Work3 do
     corp_id: "corp_id",
     agents: :runtime_env
 end
+
+defmodule WeChat.Test.Pay3 do
+  use WeChat.Pay,
+    mch_id: "1555555888",
+    api_secret_key: :runtime_env,
+    api_secret_v2_key: :runtime_env,
+    client_serial_no: "client_serial_no",
+    client_key: {:file, "test/support/cert/apiclient_key.pem"}
+end

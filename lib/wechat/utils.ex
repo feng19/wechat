@@ -138,4 +138,8 @@ defmodule WeChat.Utils do
   end
 
   def expand_file(_path), do: {:error, :bad_arg}
+
+  def request_should_retry({:ok, %{status: status}}) when status in [400, 500], do: true
+  def request_should_retry({:ok, _}), do: false
+  def request_should_retry({:error, _}), do: true
 end
