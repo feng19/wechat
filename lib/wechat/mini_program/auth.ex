@@ -8,6 +8,9 @@ defmodule WeChat.MiniProgram.Auth do
   @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api"
   @open_ability_doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/open-ability"
 
+  @typedoc "会话密钥"
+  @type session_key :: String.t()
+
   @doc """
   服务端获取开放数据 -
   [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
@@ -84,6 +87,46 @@ defmodule WeChat.MiniProgram.Auth do
         ]
       )
     end
+  end
+
+  @doc """
+  检验登录态 -
+  [官方文档](#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-login/checkSessionKey.html){:target="_blank"}
+
+  校验服务器所保存的登录态 session_key 是否合法。为了保持 session_key 私密性，接口不明文传输 session_key，而是通过校验登录态签名完成。
+  """
+  @spec check_session(WeChat.client(), WeChat.openid(), session_key) :: WeChat.response()
+  def check_session(client, openid, session_key) do
+    signature = :crypto.mac(:hmac, :sha256, session_key, "") |> Base.encode16()
+
+    client.get("/wxa/checksession",
+      query: [
+        openid: openid,
+        signature: signature,
+        sig_method: "hmac_sha256",
+        access_token: client.get_access_token()
+      ]
+    )
+  end
+
+  @doc """
+  重置登录态 -
+  [官方文档](#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-login/ResetUserSessionKey.html){:target="_blank"}
+
+  重置指定的登录态 session_key。为了保持 session_key 私密性，接口不明文传入 session_key，而是通过校验登录态签名完成。
+  """
+  @spec reset_session(WeChat.client(), WeChat.openid(), session_key) :: WeChat.response()
+  def reset_session(client, openid, session_key) do
+    signature = :crypto.mac(:hmac, :sha256, session_key, "") |> Base.encode16()
+
+    client.get("/wxa/resetusersessionkey",
+      query: [
+        openid: openid,
+        signature: signature,
+        sig_method: "hmac_sha256",
+        access_token: client.get_access_token()
+      ]
+    )
   end
 
   @doc """
