@@ -54,7 +54,7 @@ defmodule WeChat.MixProject do
       formatters: ["html"],
       formatter_opts: [gfm: true],
       groups_for_modules: groups_for_modules(),
-      groups_for_functions: [Action: &(&1[:doc_group] == :action)],
+      groups_for_docs: [Action: &(&1[:doc_group] == :action)],
       nest_modules_by_prefix: [
         Requester,
         Refresher,
