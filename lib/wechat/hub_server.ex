@@ -42,4 +42,15 @@ defmodule WeChat.HubServer do
     WorkAgent.fetch_agent_cache_id!(client, agent)
     |> Cache.get_cache({:oauth2_env_url, env})
   end
+
+  @spec del_oauth2_env_url(WeChat.client(), env) :: true
+  def del_oauth2_env_url(client, env) do
+    Cache.del_cache(client.appid(), {:oauth2_env_url, env})
+  end
+
+  @spec del_oauth2_env_url(WeChat.client(), Work.agent(), env) :: true
+  def del_oauth2_env_url(client, agent, env) do
+    WorkAgent.fetch_agent_cache_id!(client, agent)
+    |> Cache.del_cache({:oauth2_env_url, env})
+  end
 end
