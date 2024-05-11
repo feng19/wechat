@@ -10,7 +10,8 @@ defmodule WeChat.Storage.Cache do
 
   alias WeChat.Work
 
-  def init_table() do
+  @doc false
+  def init_table do
     :ets.new(:wechat, [:named_table, :set, :public, read_concurrency: true])
   end
 
