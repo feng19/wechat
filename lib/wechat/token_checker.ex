@@ -6,6 +6,8 @@ defmodule WeChat.TokenChecker do
 
   按以下方式配置，将自动给对应的 client 增加检查
 
+  **注意：此模块不支持企业微信**
+
       config :wechat, :check_token_for_clients, [ClientA, ClientB, ClientC]
 
   """
@@ -29,6 +31,19 @@ defmodule WeChat.TokenChecker do
     if client in Application.get_env(:wechat, :check_token_for_clients, []) do
       add_client(client, refresh_options)
     end
+  end
+
+  @spec add_to_check_clients(WeChat.client()) :: :ok
+  def add_to_check_clients(client) do
+    clients = Application.get_env(:wechat, :check_token_for_clients, [])
+    clients = WeChat.Utils.uniq_and_sort([client | clients])
+    Application.put_env(:wechat, :check_token_for_clients, clients)
+  end
+
+  @spec remove_from_check_clients(WeChat.client()) :: :ok
+  def remove_from_check_clients(client) do
+    clients = Application.get_env(:wechat, :check_token_for_clients, []) |> List.delete(client)
+    Application.put_env(:wechat, :check_token_for_clients, clients)
   end
 
   @spec add_client(WeChat.client()) :: :ok | nil
@@ -71,6 +86,18 @@ defmodule WeChat.TokenChecker do
   @spec add(id, check_fun, refresh_fun) :: :ok
   def add(id, check_fun, refresh_fun) do
     GenServer.call(__MODULE__, {:add, id, check_fun, refresh_fun})
+  end
+
+  @spec remove_client(WeChat.client()) :: :ok | nil
+  def remove_client(client) do
+    refresher = WeChat.refresher()
+
+    with %{refresh_options: refresh_options} <- refresher.client_options(client) do
+      for {{id, key}, _fun, _ref} <- refresh_options,
+          key == :component_access_token or key == :access_token do
+        remove(id)
+      end
+    end
   end
 
   @spec remove(id) :: :ok

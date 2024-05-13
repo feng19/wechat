@@ -210,9 +210,28 @@ defmodule WeChat do
   @doc "动态启动 client"
   @spec start_client(client, start_options) :: :ok
   def start_client(client, options \\ %{}) do
-    {options, refresher_setting} = Map.split(options, [:hub_springboard_url, :oauth2_callbacks])
-    WeChat.Setup.setup_client(client, options)
-    add_to_refresher(client, refresher_setting)
+    {setup_options, options} = Map.split(options, [:hub_springboard_url, :oauth2_callbacks])
+    WeChat.Setup.setup_client(client, setup_options)
+
+    if Map.get(options, :refresh_token?, true) do
+      if Map.get(options, :check_token?, true) and client.app_type() != :work do
+        WeChat.TokenChecker.add_to_check_clients(client)
+      end
+
+      add_to_refresher(client, options)
+    end
+
+    :ok
+  end
+
+  def shutdown_client(client) do
+    if client.app_type() != :work do
+      WeChat.TokenChecker.remove_from_check_clients(client)
+      WeChat.TokenChecker.remove_client(client)
+    end
+
+    module = refresher()
+    module.remove()
   end
 
   @doc """
