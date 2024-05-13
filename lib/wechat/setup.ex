@@ -22,7 +22,7 @@ defmodule WeChat.Setup do
     end
   end
 
-  @spec setup_client(WeChat.client(), options | work_options) :: :ok
+  @spec setup_client(WeChat.client(), options) :: :ok
   def setup_client(client, options) do
     %{hub_springboard_url: hub_springboard_url, oauth2_callbacks: oauth2_callbacks} =
       replace_app(options, client)
@@ -40,7 +40,7 @@ defmodule WeChat.Setup do
     :ok
   end
 
-  @spec setup_work_client(WeChat.client(), work_options) :: :ok
+  @spec setup_work_client(Work.client(), work_options) :: :ok
   def setup_work_client(client, %{all: options}) do
     setup_work_client(client, all: options)
   end
@@ -60,7 +60,7 @@ defmodule WeChat.Setup do
     :ok
   end
 
-  @spec setup_work_agent(WeChat.client(), Work.agent() | WorkAgent.t(), options) :: :ok
+  @spec setup_work_agent(Work.client(), Work.agent() | WorkAgent.t(), options) :: :ok
   def setup_work_agent(client, agent, options) when is_struct(agent, WorkAgent) do
     setup_work_agent(client, agent.name || agent.id, options)
   end

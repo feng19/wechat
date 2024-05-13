@@ -211,7 +211,12 @@ defmodule WeChat do
   @spec start_client(client, start_options) :: :ok
   def start_client(client, options \\ %{}) do
     {setup_options, options} = Map.split(options, [:hub_springboard_url, :oauth2_callbacks])
-    WeChat.Setup.setup_client(client, setup_options)
+
+    if match?(:work, client.app_type()) do
+      WeChat.Setup.setup_work_client(client, setup_options)
+    else
+      WeChat.Setup.setup_client(client, setup_options)
+    end
 
     if Map.get(options, :refresh_token?, true) do
       if Map.get(options, :check_token?, true) and client.app_type() != :work do
