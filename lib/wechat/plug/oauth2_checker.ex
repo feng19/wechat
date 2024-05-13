@@ -52,13 +52,19 @@ if Code.ensure_loaded?(Plug) do
     alias WeChat.{Utils, WebPage, Work, HubClient}
     @behaviour Plug
 
+    @type oauth2_callback_type :: :normal | :work
     @typedoc "授权回调处理函数"
     @type oauth2_callback_fun ::
-            (:normal | :work, Plug.Conn.t(), WebPage.code(), WeChat.client(), Work.Agent.t() ->
+            (oauth2_callback_type,
+             Plug.Conn.t(),
+             WebPage.code(),
+             WeChat.client(),
+             Work.Agent.t() ->
                Plug.Conn.t())
+    @type authorize_url_type :: :normal | :work | :work_qr
     @typedoc "获取授权链接函数"
     @type authorize_url_fun ::
-            (:normal | :work | :work_qr, Plug.Conn.t(), WeChat.client(), Work.Agent.t() ->
+            (authorize_url_type, Plug.Conn.t(), WeChat.client(), Work.Agent.t() ->
                authorize_url :: String.t())
 
     @doc false
@@ -139,6 +145,13 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
+    @spec check_code(
+            Plug.Conn.t(),
+            options :: map,
+            oauth2_callback_type,
+            WeChat.client(),
+            Work.Agent.t()
+          ) :: Plug.Conn.t()
     def check_code(
           %{query_params: %{"code" => code}} = conn,
           %{oauth2_callback_fun: oauth2_callback_fun},
@@ -151,6 +164,15 @@ if Code.ensure_loaded?(Plug) do
 
     def check_code(conn, options, type, client, agent),
       do: redirect2auth(conn, options, type, client, agent)
+
+    @spec oauth2_callback(
+            oauth2_callback_type,
+            Plug.Conn.t(),
+            code :: String.t(),
+            WeChat.client(),
+            Work.Agent.t()
+          ) :: Plug.Conn.t()
+    def oauth2_callback(type, conn, code, client, agent)
 
     def oauth2_callback(:normal, conn, code, client, _) do
       with {:ok, %{status: 200, body: info}} <- WebPage.code2access_token(client, code),
@@ -174,6 +196,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
+    @spec auth_success(Plug.Conn.t(), WeChat.client(), info :: map) :: Plug.Conn.t()
     def auth_success(conn, client, info) do
       timestamp = Utils.now_unix()
       info = Map.put(info, "timestamp", timestamp)
@@ -195,6 +218,7 @@ if Code.ensure_loaded?(Plug) do
       |> put_session(:access_info, info)
     end
 
+    @spec auth_fail(Plug.Conn.t()) :: Plug.Conn.t()
     def auth_fail(conn) do
       html(
         conn,
@@ -219,6 +243,12 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
+    @spec authorize_url_by_server_role(
+            authorize_url_type,
+            Plug.Conn.t(),
+            WeChat.client(),
+            Work.Agent.t()
+          ) :: Plug.Conn.t()
     def authorize_url_by_server_role(type, conn, client, agent) do
       if match?(:hub_client, client.server_role()) do
         hub_springboard_authorize_url(type, conn, client, agent)
@@ -227,22 +257,27 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp authorize_url(:normal, conn = %{query_params: query_params}, client, _) do
+    @spec authorize_url(authorize_url_type, Plug.Conn.t(), WeChat.client(), Work.Agent.t()) ::
+            Plug.Conn.t()
+    def authorize_url(type, conn, client, agent)
+
+    def authorize_url(:normal, conn = %{query_params: query_params}, client, _) do
       scope = Map.get(query_params, "scope", "snsapi_base")
       state = Map.get(query_params, "state", "")
       WebPage.oauth2_authorize_url(client, callback_uri(conn), scope, state)
     end
 
-    defp authorize_url(:work, conn, client, _agent) do
+    def authorize_url(:work, conn, client, _agent) do
       state = Map.get(conn.query_params, "state", "")
       WebPage.oauth2_authorize_url(client, callback_uri(conn), "snsapi_base", state)
     end
 
-    defp authorize_url(:work_qr, conn, client, agent) do
+    def authorize_url(:work_qr, conn, client, agent) do
       state = Map.get(conn.query_params, "state", "")
       Work.App.qr_connect_url(client, agent.id, callback_uri(conn), state)
     end
 
+    @spec callback_uri(Plug.Conn.t()) :: uri :: String.t()
     def callback_uri(conn) do
       query_string =
         conn.query_params
@@ -252,7 +287,15 @@ if Code.ensure_loaded?(Plug) do
       request_url(%{conn | query_string: query_string})
     end
 
-    defp hub_springboard_authorize_url(:normal, conn = %{query_params: query_params}, client, _) do
+    @spec hub_springboard_authorize_url(
+            authorize_url_type,
+            Plug.Conn.t(),
+            WeChat.client(),
+            Work.Agent.t()
+          ) :: Plug.Conn.t()
+    def hub_springboard_authorize_url(type, conn, client, agent)
+
+    def hub_springboard_authorize_url(:normal, conn = %{query_params: query_params}, client, _) do
       if hub_springboard_url = HubClient.get_hub_springboard_url(client) do
         scope = Map.get(query_params, "scope", "snsapi_base")
         state = Map.get(query_params, "state", "")
@@ -263,7 +306,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp hub_springboard_authorize_url(:work, conn, client, _agent = %{id: agent_id}) do
+    def hub_springboard_authorize_url(:work, conn, client, _agent = %{id: agent_id}) do
       if hub_springboard_url = HubClient.get_hub_springboard_url(client, agent_id) do
         state = Map.get(conn.query_params, "state", "")
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
@@ -273,7 +316,7 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    defp hub_springboard_authorize_url(:work_qr, conn, client, _agent = %{id: agent_id}) do
+    def hub_springboard_authorize_url(:work_qr, conn, client, _agent = %{id: agent_id}) do
       if hub_springboard_url = HubClient.get_hub_springboard_url(client, agent_id) do
         state = Map.get(conn.query_params, "state", "")
         callback_uri = hub_springboard_callback_uri(conn, hub_springboard_url)
@@ -284,6 +327,8 @@ if Code.ensure_loaded?(Plug) do
     end
 
     # hub_springboard_url <> "/" <> conn.request_path <> "?" <> query_string
+    @spec hub_springboard_callback_uri(Plug.Conn.t(), hub_springboard_url :: String.t()) ::
+            uri :: String.t()
     def hub_springboard_callback_uri(conn, hub_springboard_url) do
       query_string =
         conn.query_params
