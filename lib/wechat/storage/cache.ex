@@ -53,7 +53,7 @@ defmodule WeChat.Storage.Cache do
   @spec search_client(WeChat.appid() | WeChat.code_name()) :: nil | WeChat.client()
   def search_client(app_flag), do: get_cache(app_flag, :client)
 
-  @spec search_client_agent(WeChat.appid() | WeChat.code_name(), Work.agent()) ::
+  @spec search_client_agent(WeChat.appid() | WeChat.code_name(), Work.agent() | String.t()) ::
           nil | {WeChat.client(), Work.Agent.t()}
   def search_client_agent(app_flag, agent_flag), do: get_cache(app_flag, agent_flag)
 

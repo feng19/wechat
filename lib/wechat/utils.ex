@@ -51,68 +51,6 @@ defmodule WeChat.Utils do
     end
   end
 
-  def transform_clients(opts, plug) do
-    Map.get(opts, :clients)
-    |> List.wrap()
-    |> case do
-      [] -> raise ArgumentError, "please set clients when using #{inspect(plug)}"
-      list -> list
-    end
-    |> Enum.reduce(%{}, &transform_client/2)
-  end
-
-  def transform_clients(clients) do
-    Enum.reduce(clients, %{}, &transform_client/2)
-  end
-
-  def transform_client(client) do
-    transform_client(client, [])
-  end
-
-  defp transform_client(client, acc) when is_atom(client) do
-    if match?(:work, client.app_type()) do
-      transform_client({client, :all}, acc)
-    else
-      transform_client({client, nil}, acc)
-    end
-  end
-
-  defp transform_client({client, :all}, acc) do
-    agents = Enum.map(client.agents(), & &1.id)
-    transform_client({client, agents}, acc)
-  end
-
-  defp transform_client({client, agents}, acc) do
-    value =
-      if match?(:work, client.app_type()) do
-        agents = agents |> List.wrap() |> Enum.uniq()
-        agent_flag_list = transform_agents(client, agents) |> Enum.sort()
-
-        if Enum.empty?(agent_flag_list) do
-          raise ArgumentError, "please set agents for client: #{inspect(client)}"
-        end
-
-        {client, agent_flag_list}
-      else
-        client
-      end
-
-    Enum.into([{client.appid(), value}, {client.code_name(), value}], acc)
-  end
-
-  defp transform_agents(client, agents) when is_list(agents) do
-    Enum.reduce(client.agents(), [], fn agent, acc ->
-      agent_id = agent.id
-      name = agent.name
-
-      if agent_id in agents or name in agents do
-        Enum.uniq([agent_id, name, to_string(agent_id), to_string(name)]) ++ acc
-      else
-        acc
-      end
-    end)
-  end
-
   def uniq_and_sort(list) do
     list |> Enum.uniq() |> Enum.sort()
   end

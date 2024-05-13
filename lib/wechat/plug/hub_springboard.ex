@@ -9,20 +9,20 @@ if Code.ensure_loaded?(Plug) do
 
     使用 Phoenix 时，将下面的代码加到 `router` 里面：
 
-        # for normal
+        # for 公众号
         get "/:app/:env/cb/*callback_path", #{inspect(__MODULE__)}, clients: [Client, ...]
 
-        # for work
+        # for 企业微信
         get "/:app/:agent/:env/cb/*callback_path", #{inspect(__MODULE__)}, clients: [Client, ...]
 
     使用 PlugCowboy 时，将下面的代码加到 `router` 里面：
 
-        # for normal
+        # for 公众号
         get "/:app/:env/cb/*callback_path",
           to: #{inspect(__MODULE__)},
           init_opts: [clients: [Client, ...]]
 
-        # for work
+        # for 企业微信
         get "/:app/:agent/:env/cb/*callback_path",
           to: #{inspect(__MODULE__)},
           init_opts: [clients: [Client, ...]]

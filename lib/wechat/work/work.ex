@@ -74,7 +74,7 @@ defmodule WeChat.Work do
   ## 参数说明
 
   - `corp_id`: `t:corp_id/0` - 必填
-  - `agents`: 应用列表 - `t:agents/0` - 必填 & 至少一个
+  - `agents`: 应用列表 - `t:agents/0` | `t:WeChat.env_option/0` - 必填 & 至少一个
   - `server_role`: `t:WeChat.server_role/0`
   - `storage`: `t:WeChat.Storage.Adapter.t/0`
   - `requester`: 请求客户端 - `t:module/0`

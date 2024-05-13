@@ -28,9 +28,10 @@ defmodule WeChat.Plug.HubSpringboardTest do
 
   test "init - ok for work" do
     client = WeChat.Test.Work2
-    agents = [10000, :agent_name, "10000", "agent_name"] |> Enum.sort()
-    clients = %{client.appid() => {client, agents}, client.code_name() => {client, agents}}
+    clients = %{client.appid() => {client, :all}, client.code_name() => {client, :all}}
     assert %{clients: ^clients} = HubSpringboard.init(clients: [client])
+    agents = ["10000", "agent_name"]
+    clients = %{client.appid() => {client, agents}, client.code_name() => {client, agents}}
     assert %{clients: ^clients} = HubSpringboard.init(clients: [{client, 10000}])
     assert %{clients: ^clients} = HubSpringboard.init(clients: [{client, [10000]}])
     assert %{clients: ^clients} = HubSpringboard.init(clients: [{client, :agent_name}])

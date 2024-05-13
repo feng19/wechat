@@ -15,6 +15,7 @@ defmodule WeChat.Work.Agent do
   """
   @type agent_id :: integer | atom
   @type agent_name :: atom | String.t()
+  @type agent_flag :: agent_id | agent_name
   @typedoc """
   secret 是企业应用里面用于保障数据安全的“钥匙” -
   [官方文档](#{@term_introduction_doc_link}#secret)
@@ -58,6 +59,22 @@ defmodule WeChat.Work.Agent do
 
   def find_agent(client, name) do
     Enum.find(client.agents(), &match?(%{name: ^name}, &1))
+  end
+
+  @spec find_by_agent_string(Work.client(), agent :: String.t()) :: t | nil
+  def find_by_agent_string(client, agent_str) when is_binary(agent_str) do
+    Enum.find(client.agents(), fn %{id: id, name: name} ->
+      case to_string(id) do
+        ^agent_str ->
+          true
+
+        _ ->
+          case to_string(name) do
+            ^agent_str -> true
+            _ -> false
+          end
+      end
+    end)
   end
 
   @spec fetch_agent!(Work.client(), Work.agent()) :: t

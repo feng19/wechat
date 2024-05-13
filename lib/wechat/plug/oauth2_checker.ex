@@ -30,13 +30,13 @@ if Code.ensure_loaded?(Plug) do
           plug #{inspect(__MODULE__)}, clients: [Client, ...]
         end
 
-        # for normal
+        # for 公众号
         scope "/:app" do
           pipe_through :oauth2_checker
           get "/path", YourController, :your_action
         end
 
-        # for work
+        # for 企业微信
         scope "/:app/:agent" do
           pipe_through :oauth2_checker
           # 在PC端授权访问网页

@@ -22,7 +22,7 @@ if Code.ensure_loaded?(Plug) do
 
         get "/hub/expose/:store_id/:store_key", #{inspect(__MODULE__)}, clients: [ClientsA, ...]
     """
-    import WeChat.Plug.Helper
+    import WeChat.Plug.Helper, only: [json: 2, not_found: 1]
     alias WeChat.Work.Agent, as: WorkAgent
     @behaviour Plug
 
