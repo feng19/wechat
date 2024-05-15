@@ -238,6 +238,7 @@ defmodule WeChat do
 
     module = refresher()
     module.remove(client)
+    HubServer.clean_oauth2_callbacks(client)
     WeChat.Storage.Cache.clean(client)
   end
 
