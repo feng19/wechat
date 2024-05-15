@@ -7,6 +7,36 @@ defmodule WeChat.HubServer do
   @type url :: String.t()
   @type oauth2_callbacks :: %{env => url}
 
+  @spec list_oauth2_callbacks(WeChat.client()) :: oauth2_callbacks
+  def list_oauth2_callbacks(client) do
+    if match?(:work, client.app_type()) do
+      Enum.map(
+        client.agents(),
+        &{
+          &1.id,
+          Cache.match({_key = {&1.cache_id, {:oauth2_env_url, :_}}, :"$1"})
+          |> Enum.map(fn [v] -> v end)
+        }
+      )
+    else
+      Cache.match({_key = {client.appid(), {:oauth2_env_url, :_}}, :"$1"})
+      |> Enum.map(fn [v] -> v end)
+    end
+  end
+
+  @spec clean_oauth2_callbacks(WeChat.client()) :: :ok
+  def clean_oauth2_callbacks(client) do
+    if match?(:work, client.app_type()) do
+      Enum.each(
+        client.agents(),
+        &Cache.match_delete({_key = {&1.cache_id, {:oauth2_env_url, :_}}, :_})
+      )
+    else
+      Cache.match_delete({_key = {client.appid(), {:oauth2_env_url, :_}}, :_})
+      :ok
+    end
+  end
+
   @spec set_oauth2_callbacks(WeChat.client(), oauth2_callbacks) :: [true]
   def set_oauth2_callbacks(client, oauth2_callbacks) do
     for {env, url} <- oauth2_callbacks, is_binary(env) and is_binary(url) do

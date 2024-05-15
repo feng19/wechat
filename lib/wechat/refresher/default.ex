@@ -586,8 +586,10 @@ defmodule WeChat.Refresher.Default do
     clients = List.delete(state.clients, client)
 
     with {_client, opts} <- get do
-      Enum.each(opts.refresh_options, fn {_key, _fun, timer} ->
+      Enum.each(opts.refresh_options, fn {{store_id, store_key}, _fun, timer} ->
         cancel_timer(timer)
+        Cache.del_cache({store_id, store_key})
+        Cache.del_cache({:store_map, store_id}, store_key)
       end)
     end
 

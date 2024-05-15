@@ -237,7 +237,7 @@ defmodule WeChat do
     end
 
     module = refresher()
-    module.remove()
+    module.remove(client)
     WeChat.Storage.Cache.clean(client)
   end
 

@@ -114,7 +114,7 @@ if Code.ensure_loaded?(Plug) do
     # 2. check code
     # 3. redirect to authorize_url
     def call(conn, options) do
-      case setup_plug(conn, options) do
+      case call_plug(conn, options) do
         {:work, client, agent} -> call_work(conn, client, agent, options)
         {:normal, client, _agent} -> call_normal(conn, client, options)
         conn -> conn

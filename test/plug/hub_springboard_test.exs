@@ -1,6 +1,8 @@
 defmodule WeChat.Plug.HubSpringboardTest do
   use ExUnit.Case, async: true
   use Plug.Test
+  alias WeChat.HubServer
+  alias WeChat.Storage.Cache
   alias WeChat.Plug.HubSpringboard
   alias WeChat.HubSpringboardRouter
 
@@ -65,7 +67,8 @@ defmodule WeChat.Plug.HubSpringboardTest do
     appid = client.appid()
     env_url = "http://127.0.0.1:4000"
     env = "dev"
-    WeChat.HubServer.set_oauth2_env_url(client, env, env_url)
+    HubServer.set_oauth2_env_url(client, env, env_url)
+    assert [^env_url] = HubServer.list_oauth2_callbacks(client)
     redirect_url = "#{env_url}/a/b/c?code=test"
 
     # get "/:env/:app/cb/*callback_path"
@@ -83,6 +86,9 @@ defmodule WeChat.Plug.HubSpringboardTest do
 
     assert conn.status == 302
     assert get_resp_header(conn, "location") == [redirect_url]
+
+    HubServer.clean_oauth2_callbacks(client)
+    assert [] = HubServer.list_oauth2_callbacks(client)
   end
 
   test "call - for work" do
@@ -91,11 +97,12 @@ defmodule WeChat.Plug.HubSpringboardTest do
     agent_id = 10000
     env_url = "http://127.0.0.1:4000"
     env = "dev"
-    WeChat.HubServer.set_oauth2_env_url(client, agent_id, env, env_url)
+    HubServer.set_oauth2_env_url(client, agent_id, env, env_url)
     agent = WeChat.Work.Agent.fetch_agent!(client, agent_id)
-    WeChat.Storage.Cache.put_cache(appid, to_string(agent_id), {client, agent})
+    Cache.put_cache(appid, to_string(agent_id), {client, agent})
     redirect_url = "#{env_url}/a/b/c?code=test"
 
+    
     # get "/:env/:app/:agent/cb/*callback_path"
     conn =
       conn(:get, "/#{env}/#{appid}/#{agent_id}/cb/a/b/c", %{code: "test"})
@@ -122,9 +129,9 @@ defmodule WeChat.Plug.HubSpringboardTest do
 
     client = WeChat.Test.Work3
     appid = client.appid()
-    WeChat.HubServer.set_oauth2_env_url(client, agent_id, env, env_url)
+    HubServer.set_oauth2_env_url(client, agent_id, env, env_url)
     agent = WeChat.Work.Agent.fetch_agent!(client, agent_id)
-    WeChat.Storage.Cache.put_cache(appid, to_string(agent_id), {client, agent})
+    Cache.put_cache(appid, to_string(agent_id), {client, agent})
 
     # get "/work/runtime/:env/:agent/cb/*callback_path"
     conn =

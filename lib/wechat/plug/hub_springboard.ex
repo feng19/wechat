@@ -44,7 +44,7 @@ if Code.ensure_loaded?(Plug) do
           } = conn,
           options
         ) do
-      with {_type, client, agent} <- setup_plug(conn, options) do
+      with {_type, client, agent} <- call_plug(conn, options) do
         oauth2_callback(conn, client, agent, env, callback_path)
       end
     end

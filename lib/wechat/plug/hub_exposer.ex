@@ -21,8 +21,15 @@ if Code.ensure_loaded?(Plug) do
         plug :basic_auth, username: "hello", password: "secret"
 
         get "/hub/expose/:store_id/:store_key", #{inspect(__MODULE__)}, clients: [ClientsA, ...]
+
+    参数说明:
+      - `%{clients: clients}`: 指定 clients 相当于设置白名单
+      - `%{clients: {:runtime, persistent_id}}`: 在运行时获取白名单, `:persistent_term.get(persistent_id)` 返回的为 client 列表
+      - `%{runtime: persistent_id, clients: clients}`: 在运行时获取白名单, `:persistent_term.get(persistent_id)` 返回的为 transform_clients 后的值
     """
-    import WeChat.Plug.Helper, only: [json: 2, not_found: 1]
+    import WeChat.Plug.Helper,
+      only: [json: 2, not_found: 1, get_runtime_value: 1, get_runtime_value: 2]
+
     alias WeChat.Work.Agent, as: WorkAgent
     @behaviour Plug
 
@@ -37,75 +44,90 @@ if Code.ensure_loaded?(Plug) do
     @doc false
     def init(opts) do
       opts = Map.new(opts)
-      runtime = Map.get(opts, :runtime, false)
 
-      clients =
-        opts
-        |> Map.get(:clients)
-        |> List.wrap()
-        |> case do
-          [] -> raise ArgumentError, "please set clients when using #{inspect(__MODULE__)}"
-          list -> list
+      maybe_runtime = fn clients ->
+        case Map.get(opts, :runtime, false) do
+          true ->
+            if persistent_id = Map.get(opts, :persistent_id) do
+              %{runtime: persistent_id, clients: clients}
+            else
+              raise ArgumentError,
+                    "please set persistent_id when runtime: true for using #{inspect(__MODULE__)}"
+            end
+
+          false ->
+            %{clients: transform_clients(clients)}
+
+          persistent_id ->
+            %{runtime: persistent_id, clients: clients}
         end
+      end
 
-      {persistent_id, clients} =
-        if runtime do
-          persistent_id = Map.get(opts, :persistent_id)
+      case Map.get(opts, :clients) do
+        {:runtime, persistent_id} ->
+          %{clients: {:runtime, persistent_id}}
 
-          unless persistent_id do
-            raise ArgumentError,
-                  "please set persistent_id when runtime: true for using #{inspect(__MODULE__)}"
-          end
+        nil ->
+          raise ArgumentError, "please set clients when using #{inspect(__MODULE__)}"
 
-          {persistent_id, clients}
-        else
-          {nil, transform_clients(clients)}
-        end
+        client when is_atom(client) ->
+          maybe_runtime.([client])
 
-      %{runtime: runtime, persistent_id: persistent_id, clients: clients}
+        [] ->
+          raise ArgumentError, "please set clients when using #{inspect(__MODULE__)}"
+
+        clients when is_list(clients) ->
+          maybe_runtime.(clients)
+      end
     end
 
     @doc false
     def call(%{path_params: %{"store_id" => store_id, "store_key" => store_key}} = conn, options) do
-      clients =
-        if options.runtime do
-          persistent_id = options.persistent_id
+      case options do
+        %{runtime: persistent_id, clients: clients} ->
+          get_runtime_value({:runtime, persistent_id}, fn -> transform_clients(clients) end)
 
-          with nil <- :persistent_term.get(persistent_id, nil) do
-            transform_clients(options.clients)
-            |> tap(&:persistent_term.put(persistent_id, &1))
+        %{clients: {:runtime, persistent_id}} ->
+          with clients when clients != :error <- get_runtime_value({:runtime, persistent_id}) do
+            transform_clients(clients)
           end
-        else
-          options.clients
-        end
 
-      in_scope? =
-        case Map.fetch(clients, store_id) do
-          {:ok, :all} -> true
-          {:ok, scope_list} when is_list(scope_list) -> store_key in scope_list
-          _ -> false
-        end
+        %{clients: clients} ->
+          clients
+      end
+      |> case do
+        :error ->
+          not_found(conn)
 
-      json =
-        with true <- in_scope?,
-             true <- store_key in @valid_keys,
-             store_key <- String.to_existing_atom(store_key),
-             store_map when store_map != nil <-
-               WeChat.Storage.Cache.get_cache({:store_map, store_id}, store_key) do
-          %{error: 0, msg: "success", store_map: store_map}
-        else
-          _ -> %{error: 404, msg: "not found"}
-        end
+        clients ->
+          in_scope? =
+            case Map.fetch(clients, store_id) do
+              {:ok, :all} -> true
+              {:ok, scope_list} when is_list(scope_list) -> store_key in scope_list
+              _ -> false
+            end
 
-      json(conn, json)
+          json =
+            with true <- in_scope?,
+                 true <- store_key in @valid_keys,
+                 store_key <- String.to_existing_atom(store_key),
+                 store_map when store_map != nil <-
+                   WeChat.Storage.Cache.get_cache({:store_map, store_id}, store_key) do
+              %{error: 0, msg: "success", store_map: store_map}
+            else
+              _ -> %{error: 404, msg: "not found"}
+            end
+
+          json(conn, json)
+      end
     rescue
       ArgumentError -> json(conn, %{error: 404, msg: "not found"})
     end
 
     def call(conn, _), do: not_found(conn)
 
-    defp transform_clients(clients) do
-      Enum.reduce(clients, %{}, &transform_client/2)
+    def transform_clients(clients) do
+      List.wrap(clients) |> Enum.reduce(%{}, &transform_client/2)
     end
 
     defp transform_client(client, acc) when is_atom(client) do

@@ -92,11 +92,20 @@ if Code.ensure_loaded?(Plug) do
       opts
     end
 
-    # special client but runtime agents
-    def init_plug_clients(opts = %{client: client, agents: :runtime}, plug)
+    # runtime client and special agents
+    def init_plug_clients(opts = %{client: {:runtime, _persistent_id}, agent: agent}, _plug)
+        when is_atom(agent),
+        do: opts
+
+    # special client and runtime agents
+    def init_plug_clients(opts = %{client: client, agents: {:runtime, _persistent_id}}, _plug)
+        when is_atom(client),
+        do: opts
+
+    def init_plug_clients(%{client: client, agents: :runtime} = opts, plug)
         when is_atom(client) do
-      if Map.get(opts, :persistent_id) do
-        opts
+      if persistent_id = Map.get(opts, :persistent_id) do
+        %{client: client, agents: {:runtime, persistent_id}}
       else
         raise ArgumentError,
               "please set persistent_id when agents: :runtime for using #{inspect(plug)}"
@@ -111,9 +120,12 @@ if Code.ensure_loaded?(Plug) do
     end
 
     # special client & all agents
-    def init_plug_clients(opts = %{client: client, agents: :all}, _plug) when is_atom(client) do
-      opts
-    end
+    def init_plug_clients(opts = %{client: client, agents: :all}, _plug) when is_atom(client),
+      do: opts
+
+    # runtime client and all agents
+    def init_plug_clients(opts = %{client: {:runtime, _persistent_id}, agents: :all}, _plug),
+      do: opts
 
     # special client
     def init_plug_clients(opts = %{client: client}, _plug) when is_atom(client) do
@@ -126,32 +138,43 @@ if Code.ensure_loaded?(Plug) do
 
     # special clients
     def init_plug_clients(opts, plug) when is_map(opts) do
-      runtime = Map.get(opts, :runtime, false)
+      maybe_runtime = fn clients ->
+        case Map.get(opts, :runtime, false) do
+          true ->
+            if persistent_id = Map.get(opts, :persistent_id) do
+              %{runtime: persistent_id, clients: clients}
+            else
+              raise ArgumentError,
+                    "please set persistent_id when runtime: true for using #{inspect(plug)}"
+            end
 
-      clients =
-        Map.get(opts, :clients)
-        |> List.wrap()
-        |> case do
-          [] -> raise ArgumentError, "please set clients when using #{inspect(plug)}"
-          list -> list
+          false ->
+            %{clients: transform_clients(clients)}
+
+          persistent_id ->
+            %{runtime: persistent_id, clients: clients}
         end
+      end
 
-      {persistent_id, clients} =
-        if runtime do
-          if persistent_id = Map.get(opts, :persistent_id) do
-            {persistent_id, clients}
-          else
-            raise ArgumentError,
-                  "please set persistent_id when runtime: true for using #{inspect(plug)}"
-          end
-        else
-          {nil, transform_clients(clients)}
-        end
+      case Map.get(opts, :clients) do
+        {:runtime, persistent_id} ->
+          %{clients: {:runtime, persistent_id}}
 
-      %{runtime: runtime, persistent_id: persistent_id, clients: clients}
+        nil ->
+          raise ArgumentError, "please set clients when using #{inspect(plug)}"
+
+        client when is_atom(client) ->
+          maybe_runtime.([client])
+
+        [] ->
+          raise ArgumentError, "please set clients when using #{inspect(plug)}"
+
+        clients when is_list(clients) ->
+          maybe_runtime.(clients)
+      end
     end
 
-    def setup_plug(%{path_params: %{"app" => app}} = conn, %{enable_for_all: true}) do
+    def call_plug(%{path_params: %{"app" => app}} = conn, %{enable_for_all: true}) do
       case WeChat.get_client(app) do
         nil ->
           not_found(conn)
@@ -165,55 +188,66 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
-    def setup_plug(conn, %{client: client, agents: :all} = _options) do
-      get_agent_by_path(conn, client, :all)
-    end
-
-    def setup_plug(conn, %{client: client, agent: agent_or_id} = _options) do
-      if agent = Work.Agent.find_agent(client, agent_or_id) do
-        {:work, client, agent}
-      else
-        not_found(conn)
+    def call_plug(conn, %{client: client, agents: :all} = _options) do
+      case get_runtime_value(client) do
+        :error -> not_found(conn)
+        client -> get_agent_by_path(conn, client, :all)
       end
     end
 
-    def setup_plug(
-          conn,
-          %{client: client, agents: :runtime, persistent_id: persistent_id} = options
-        ) do
-      agents =
-        with nil <- :persistent_term.get(persistent_id, nil) do
-          agent_string_list = agent_string_list(client)
-          :persistent_term.put(persistent_id, agent_string_list)
-          agent_string_list
-        end
-
-      setup_plug(conn, %{options | agents: agents})
+    def call_plug(conn, %{client: client, agent: agent_or_id} = _options) do
+      with client when client != :error <- get_runtime_value(client),
+           agent_or_id when agent_or_id != :error <- get_runtime_value(agent_or_id),
+           agent when not is_nil(agent) <- Work.Agent.find_agent(client, agent_or_id) do
+        {:work, client, agent}
+      else
+        _ -> not_found(conn)
+      end
     end
 
-    def setup_plug(conn, %{client: client, agents: agents} = _options) do
-      get_agent_by_path(conn, client, agents)
+    def call_plug(conn, %{client: client, agents: agents} = _options) do
+      with client when client != :error <- get_runtime_value(client),
+           agents when agents != :error <-
+             get_runtime_value(agents, fn -> agent_string_list(client) end) do
+        get_agent_by_path(conn, client, agents)
+      else
+        _ -> not_found(conn)
+      end
     end
 
-    def setup_plug(_conn, %{client: client} = _options) do
-      {:normal, client, nil}
+    def call_plug(conn, %{client: client} = _options) do
+      case get_runtime_value(client) do
+        :error -> not_found(conn)
+        client -> {:normal, client, nil}
+      end
     end
 
-    def setup_plug(conn, %{runtime: true, persistent_id: persistent_id} = options) do
+    def call_plug(conn, %{runtime: persistent_id} = options) do
       clients =
-        with nil <- :persistent_term.get(persistent_id, nil) do
-          transform_clients(options.clients)
-          |> tap(&:persistent_term.put(persistent_id, &1))
-        end
+        get_runtime_value(
+          {:runtime, persistent_id},
+          fn -> transform_clients(options.clients) end
+        )
 
       get_client_agent_by_path(conn, %{options | clients: clients})
     end
 
-    def setup_plug(conn, options) do
-      get_client_agent_by_path(conn, options)
+    def call_plug(conn, %{clients: {:runtime, persistent_id}} = options) do
+      case get_runtime_value({:runtime, persistent_id}) do
+        :error ->
+          not_found(conn)
+
+        clients ->
+          transform_clients(clients)
+          get_client_agent_by_path(conn, %{options | clients: clients})
+      end
     end
 
-    defp transform_clients(clients) do
+    def call_plug(conn, %{clients: clients} = options) do
+      get_client_agent_by_path(conn, %{options | clients: clients})
+    end
+
+    def transform_clients(clients) do
       Enum.reduce(clients, %{}, &transform_client/2)
     end
 
@@ -250,14 +284,14 @@ if Code.ensure_loaded?(Plug) do
       Map.merge(acc, %{client.appid() => value, client.code_name() => value})
     end
 
-    defp agent_string_list(client) do
+    def agent_string_list(client) do
       Enum.flat_map(client.agents(), fn agent ->
         [to_string(agent.id), to_string(agent.name)]
       end)
       |> Utils.uniq_and_sort()
     end
 
-    defp agent_string_list(client, agents) when is_list(agents) do
+    def agent_string_list(client, agents) when is_list(agents) do
       Enum.reduce(client.agents(), [], fn agent, acc ->
         agent_id = agent.id
         name = agent.name
@@ -270,5 +304,20 @@ if Code.ensure_loaded?(Plug) do
       end)
       |> Utils.uniq_and_sort()
     end
+
+    def get_runtime_value(maybe_runtime, lazy_fun \\ nil)
+
+    def get_runtime_value({:runtime, persistent_id}, lazy_fun) do
+      with nil <- :persistent_term.get(persistent_id, nil),
+           true <- is_function(lazy_fun, 0) do
+        value = lazy_fun.()
+        :persistent_term.put(persistent_id, value)
+        value
+      else
+        _ -> :error
+      end
+    end
+
+    def get_runtime_value(value, _lazy_fun), do: value
   end
 end

@@ -15,29 +15,35 @@ defmodule WeChat.Plug.HubExposerTest do
   test "init - ok for official_account" do
     client = Test.OfficialAccount
     store_id = client.appid()
-    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => :all}}
+    opts = %{clients: %{store_id => :all}}
     assert opts == HubExposer.init(clients: [client])
     assert opts == HubExposer.init(clients: [{client, :all}])
 
-    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => ["access_token"]}}
+    opts = %{clients: %{store_id => ["access_token"]}}
     assert opts == HubExposer.init(clients: [{client, ["access_token"]}])
   end
 
   test "init - ok for work" do
     client = Test.Work2
     store_id = WorkAgent.fetch_agent_cache_id!(client, 10000)
-    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => :all}}
+    opts = %{clients: %{store_id => :all}}
     assert opts == HubExposer.init(clients: [client])
     assert opts == HubExposer.init(clients: [{client, :all}])
     assert opts == HubExposer.init(clients: [{client, [{10000, :all}]}])
-    opts = %{persistent_id: nil, runtime: false, clients: %{store_id => ["access_token"]}}
+    opts = %{clients: %{store_id => ["access_token"]}}
     assert opts == HubExposer.init(clients: [{client, [{10000, ["access_token"]}]}])
 
     # runtime
     client = Test.Work3
 
-    assert %{persistent_id: :test_hub_exposer, runtime: true, clients: [client]} ==
+    assert %{runtime: :test_hub_exposer, clients: [client]} ==
              HubExposer.init(clients: [client], runtime: true, persistent_id: :test_hub_exposer)
+
+    assert %{runtime: :test_hub_exposer, clients: [client]} ==
+             HubExposer.init(clients: [client], runtime: :test_hub_exposer)
+
+    assert %{clients: {:runtime, :test_hub_exposer}} ==
+             HubExposer.init(clients: {:runtime, :test_hub_exposer})
   end
 
   @opts HubExposerRouter.init([])

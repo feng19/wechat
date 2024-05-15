@@ -15,6 +15,16 @@ defmodule WeChat.Storage.Cache do
     :ets.new(:wechat, [:named_table, :set, :public, read_concurrency: true])
   end
 
+  @doc false
+  def match(pattern) do
+    :ets.match(:wechat, pattern)
+  end
+
+  @doc false
+  def match_delete(pattern) do
+    :ets.match_delete(:wechat, pattern)
+  end
+
   @spec set_client(WeChat.client()) :: true
   def set_client(client) do
     appid = client.appid()
