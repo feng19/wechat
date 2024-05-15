@@ -308,13 +308,18 @@ if Code.ensure_loaded?(Plug) do
     def get_runtime_value(maybe_runtime, lazy_fun \\ nil)
 
     def get_runtime_value({:runtime, persistent_id}, lazy_fun) do
-      with nil <- :persistent_term.get(persistent_id, nil),
-           true <- is_function(lazy_fun, 0) do
-        value = lazy_fun.()
-        :persistent_term.put(persistent_id, value)
-        value
-      else
-        _ -> :error
+      case :persistent_term.get(persistent_id, nil) do
+        nil ->
+          if is_function(lazy_fun, 0) do
+            value = lazy_fun.()
+            :persistent_term.put(persistent_id, value)
+            value
+          else
+            :error
+          end
+
+        value ->
+          value
       end
     end
 
