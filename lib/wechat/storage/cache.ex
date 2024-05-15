@@ -25,10 +25,29 @@ defmodule WeChat.Storage.Cache do
     if match?(:work, client.app_type()) do
       Enum.flat_map(client.agents(), &agent_cache_list(app_list, client, &1))
       |> put_caches()
+    else
+      true
     end
   end
 
-  @spec set_work_agent(WeChat.client(), Work.Agent.t()) :: true
+  @spec clean(WeChat.client()) :: :ok
+  def clean(client) do
+    appid = client.appid()
+    code_name = client.code_name()
+    app_list = Enum.uniq([appid, code_name])
+    Enum.each(app_list, &del_cache({&1, :client}))
+
+    if match?(:work, client.app_type()) do
+      Enum.each(client.agents(), fn agent ->
+        agent_cache_list(app_list, client, agent)
+        |> Enum.each(&del_cache(elem(&1, 0)))
+      end)
+    else
+      :ok
+    end
+  end
+
+  @spec set_work_agent(Work.client(), Work.Agent.t()) :: true
   def set_work_agent(client, agent) do
     appid = client.appid()
     code_name = client.code_name()
@@ -37,6 +56,16 @@ defmodule WeChat.Storage.Cache do
     |> agent_cache_list(client, agent)
     |> List.flatten()
     |> put_caches()
+  end
+
+  @spec clean_work_agent(Work.client(), Work.Agent.t()) :: :ok
+  def clean_work_agent(client, agent) do
+    appid = client.appid()
+    code_name = client.code_name()
+
+    Enum.uniq([appid, code_name])
+    |> agent_cache_list(client, agent)
+    |> Enum.each(&del_cache(elem(&1, 0)))
   end
 
   defp agent_cache_list(app_list, client, agent) do
@@ -54,7 +83,7 @@ defmodule WeChat.Storage.Cache do
   def search_client(app_flag), do: get_cache(app_flag, :client)
 
   @spec search_client_agent(WeChat.appid() | WeChat.code_name(), Work.agent() | String.t()) ::
-          nil | {WeChat.client(), Work.Agent.t()}
+          nil | {Work.client(), Work.Agent.t()}
   def search_client_agent(app_flag, agent_flag), do: get_cache(app_flag, agent_flag)
 
   @spec put_cache(cache_id(), cache_sub_key(), cache_value()) :: true

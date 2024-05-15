@@ -229,6 +229,7 @@ defmodule WeChat do
     :ok
   end
 
+  @spec shutdown_client(client) :: :ok
   def shutdown_client(client) do
     if client.app_type() != :work do
       WeChat.TokenChecker.remove_from_check_clients(client)
@@ -237,6 +238,7 @@ defmodule WeChat do
 
     module = refresher()
     module.remove()
+    WeChat.Storage.Cache.clean(client)
   end
 
   @doc """
