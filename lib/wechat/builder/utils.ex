@@ -1,6 +1,10 @@
 defmodule WeChat.Builder.Utils do
   @moduledoc false
 
+  def gen_code_name(client) do
+    client |> to_string() |> String.split(".") |> List.last() |> String.downcase()
+  end
+
   def gen_sub_modules(sub_modules, client_module, drop_amount \\ 1) do
     {sub_module_ast_list, files} =
       sub_modules

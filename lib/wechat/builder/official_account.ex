@@ -120,9 +120,7 @@ defmodule WeChat.Builder.OfficialAccount do
     {requester, default_opts} = Keyword.pop!(default_opts, :requester)
 
     {code_name, default_opts} =
-      Keyword.pop_lazy(default_opts, :code_name, fn ->
-        client |> to_string() |> String.split(".") |> List.last() |> String.downcase()
-      end)
+      Keyword.pop_lazy(default_opts, :code_name, fn -> Utils.gen_code_name(client) end)
 
     base_funs =
       quote do
