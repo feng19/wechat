@@ -582,11 +582,11 @@ defmodule WeChat.Refresher.Default do
 
   defp remove_client(state, client) do
     Logger.info("Removing WeChat Client: #{inspect(client)}.")
-    {get, state} = Map.pop(state, client)
+    {client_opts, state} = Map.pop(state, client)
     clients = List.delete(state.clients, client)
 
-    with {_client, opts} <- get do
-      Enum.each(opts.refresh_options, fn {{store_id, store_key}, _fun, timer} ->
+    if is_map(client_opts) do
+      Enum.each(client_opts.refresh_options, fn {{store_id, store_key}, _fun, timer} ->
         cancel_timer(timer)
         Cache.del_cache({store_id, store_key})
         Cache.del_cache({:store_map, store_id}, store_key)
