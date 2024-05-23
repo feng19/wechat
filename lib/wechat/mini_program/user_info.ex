@@ -1,10 +1,17 @@
 defmodule WeChat.MiniProgram.UserInfo do
+  @moduledoc """
+  小程序 - 用户信息
+  """
   import Jason.Helpers
   import WeChat.Utils, only: [doc_link_prefix: 0]
+  alias WeChat.{Utils, ServerMessage.Encryptor}
+
+  @doc_link "#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-info"
+  @open_ability_doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/open-ability"
 
   @doc """
-  > 小程序 - 用户信息 - 获取插件用户openpid
-  [- 官方文档](#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-info/basic-info/getPluginOpenPId.html)
+  获取插件用户openpid
+  - [官方文档](#{@doc_link}/basic-info/getPluginOpenPId.html){:target="_blank"}
   """
   @spec get_plugin_openpid(WeChat.client(), code :: String.t()) :: WeChat.response()
   def get_plugin_openpid(client, code) do
@@ -17,8 +24,8 @@ defmodule WeChat.MiniProgram.UserInfo do
   end
 
   @doc """
-   > 小程序 - 用户信息 - 检查加密信息
-  - [官方文档](#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-info/basic-info/checkEncryptedData.html)
+  检查加密信息
+  - [官方文档](#{@doc_link}/basic-info/checkEncryptedData.html){:target="_blank"}
   """
   @spec check_encrypted_data(WeChat.client(), encrypted_msg_hash :: String.t()) ::
           WeChat.response()
@@ -31,31 +38,77 @@ defmodule WeChat.MiniProgram.UserInfo do
   end
 
   @doc """
-  > 小程序 - 用户信息 - 支付后获取 Unionid
-  - [官方文档](#{doc_link_prefix()}/wxa/getpaidunionid)
+  支付后获取用户的`UnionId`
+  - [官方文档](#{@doc_link}/basic-info/getPaidUnionid.html){:target="_blank"}
+
+  用户支付完成后，获取该用户的`UnionId`，无需用户授权.
+
+  本接口支持第三方平台代理查询.
+
+  **注意：调用前需要用户完成支付，且在支付后的五分钟内有效**
   """
-  @spec get_paid_unionid(
-          WeChat.client(),
-          WeChat.openid(),
-          transaction_id :: String.t(),
-          out_trade_no :: String.t()
-        ) ::
-          WeChat.response()
-  def get_paid_unionid(client, openid, transaction_id, out_trade_no) do
+  @spec get_paid_unionid(WeChat.client(), WeChat.openid()) :: WeChat.response()
+  def get_paid_unionid(client, openid) do
     client.get("/wxa/getpaidunionid",
       query: [
-        access_token: client.get_access_token(),
-        mch_id: client.mch_id(),
         openid: openid,
-        transaction_id: transaction_id,
-        out_trade_no: out_trade_no
+        access_token: client.get_access_token()
       ]
     )
   end
 
   @doc """
-  > 小程序 - 用户信息 - 获取用户encryptKey
-  - [官方文档](#{doc_link_prefix()}/wxa/business/getuserencryptkey)
+  支付后获取用户的`UnionId` - 微信支付订单号(`transaction_id`)
+  - [官方文档](#{@doc_link}/basic-info/getPaidUnionid.html){:target="_blank"}
+
+  用户支付完成后，获取该用户的`UnionId`，无需用户授权.
+
+  本接口支持第三方平台代理查询.
+
+  **注意：调用前需要用户完成支付，且在支付后的五分钟内有效**
+  """
+  @spec get_paid_unionid(WeChat.client(), WeChat.openid(), transaction_id :: String.t()) ::
+          WeChat.response()
+  def get_paid_unionid(client, openid, transaction_id) do
+    client.get("/wxa/getpaidunionid",
+      query: [
+        openid: openid,
+        transaction_id: transaction_id,
+        access_token: client.get_access_token()
+      ]
+    )
+  end
+
+  @doc """
+  支付后获取用户的`UnionId` - 微信支付商户订单号和微信支付商户号(`out_trade_no`及`mch_id`)
+  - [官方文档](#{@doc_link}/basic-info/getPaidUnionid.html){:target="_blank"}
+
+  用户支付完成后，获取该用户的`UnionId`，无需用户授权.
+
+  本接口支持第三方平台代理查询.
+
+  **注意：调用前需要用户完成支付，且在支付后的五分钟内有效**
+  """
+  @spec get_paid_unionid(
+          WeChat.client(),
+          WeChat.openid(),
+          mch_id :: String.t(),
+          out_trade_no :: String.t()
+        ) :: WeChat.response()
+  def get_paid_unionid(client, openid, mch_id, out_trade_no) do
+    client.get("/wxa/getpaidunionid",
+      query: [
+        openid: openid,
+        mch_id: mch_id,
+        out_trade_no: out_trade_no,
+        access_token: client.get_access_token()
+      ]
+    )
+  end
+
+  @doc """
+  获取用户 EncryptKey
+  - [官方文档](#{@doc_link}/internet/getUserEncryptKey.html){:target="_blank"}
   """
   @spec get_user_encrypt_key(WeChat.client(), WeChat.openid(), session_key :: String.t()) ::
           WeChat.response()
@@ -73,8 +126,8 @@ defmodule WeChat.MiniProgram.UserInfo do
   end
 
   @doc """
-  > 小程序 - 用户信息 - 手机号快速验证
-  - [官方文档](#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html)
+  手机号快速验证
+  - [官方文档](#{@doc_link}/phone-number/getPhoneNumber.html){:target="_blank"}
   """
   @spec get_phone_number(WeChat.client(), WeChat.openid(), code :: String.t()) ::
           WeChat.response()
@@ -84,5 +137,46 @@ defmodule WeChat.MiniProgram.UserInfo do
       json_map(openid: openid, code: code),
       query: [access_token: client.get_access_token()]
     )
+  end
+
+  @doc """
+  服务端获取开放数据
+  - [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
+  - [登录流程](#{@open_ability_doc_link}/login.html)
+  """
+  @spec decode_user_info(
+          session_key :: String.t(),
+          raw_data :: String.t(),
+          signature :: String.t()
+        ) :: {:ok, map()} | {:error, String.t()}
+  def decode_user_info(session_key, raw_data, signature) do
+    case Utils.sha1(raw_data <> session_key) do
+      ^signature ->
+        Jason.decode(raw_data)
+
+      _ ->
+        {:error, "invalid"}
+    end
+  end
+
+  @doc """
+  服务端获取开放数据 - 包含敏感数据
+  - [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
+  - [小程序登录](#{@open_ability_doc_link}/login.html)
+  - [加密数据解密算法](#{@open_ability_doc_link}/signature.html#加密数据解密算法)
+  """
+  @spec decode_get_user_sensitive_info(
+          session_key :: String.t(),
+          encrypted_data :: String.t(),
+          iv :: String.t()
+        ) :: {:ok, map()} | :error | {:error, any()}
+  def decode_get_user_sensitive_info(session_key, encrypted_data, iv) do
+    with {:ok, session_key} <- Base.decode64(session_key),
+         {:ok, iv} <- Base.decode64(iv),
+         {:ok, encrypted_data} <- Base.decode64(encrypted_data) do
+      :crypto.crypto_one_time(:aes_128_cbc, session_key, iv, encrypted_data, false)
+      |> Encryptor.decode_padding_with_pkcs7()
+      |> Jason.decode()
+    end
   end
 end

@@ -30,7 +30,7 @@ You can use `wechat` in your projects by adding it to your `mix.exs` dependencie
 ```elixir
 def deps do
   [
-    {:wechat, "~> 0.14", hex: :wechat_sdk}
+    {:wechat, "~> 0.15", hex: :wechat_sdk}
   ]
 end
 ```
