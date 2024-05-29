@@ -143,13 +143,11 @@ defmodule WeChat.Refresher.DefaultSettings do
   end
 
   @spec work_refresh_options(WeChat.client(), Work.Agent.t()) :: refresh_options
-  def work_refresh_options(client, %Work.Agent{
-        id: agent_id,
-        cache_id: cache_id,
-        secret: secret,
-        refresh_list: refresh_list
-      }) do
-    unless secret do
+  def work_refresh_options(
+        client,
+        %Work.Agent{id: agent_id, cache_id: cache_id, refresh_list: refresh_list} = agent
+      ) do
+    if client.server_role() != :hub_client && is_nil(agent.secret) do
       raise RuntimeError,
             "Please set :secret for agent:#{agent_id} when defining #{inspect(client)}."
     end
