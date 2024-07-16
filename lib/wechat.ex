@@ -229,6 +229,7 @@ defmodule WeChat do
     :ok
   end
 
+  @doc "动态关闭 client"
   @spec shutdown_client(client) :: :ok
   def shutdown_client(client) do
     if client.app_type() != :work do

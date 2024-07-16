@@ -155,6 +155,21 @@ defmodule WeChat.Pay do
     end
   end
 
+  @doc "动态启动 client"
+  @spec start_client(Supervisor.supervisor(), client, start_options) ::
+          Supervisor.on_start_child()
+  def start_client(supervisor, client, options \\ []) do
+    Supervisor.start_child(supervisor, {client, options})
+  end
+
+  @doc "动态关闭 client"
+  @spec shutdown_client(Supervisor.supervisor(), client) :: :ok | {:error, error :: any()}
+  def shutdown_client(supervisor, client) do
+    with :ok <- Supervisor.terminate_child(supervisor, {__MODULE__, client.mch_id()}) do
+      Supervisor.delete_child(supervisor, {__MODULE__, client.mch_id()})
+    end
+  end
+
   @doc false
   # v3
   def finch_name(client), do: :"#{client}.Finch"

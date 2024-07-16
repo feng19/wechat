@@ -138,6 +138,10 @@ defmodule WeChat.Work do
   @spec start_client(client, WeChat.start_options()) :: :ok
   defdelegate start_client(client, options \\ %{}), to: WeChat
 
+  @doc "动态关闭 client"
+  @spec shutdown_client(client) :: :ok
+  defdelegate shutdown_client(client), to: WeChat
+
   @doc "动态启动 agent"
   @spec start_agent(client, Agent.t(), WeChat.Setup.options()) ::
           :ok | :client_not_in | {atom, term()}
