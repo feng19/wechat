@@ -14,7 +14,7 @@ defmodule WeChat.Builder.Pay do
     storage = Map.get(options, :storage, WeChat.Storage.PayFile)
 
     quote do
-      use Supervisor, id: {WeChat.Pay, unquote(options.mch_id)}
+      use Supervisor
 
       @spec start_link(WeChat.Pay.start_options()) :: Supervisor.on_start()
       def start_link(opts) do
@@ -27,7 +27,7 @@ defmodule WeChat.Builder.Pay do
 
         children = [
           {refresher, Map.put(opts, :client, __MODULE__)}
-          | WeChat.Pay.get_requester_specs(__MODULE__)
+          | WeChat.Pay.get_requester_specs(__MODULE__, opts)
         ]
 
         Supervisor.init(children, strategy: :one_for_one)

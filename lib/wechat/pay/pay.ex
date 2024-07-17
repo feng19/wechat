@@ -100,18 +100,13 @@ defmodule WeChat.Pay do
 
   ## 参数说明
 
-  - `mch_id`: 商户ID `t:mch_id/0` - 必填
-  - `api_secret_v2_key`: API v2密钥 `t:api_secret_key/0` - 必填
-  - `api_secret_key`: API v3密钥 `t:api_secret_key/0` - 必填
-  - `client_serial_no`: 客户端证书序列哈 `t:client_serial_no/0` - 必填
-  - `client_key`: 客户端私钥 `t:client_key/0` - 必填
-  - `storage`: 存储器 `t:WeChat.Storage.Adapter.t/0`
-  - `requester`: 请求客户端 - `t:module/0`
-
-  ## 默认参数:
-
-  - `storage`: `WeChat.Storage.PayFile`
-  - `requester`: `WeChat.Requester.Pay`
+  - `mch_id`: 商户ID, 必填
+  - `api_secret_v2_key`: API v2密钥, 必填
+  - `api_secret_key`: API v3密钥, 必填
+  - `client_serial_no`: 客户端证书序列号, 必填
+  - `client_key`: 客户端私钥, 必填
+  - `storage`: 存储器，默认值: `WeChat.Storage.PayFile`
+  - `requester`: 请求客户端, 默认值: `WeChat.Requester.Pay`
   """
   @type options :: [
           mch_id: mch_id,
@@ -126,9 +121,15 @@ defmodule WeChat.Pay do
   @typedoc """
   启动参数
 
-  - `refresher`: 刷新器 - `t:module/0`, 可选, 默认值: `WeChat.Refresher.Pay`
+  - `refresher`: 刷新器, 可选, 默认值: `WeChat.Refresher.Pay`
+  - `finch_pool`: Finch Pool 配置, 可选, 默认值: `[size: 32, count: 8]`
+  - `v2_ssl`: V2 SSL 配置, 可选
   """
-  @type start_options :: [refresher: module]
+  @type start_options :: [
+          refresher: module,
+          finch_pool: Keyword.t(),
+          v2_ssl: Keyword.t()
+        ]
   @type requester_id :: :A | :B
   @type requester_opts :: %{id: requester_id, name: atom}
 
@@ -165,8 +166,8 @@ defmodule WeChat.Pay do
   @doc "动态关闭 client"
   @spec shutdown_client(Supervisor.supervisor(), client) :: :ok | {:error, error :: any()}
   def shutdown_client(supervisor, client) do
-    with :ok <- Supervisor.terminate_child(supervisor, {__MODULE__, client.mch_id()}) do
-      Supervisor.delete_child(supervisor, {__MODULE__, client.mch_id()})
+    with :ok <- Supervisor.terminate_child(supervisor, client) do
+      Supervisor.delete_child(supervisor, client)
     end
   end
 
@@ -176,8 +177,8 @@ defmodule WeChat.Pay do
   @doc false
   def v2_ssl_finch_name(client), do: :"#{client}.v2ssl.Finch"
 
-  @spec get_requester_specs(client) :: [map]
-  def get_requester_specs(client) do
+  @spec get_requester_specs(client, opts :: map) :: [map]
+  def get_requester_specs(client, opts) do
     client_config =
       case Application.fetch_env(:wechat, client) do
         {:ok, config} -> config
@@ -185,7 +186,7 @@ defmodule WeChat.Pay do
       end
 
     finch_pool =
-      case client_config[:finch_pool] do
+      case Map.get(opts, :finch_pool, client_config[:finch_pool]) do
         finch_pool when is_list(finch_pool) or is_map(finch_pool) -> finch_pool
         _ -> Application.get_env(:wechat, :finch_pool, size: 32, count: 8)
       end
@@ -196,7 +197,7 @@ defmodule WeChat.Pay do
       |> Map.put(:id, Finch)
 
     v2_spec =
-      case client_config[:v2_ssl] do
+      case Map.get(opts, :v2_ssl, client_config[:v2_ssl]) do
         ssl when is_list(ssl) ->
           certfile =
             Keyword.get_lazy(ssl, :certfile, fn ->
