@@ -5,11 +5,10 @@ defmodule WeChat.CardDistributing do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Card, User}
   @typep body :: map
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Distributing_Coupons_Vouchers_and_Cards.html"
 
   @doc """
   创建二维码接口 -
@@ -19,7 +18,7 @@ defmodule WeChat.CardDistributing do
 
   自定义Code码的卡券调用接口时，POST数据中需指定code，非自定义code不需指定，指定openid同理。指定后的二维码只能被用户扫描领取一次。
 
-  获取二维码ticket后，开发者可用[换取二维码图片详情](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)。
+  获取二维码ticket后，开发者可用[换取二维码图片详情](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html)。
   """
   @spec create_qrcode(WeChat.client(), body) :: WeChat.response()
   def create_qrcode(client, body) do
@@ -80,7 +79,7 @@ defmodule WeChat.CardDistributing do
   图文消息群发卡券 -
   [官方文档](#{@doc_link}#6){:target="_blank"}
 
-  支持开发者调用该接口获取卡券嵌入图文消息的标准格式代码，将返回代码填入 [新增临时素材](#{doc_link_prefix()}/doc/offiaccount/Asset_Management/New_temporary_materials) 中content字段，即可获取嵌入卡券的图文消息素材。
+  支持开发者调用该接口获取卡券嵌入图文消息的标准格式代码，将返回代码填入 [新增临时素材](https://developers.weixin.qq.com/doc/offiaccount/Asset_Management/New_temporary_materials) 中content字段，即可获取嵌入卡券的图文消息素材。
 
   特别注意：目前该接口仅支持填入非自定义code的卡券,自定义code的卡券需先进行code导入后调用。
   """

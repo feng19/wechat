@@ -6,7 +6,6 @@ defmodule WeChat.Work.WeDrive.FileACL do
   alias Work.Contacts.User
   alias Work.WeDrive.FileManagement
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
   @type auth_info :: [map]
   @typedoc """
   权限范围
@@ -31,7 +30,7 @@ defmodule WeChat.Work.WeDrive.FileACL do
 
   @doc """
   新增成员
-  - [官方文档](#{@doc_link}/93658){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/93658){:target="_blank"}
   """
   @spec add(Work.client(), Work.agent(), User.userid(), FileManagement.file_id(), auth_info) ::
           WeChat.response()
@@ -45,7 +44,7 @@ defmodule WeChat.Work.WeDrive.FileACL do
 
   @doc """
   删除成员
-  - [官方文档](#{@doc_link}/97888){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97888){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), User.userid(), FileManagement.file_id(), auth_info) ::
           WeChat.response()
@@ -59,7 +58,7 @@ defmodule WeChat.Work.WeDrive.FileACL do
 
   @doc """
   分享设置
-  - [官方文档](#{@doc_link}/97889){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97889){:target="_blank"}
   """
   @spec setting(
           Work.client(),
@@ -79,7 +78,7 @@ defmodule WeChat.Work.WeDrive.FileACL do
 
   @doc """
   获取分享链接
-  - [官方文档](#{@doc_link}/97890){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97890){:target="_blank"}
   """
   @spec share(Work.client(), Work.agent(), User.userid(), FileManagement.file_id()) ::
           WeChat.response()
@@ -93,7 +92,7 @@ defmodule WeChat.Work.WeDrive.FileACL do
 
   @doc """
   获取文件权限信息
-  - [官方文档](#{@doc_link}/97891){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97891){:target="_blank"}
   """
   @spec get_file_permission(Work.client(), Work.agent(), FileManagement.file_id()) ::
           WeChat.response()
@@ -107,7 +106,7 @@ defmodule WeChat.Work.WeDrive.FileACL do
 
   @doc """
   修改文件安全设置
-  - [官方文档](#{@doc_link}/97892){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97892){:target="_blank"}
   """
   @spec file_secure_setting(
           Work.client(),

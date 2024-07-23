@@ -4,8 +4,6 @@ defmodule WeChat.Work.Customer.Strategy do
   import Jason.Helpers
   alias WeChat.Work
 
-  @doc_link "#{WeChat.Utils.work_doc_link_prefix()}/94883"
-
   @typedoc "客户联系规则组ID"
   @type strategy_id :: integer
   @typep cursor :: String.t()
@@ -13,7 +11,7 @@ defmodule WeChat.Work.Customer.Strategy do
 
   @doc """
   获取规则组列表 -
-  [官方文档](#{@doc_link}#获取规则组列表){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94883#获取规则组列表){:target="_blank"}
 
   企业可通过此接口获取企业配置的所有客户规则组id列表。
   """
@@ -33,7 +31,7 @@ defmodule WeChat.Work.Customer.Strategy do
 
   @doc """
   获取规则组详情 -
-  [官方文档](#{@doc_link}#获取规则组详情){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94883#获取规则组详情){:target="_blank"}
 
   企业可以通过此接口获取某个客户规则组的详细信息。
   """
@@ -48,7 +46,7 @@ defmodule WeChat.Work.Customer.Strategy do
 
   @doc """
   获取规则组管理范围 -
-  [官方文档](#{@doc_link}#获取规则组管理范围){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94883#获取规则组管理范围){:target="_blank"}
 
   企业可通过此接口获取某个客户规则组管理的成员和部门列表。
   """
@@ -68,7 +66,7 @@ defmodule WeChat.Work.Customer.Strategy do
 
   @doc """
   创建新的规则组 -
-  [官方文档](#{@doc_link}#创建新的规则组){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94883#创建新的规则组){:target="_blank"}
 
   企业可通过此接口创建一个新的客户规则组。该接口仅支持串行调用，请勿并发创建规则组。
   """
@@ -81,7 +79,7 @@ defmodule WeChat.Work.Customer.Strategy do
 
   @doc """
   编辑规则组及其管理范围 -
-  [官方文档](#{@doc_link}#编辑规则组及其管理范围){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94883#编辑规则组及其管理范围){:target="_blank"}
 
   企业可通过此接口编辑规则组的基本信息和修改客户规则组管理范围。该接口仅支持串行调用，请勿并发修改规则组。
   """
@@ -94,7 +92,7 @@ defmodule WeChat.Work.Customer.Strategy do
 
   @doc """
   删除规则组 -
-  [官方文档](#{@doc_link}#删除规则组){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94883#删除规则组){:target="_blank"}
 
   企业可通过此接口删除某个规则组。
   """

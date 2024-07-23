@@ -4,8 +4,6 @@ defmodule WeChat.Work.OA.MeetingRoom do
   import Jason.Helpers
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "会议室的ID"
   @type meeting_room_id :: integer
   @typedoc "会议的ID"
@@ -14,8 +12,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   # management
 
   @doc """
-  会议室管理-添加会议室
-  - [官方文档](#{@doc_link}/93619#添加会议室){:target="_blank"}
+  会议室管理-添加会议室 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93619#添加会议室){:target="_blank"}
   """
   @spec add(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def add(client, agent, body) do
@@ -25,8 +23,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   end
 
   @doc """
-  会议室管理-查询会议室
-  - [官方文档](#{@doc_link}/93619#查询会议室){:target="_blank"}
+  会议室管理-查询会议室 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93619#查询会议室){:target="_blank"}
   """
   @spec list(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def list(client, agent, body) do
@@ -36,8 +34,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   end
 
   @doc """
-  会议室管理-编辑会议室
-  - [官方文档](#{@doc_link}/93619#编辑会议室){:target="_blank"}
+  会议室管理-编辑会议室 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93619#编辑会议室){:target="_blank"}
   """
   @spec edit(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def edit(client, agent, body) do
@@ -47,8 +45,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   end
 
   @doc """
-  会议室管理-删除会议室
-  - [官方文档](#{@doc_link}/93619#删除会议室){:target="_blank"}
+  会议室管理-删除会议室 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93619#删除会议室){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), meeting_room_id) :: WeChat.response()
   def delete(client, agent, meeting_room_id) do
@@ -60,8 +58,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   # booking
 
   @doc """
-  会议室预定管理-查询会议室的预定信息
-  - [官方文档](#{@doc_link}/93620#查询会议室的预定信息){:target="_blank"}
+  会议室预定管理-查询会议室的预定信息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93620#查询会议室的预定信息){:target="_blank"}
   """
   @spec list_booking(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def list_booking(client, agent, body) do
@@ -71,8 +69,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   end
 
   @doc """
-  会议室预定管理-预定会议室
-  - [官方文档](#{@doc_link}/93620#预定会议室){:target="_blank"}
+  会议室预定管理-预定会议室 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93620#预定会议室){:target="_blank"}
   """
   @spec book(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def book(client, agent, body) do
@@ -82,8 +80,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   end
 
   @doc """
-  会议室预定管理-取消预定会议室
-  - [官方文档](#{@doc_link}/93620#取消预定会议室){:target="_blank"}
+  会议室预定管理-取消预定会议室 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93620#取消预定会议室){:target="_blank"}
   """
   @spec cancel_book(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def cancel_book(client, agent, body) do
@@ -93,8 +91,8 @@ defmodule WeChat.Work.OA.MeetingRoom do
   end
 
   @doc """
-  会议室预定管理-根据会议ID查询会议室的预定信息
-  - [官方文档](#{@doc_link}/93620#根据会议id查询会议室的预定信息){:target="_blank"}
+  会议室预定管理-根据会议ID查询会议室的预定信息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93620#根据会议id查询会议室的预定信息){:target="_blank"}
   """
   @spec get_booking_info_by_meeting_id(Work.client(), Work.agent(), meeting_room_id, meeting_id) ::
           WeChat.response()

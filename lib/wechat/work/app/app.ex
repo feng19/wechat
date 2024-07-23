@@ -4,17 +4,12 @@ defmodule WeChat.Work.App do
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typep opts :: Enumerable.t()
   @typep redirect_uri :: String.t()
 
   @doc """
   获取指定的应用详情 -
-  [官方文档](#{@doc_link}/90227#获取指定的应用详情){:target="_blank"}
-
-  对于互联企业的应用，如果需要获取应用可见范围内其他互联企业的部门与成员，请调用
-  [互联企业-获取应用可见范围接口](#{@doc_link}/90227#24275)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90227#获取指定的应用详情){:target="_blank"}
   """
   @spec get(Work.client(), Work.agent()) :: WeChat.response()
   def get(client, agent) do
@@ -28,7 +23,7 @@ defmodule WeChat.Work.App do
 
   @doc """
   获取access_token对应的应用列表 -
-  [官方文档](#{@doc_link}/90227#获取access-token对应的应用列表){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90227#获取access-token对应的应用列表){:target="_blank"}
   """
   @spec list(Work.client(), Work.agent()) :: WeChat.response()
   def list(client, agent) do
@@ -38,7 +33,7 @@ defmodule WeChat.Work.App do
   end
 
   @doc """
-  设置应用 - [官方文档](#{@doc_link}/90228){:target="_blank"}
+  设置应用 - [官方文档](https://developer.work.weixin.qq.com/document/path/90228){:target="_blank"}
   """
   @spec set(Work.client(), Work.agent(), opts) :: WeChat.response()
   def set(client, agent, opts \\ []) do
@@ -50,7 +45,7 @@ defmodule WeChat.Work.App do
   end
 
   @doc """
-  构造独立窗口登录二维码 - [官方文档](#{@doc_link}/91019#构造独立窗口登录二维码){:target="_blank"}
+  构造独立窗口登录二维码 - [官方文档](https://developer.work.weixin.qq.com/document/path/91019#构造独立窗口登录二维码){:target="_blank"}
   """
   @spec qr_connect_url(
           WeChat.client(),
@@ -80,7 +75,7 @@ defmodule WeChat.Work.App do
   end
 
   @doc """
-  构造内嵌登录二维码 - [官方文档](#{@doc_link}/91019#构造内嵌登录二维码){:target="_blank"}
+  构造内嵌登录二维码 - [官方文档](https://developer.work.weixin.qq.com/document/path/91019#构造内嵌登录二维码){:target="_blank"}
   """
   @spec qr_connect_opts(WeChat.client(), Work.agent(), redirect_uri, opts) :: opts :: map
   def qr_connect_opts(client, agent, redirect_uri, opts \\ []) do
@@ -93,7 +88,7 @@ defmodule WeChat.Work.App do
   end
 
   @doc """
-  获取访问用户身份 - [官方文档](#{@doc_link}/91437){:target="_blank"}
+  获取访问用户身份 - [官方文档](https://developer.work.weixin.qq.com/document/path/91437){:target="_blank"}
 
   该接口用于根据code获取成员信息
 

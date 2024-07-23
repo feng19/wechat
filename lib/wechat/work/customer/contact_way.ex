@@ -4,13 +4,11 @@ defmodule WeChat.Work.Customer.ContactWay do
   import Jason.Helpers
   alias WeChat.{Work, Work.Customer, Work.Contacts.User}
 
-  @doc_link "#{WeChat.Utils.work_doc_link_prefix()}/92228"
-
   @type config_id :: String.t()
 
   @doc """
   配置客户联系「联系我」方式 -
-  [官方文档](#{@doc_link}#配置客户联系「联系我」方式){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92228#配置客户联系「联系我」方式){:target="_blank"}
 
   企业可以在管理后台-客户联系-加客户中配置成员的「联系我」的二维码或者小程序按钮，客户通过扫描二维码或点击小程序上的按钮，即可获取成员联系方式，主动联系到成员。
   企业可通过此接口为具有客户联系功能的成员生成专属的「联系我」二维码或者「联系我」按钮。
@@ -31,7 +29,7 @@ defmodule WeChat.Work.Customer.ContactWay do
 
   @doc """
   获取企业已配置的「联系我」方式 -
-  [官方文档](#{@doc_link}#获取企业已配置的「联系我」方式){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92228#获取企业已配置的「联系我」方式){:target="_blank"}
 
   获取企业配置的「联系我」二维码和「联系我」小程序按钮。
   """
@@ -44,7 +42,7 @@ defmodule WeChat.Work.Customer.ContactWay do
 
   @doc """
   更新企业已配置的「联系我」方式 -
-  [官方文档](#{@doc_link}#更新企业已配置的「联系我」方式){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92228#更新企业已配置的「联系我」方式){:target="_blank"}
 
   更新企业配置的「联系我」二维码和「联系我」小程序按钮中的信息，如使用人员和备注等。
   """
@@ -57,7 +55,7 @@ defmodule WeChat.Work.Customer.ContactWay do
 
   @doc """
   删除企业已配置的「联系我」方式 -
-  [官方文档](#{@doc_link}#删除企业已配置的「联系我」方式){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92228#删除企业已配置的「联系我」方式){:target="_blank"}
 
   删除一个已配置的「联系我」二维码或者「联系我」小程序按钮。
   """
@@ -70,7 +68,7 @@ defmodule WeChat.Work.Customer.ContactWay do
 
   @doc """
   结束临时会话 -
-  [官方文档](#{@doc_link}#结束临时会话){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92228#结束临时会话){:target="_blank"}
 
   删除一个已配置的「联系我」二维码或者「联系我」小程序按钮。
   """

@@ -7,8 +7,6 @@ defmodule WeChat.Work.Customer.Tag do
 
   alias WeChat.{Work, Work.Customer, Work.Customer.Strategy}
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "标签的id 或 标签组的id"
   @type id :: tag_id | group_id
   @typedoc "标签的id"
@@ -27,7 +25,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   获取企业标签库 -
-  [官方文档](#{@doc_link}/92117#获取企业标签库){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92117#获取企业标签库){:target="_blank"}
 
   企业可通过此接口获取企业客户标签详情。
   """
@@ -40,7 +38,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   添加企业客户标签 -
-  [官方文档](#{@doc_link}/92117#添加企业客户标签){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92117#添加企业客户标签){:target="_blank"}
 
   企业可通过此接口向客户标签库中添加新的标签组和标签，每个企业最多可配置3000个企业标签。
   """
@@ -53,7 +51,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   编辑企业客户标签 -
-  [官方文档](#{@doc_link}/92117#编辑企业客户标签){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92117#编辑企业客户标签){:target="_blank"}
 
   企业可通过此接口获取企业客户标签详情。
   """
@@ -68,7 +66,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   删除企业客户标签 -
-  [官方文档](#{@doc_link}/92117#删除企业客户标签){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92117#删除企业客户标签){:target="_blank"}
 
   企业可通过此接口获取企业客户标签详情。
   """
@@ -92,7 +90,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   获取指定规则组下的企业客户标签 -
-  [官方文档](#{@doc_link}/94882#获取指定规则组下的企业客户标签){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94882#获取指定规则组下的企业客户标签){:target="_blank"}
 
   企业可通过此接口获取某个规则组内的企业客户标签详情。
   """
@@ -105,7 +103,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   为指定规则组创建企业客户标签 -
-  [官方文档](#{@doc_link}/94882#为指定规则组创建企业客户标签){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94882#为指定规则组创建企业客户标签){:target="_blank"}
 
   企业可通过此接口向规则组中添加新的标签组和标签，每个企业的企业标签和规则组标签合计最多可配置3000个。
   """
@@ -121,7 +119,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   编辑指定规则组下的企业客户标签 -
-  [官方文档](#{@doc_link}/94882#编辑指定规则组下的企业客户标签){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94882#编辑指定规则组下的企业客户标签){:target="_blank"}
 
   企业可通过此接口编辑指定规则组下的客户标签/标签组的名称或次序值，但不可重新指定标签/标签组所属规则组。
   """
@@ -136,7 +134,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   删除指定规则组下的企业客户标签 -
-  [官方文档](#{@doc_link}/94882#删除指定规则组下的企业客户标签){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94882#删除指定规则组下的企业客户标签){:target="_blank"}
 
   企业可通过此接口删除某个规则组下的标签，或删除整个标签组。
   """
@@ -155,7 +153,7 @@ defmodule WeChat.Work.Customer.Tag do
 
   @doc """
   编辑客户企业标签 -
-  [官方文档](#{@doc_link}/92118){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92118){:target="_blank"}
 
   企业可通过此接口为指定成员的客户添加上由企业统一配置的标签。
   """

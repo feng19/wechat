@@ -3,7 +3,6 @@ defmodule WeChat.Pay.Transactions do
   微信支付 - 交易
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [pay_doc_link_prefix: 0, pay_v2_doc_link_prefix: 0]
   alias WeChat.Pay
   @currency "CNY"
 
@@ -61,7 +60,7 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   JSAPI下单 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/jsapi-payment/direct-jsons/jsapi-prepay.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/jsapi-payment/direct-jsons/jsapi-prepay.html){:target="_blank"}
 
   商户系统先调用该接口在微信支付服务后台生成预支付交易单，返回正确的预支付交易会话标识后再按Native、JSAPI、APP等不同场景生成交易串调起支付
   """
@@ -72,7 +71,7 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   JSAPI调起支付 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/jsapi-payment/jsapi-transfer-payment.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/jsapi-payment/jsapi-transfer-payment.html){:target="_blank"}
 
   通过 JSAPI下单 接口获取到发起支付的必要参数 `t:prepay_id/0`，然后使用微信支付提供的 前端JS方法 调起支付窗口
   """
@@ -101,7 +100,7 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   APP 下单 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/in-app-payment/direct-jsons/app-prepay.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/in-app-payment/direct-jsons/app-prepay.html){:target="_blank"}
 
   商户系统先调用该接口在微信支付服务后台生成预支付交易单，返回正确的预支付交易会话标识后再按Native、JSAPI、APP等不同场景生成交易串调起支付
   """
@@ -112,7 +111,7 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   APP 调起支付 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/in-app-payment/app-transfer-payment.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/in-app-payment/app-transfer-payment.html){:target="_blank"}
 
   通过App下单接口获取到发起支付的必要参数prepay_id，可以按照接口定义中的规则，使用微信支付提供的SDK调起App支付
   """
@@ -135,7 +134,7 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   H5 下单 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/h5-payment/direct-jsons/h5-prepay.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/h5-payment/direct-jsons/h5-prepay.html){:target="_blank"}
 
   商户系统先调用该接口在微信支付服务后台生成预支付交易单，返回正确的预支付交易会话标识后再按Native、JSAPI、APP等不同场景生成交易串调起支付
   """
@@ -146,7 +145,7 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   Native 下单 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/h5-payment/direct-jsons/h5-prepay.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/h5-payment/direct-jsons/h5-prepay.html){:target="_blank"}
 
   通过本接口来生成支付链接参数code_url，然后将该参数值生成二维码图片展示给用户。
   用户在使用微信客户端扫描二维码后，可以直接跳转到微信支付页面完成支付操作
@@ -187,11 +186,11 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   付款码支付(v2) -
-  [官方文档](#{pay_v2_doc_link_prefix()}/api/micropay.php?chapter=9_10){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10){:target="_blank"}
 
   收银员使用扫码设备读取微信用户付款码以后，二维码或条码信息会传送至商户收银台，由商户收银台或者商户后台调用该接口发起支付
 
-  [支付流程](#{pay_v2_doc_link_prefix()}/api/micropay.php?chapter=5_4){:target="_blank"}
+  [支付流程](https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=5_4){:target="_blank"}
   """
   @spec pay_by_scan(Pay.client(), body) :: WeChat.response()
   def pay_by_scan(client, body) do
@@ -200,7 +199,7 @@ defmodule WeChat.Pay.Transactions do
 
   @doc """
   撤销订单(v2) -
-  [官方文档](#{pay_v2_doc_link_prefix()}/api/micropay.php?chapter=9_11){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_11){:target="_blank"}
 
   **需要配置证书**
 

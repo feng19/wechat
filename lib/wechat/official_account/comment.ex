@@ -5,9 +5,8 @@ defmodule WeChat.Comment do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Comments_management/Image_Comments_Management_Interface.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Comments_management/Image_Comments_Management_Interface.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Comments_management/Image_Comments_Management_Interface.html"
 
   @type msg_data_id :: integer
   @type user_comment_id :: integer

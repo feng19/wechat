@@ -14,8 +14,6 @@ defmodule WeChat.Work.OA.Journal do
   import Jason.Helpers
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @type timestamp :: integer
   @typedoc "游标首次请求传0，非首次请求携带上一次请求返回的next_cursor"
   @type cursor :: integer
@@ -41,8 +39,8 @@ defmodule WeChat.Work.OA.Journal do
   @type template_id :: String.t()
 
   @doc """
-  批量获取汇报记录单号
-  - [官方文档](#{@doc_link}/93393){:target="_blank"}
+  批量获取汇报记录单号 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93393){:target="_blank"}
   """
   @spec list_records(
           Work.client(),
@@ -83,8 +81,8 @@ defmodule WeChat.Work.OA.Journal do
   end
 
   @doc """
-  获取汇报记录详情
-  - [官方文档](#{@doc_link}/93394){:target="_blank"}
+  获取汇报记录详情 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93394){:target="_blank"}
   """
   @spec get_record_detail(Work.client(), Work.agent(), journal_uuid) :: WeChat.response()
   def get_record_detail(client, agent, journal_uuid) do
@@ -94,8 +92,8 @@ defmodule WeChat.Work.OA.Journal do
   end
 
   @doc """
-  获取汇报统计数据
-  - [官方文档](#{@doc_link}/93395){:target="_blank"}
+  获取汇报统计数据 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93395){:target="_blank"}
   """
   @spec list_stats(
           Work.client(),
@@ -117,8 +115,8 @@ defmodule WeChat.Work.OA.Journal do
   end
 
   @doc """
-  导出汇报文档
-  - [官方文档](#{@doc_link}/96108){:target="_blank"}
+  导出汇报文档 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/96108){:target="_blank"}
   """
   @spec export_doc(Work.client(), Work.agent(), journal_uuid, doc_id :: String.t()) ::
           WeChat.response()
@@ -131,8 +129,8 @@ defmodule WeChat.Work.OA.Journal do
   end
 
   @doc """
-  下载微盘文件
-  - [官方文档](#{@doc_link}/98021){:target="_blank"}
+  下载微盘文件 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/98021){:target="_blank"}
   """
   @spec download_we_drive_file(
           Work.client(),

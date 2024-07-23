@@ -4,11 +4,10 @@ defmodule WeChat.SubscribeMessage do
 
   同时支持
 
-  - [公众号](#{WeChat.Utils.doc_link_prefix()}/doc/offiaccount/Subscription_Messages/intro.html)
-  - [小程序](#{WeChat.Utils.doc_link_prefix()}/miniprogram/dev/framework/open-ability/subscribe-message.html)
+  - [公众号](https://developers.weixin.qq.com/doc/offiaccount/Subscription_Messages/intro.html)
+  - [小程序](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/subscribe-message.html)
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.MiniProgram.Code
 
   @typedoc "模板id"
@@ -85,11 +84,9 @@ defmodule WeChat.SubscribeMessage do
           optional(:lang) => lang
         }
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/subscribe-message"
-
   @doc """
   组合模板并添加至帐号下的个人模板库 -
-  [官方文档](#{@doc_link}/subscribeMessage.addTemplate.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/addMessageTemplate.html){:target="_blank"}
   """
   @spec add_template(WeChat.client(), tid, kid_list, scene_desc) :: WeChat.response()
   def add_template(client, tid, kid_list, scene_desc \\ "") do
@@ -102,7 +99,7 @@ defmodule WeChat.SubscribeMessage do
 
   @doc """
   删除帐号下的个人模板 -
-  [官方文档](#{@doc_link}/subscribeMessage.deleteTemplate.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/deleteMessageTemplate.html){:target="_blank"}
   """
   @spec delete_template(WeChat.client(), pri_tmpl_id) :: WeChat.response()
   def delete_template(client, pri_tmpl_id) do
@@ -115,7 +112,7 @@ defmodule WeChat.SubscribeMessage do
 
   @doc """
   获取小程序账号的类目 -
-  [官方文档](#{@doc_link}/subscribeMessage.getCategory.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getCategory.html){:target="_blank"}
   """
   @spec get_category(WeChat.client()) :: WeChat.response()
   def get_category(client) do
@@ -124,7 +121,7 @@ defmodule WeChat.SubscribeMessage do
 
   @doc """
   获取模板标题下的关键词列表 -
-  [官方文档](#{@doc_link}/subscribeMessage.getPubTemplateKeyWordsById.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getPubTemplateKeyWordsById.html){:target="_blank"}
   """
   @spec get_pub_template_key_words_by_id(WeChat.client(), tid) :: WeChat.response()
   def get_pub_template_key_words_by_id(client, tid) do
@@ -135,7 +132,7 @@ defmodule WeChat.SubscribeMessage do
 
   @doc """
   获取帐号所属类目下的公共模板标题 -
-  [官方文档](#{@doc_link}/subscribeMessage.getPubTemplateTitleList.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getPubTemplateTitleList.html){:target="_blank"}
   """
   @spec get_pub_template_titles(
           WeChat.client(),
@@ -156,7 +153,7 @@ defmodule WeChat.SubscribeMessage do
 
   @doc """
   获取当前帐号下的个人模板列表 -
-  [官方文档](#{@doc_link}/subscribeMessage.getTemplateList.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/getMessageTemplateList.html){:target="_blank"}
   """
   @spec get_templates(WeChat.client()) :: WeChat.response()
   def get_templates(client) do
@@ -166,8 +163,8 @@ defmodule WeChat.SubscribeMessage do
   @doc """
   发送订阅消息
 
-  - [公众号](#{doc_link_prefix()}/doc/offiaccount/Subscription_Messages/api.html#send发送订阅通知){:target="_blank"}
-  - [小程序](#{@doc_link}/subscribeMessage.send.html){:target="_blank"}
+  - [公众号](https://developers.weixin.qq.com/doc/offiaccount/Subscription_Messages/api.html#send发送订阅通知){:target="_blank"}
+  - [小程序](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/sendMessage.html){:target="_blank"}
   """
   @spec send(WeChat.client(), WeChat.openid(), template_id, send_data, send_options) ::
           WeChat.response()

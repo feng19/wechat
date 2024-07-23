@@ -2,17 +2,14 @@ defmodule WeChat.MiniProgram.OCR do
   @moduledoc """
   小程序 - OCR接口
   """
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
   @typep url :: String.t()
   # 图片识别模式，photo（拍照模式）或 scan（扫描模式）
   @typep type :: String.t()
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/ocr/ocr"
-
   @doc """
   识别银行卡
-  - [官方文档](#{@doc_link}.bankcard.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/img-ocr/ocr/bankCardOCR.html){:target="_blank"}
 
   本接口提供基于小程序的银行卡 OCR 识别
   """
@@ -25,7 +22,7 @@ defmodule WeChat.MiniProgram.OCR do
 
   @doc """
   营业执照
-  - [官方文档](#{@doc_link}.businessLicense.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/img-ocr/ocr/businessLicenseOCR.html){:target="_blank"}
 
   本接口提供基于小程序的营业执照 OCR 识别
   """
@@ -38,7 +35,7 @@ defmodule WeChat.MiniProgram.OCR do
 
   @doc """
   驾驶证
-  - [官方文档](#{@doc_link}.driverLicense.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/img-ocr/ocr/driverLicenseOCR.html){:target="_blank"}
 
   本接口提供基于小程序的驾驶证 OCR 识别
   """
@@ -51,7 +48,7 @@ defmodule WeChat.MiniProgram.OCR do
 
   @doc """
   身份证
-  - [官方文档](#{@doc_link}.idcard.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/img-ocr/ocr/idCardOCR.html){:target="_blank"}
 
   本接口提供基于小程序的身份证 OCR 识别
   """
@@ -64,7 +61,7 @@ defmodule WeChat.MiniProgram.OCR do
 
   @doc """
   通用印刷体
-  - [官方文档](#{@doc_link}.printedText.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/img-ocr/ocr/printedTextOCR.html){:target="_blank"}
 
   本接口提供基于小程序的通用印刷体 OCR 识别
   """
@@ -77,7 +74,7 @@ defmodule WeChat.MiniProgram.OCR do
 
   @doc """
   行驶证
-  - [官方文档](#{@doc_link}.vehicleLicense.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/img-ocr/ocr/vehicleLicenseOCR.html){:target="_blank"}
 
   本接口提供基于小程序的行驶证 OCR 识别
   """

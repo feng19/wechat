@@ -1,10 +1,9 @@
 defmodule WeChat.DraftBox do
   @moduledoc "草稿箱"
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.Material.Article
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Draft_Box"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Draft_Box"
 
   @typedoc "草稿箱的media_id"
   @type media_id :: String.t()

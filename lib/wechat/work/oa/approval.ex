@@ -8,8 +8,6 @@ defmodule WeChat.Work.OA.Approval do
   import Jason.Helpers
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "模板的唯一标识id"
   @type template_id :: String.t()
   @type timestamp :: integer
@@ -58,7 +56,7 @@ defmodule WeChat.Work.OA.Approval do
 
   @doc """
   获取审批模板详情
-  - [官方文档](#{@doc_link}/92631){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/92631){:target="_blank"}
   """
   @spec get_template_detail(Work.client(), Work.agent(), template_id) :: WeChat.response()
   def get_template_detail(client, agent, template_id) do
@@ -69,7 +67,7 @@ defmodule WeChat.Work.OA.Approval do
 
   @doc """
   提交审批申请
-  - [官方文档](#{@doc_link}/92632){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/92632){:target="_blank"}
   """
   @spec apply_event(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def apply_event(client, agent, body) do
@@ -80,7 +78,7 @@ defmodule WeChat.Work.OA.Approval do
 
   @doc """
   批量获取审批单号
-  - [官方文档](#{@doc_link}/94603){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/94603){:target="_blank"}
   """
   @spec list_approvals(
           Work.client(),
@@ -122,7 +120,7 @@ defmodule WeChat.Work.OA.Approval do
 
   @doc """
   获取审批申请详情
-  - [官方文档](#{@doc_link}/92634){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/92634){:target="_blank"}
   """
   @spec get_approval_detail(Work.client(), Work.agent(), sp_no) :: WeChat.response()
   def get_approval_detail(client, agent, sp_no) do

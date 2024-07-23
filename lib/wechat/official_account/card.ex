@@ -5,9 +5,8 @@ defmodule WeChat.Card do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/WeChat_Coupon_Interface.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer"
 
   @type card_id :: String.t()
   @typedoc """

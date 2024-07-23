@@ -4,8 +4,6 @@ defmodule WeChat.Work.Message do
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.{Work, Work.Material}
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc """
   消息类型
 
@@ -32,7 +30,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送应用消息 -
-  [官方文档](#{@doc_link}/90236){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236){:target="_blank"}
 
   应用支持推送文本、图片、视频、文件、图文等类型。
 
@@ -80,7 +78,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送文本消息 -
-  [官方文档](#{@doc_link}/90236#文本消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#文本消息){:target="_blank"}
   """
   @spec send_text(Work.client(), Work.agent(), to, content, opts) :: WeChat.response()
   def send_text(client, agent, to, content, opts \\ []) do
@@ -89,7 +87,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送图片消息 -
-  [官方文档](#{@doc_link}/90236#图片消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#图片消息){:target="_blank"}
   """
   @spec send_image(Work.client(), Work.agent(), to, Material.media_id(), opts) ::
           WeChat.response()
@@ -99,7 +97,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送语音消息 -
-  [官方文档](#{@doc_link}/90236#语音消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#语音消息){:target="_blank"}
   """
   @spec send_voice(Work.client(), Work.agent(), to, Material.media_id(), opts) ::
           WeChat.response()
@@ -109,7 +107,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送视频消息 -
-  [官方文档](#{@doc_link}/90236#视频消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#视频消息){:target="_blank"}
   """
   @spec send_video(
           Work.client(),
@@ -132,7 +130,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送文件消息 -
-  [官方文档](#{@doc_link}/90236#文件消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#文件消息){:target="_blank"}
   """
   @spec send_file(Work.client(), Work.agent(), to, Material.media_id(), opts) :: WeChat.response()
   def send_file(client, agent, to, media_id, opts \\ []) do
@@ -141,7 +139,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送文本卡片消息 -
-  [官方文档](#{@doc_link}/90236#文本卡片消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#文本卡片消息){:target="_blank"}
   """
   @spec send_text_card(
           Work.client(),
@@ -166,7 +164,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送图文消息 -
-  [官方文档](#{@doc_link}/90236#图文消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#图文消息){:target="_blank"}
   """
   @spec send_news(Work.client(), Work.agent(), to, msg, opts) :: WeChat.response()
   def send_news(client, agent, to, msg, opts \\ []) do
@@ -175,7 +173,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送图文消息（mpnews） -
-  [官方文档](#{@doc_link}/90236#图文消息（mpnews）){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#图文消息（mpnews）){:target="_blank"}
   """
   @spec send_mpnews(Work.client(), Work.agent(), to, msg, opts) :: WeChat.response()
   def send_mpnews(client, agent, to, msg, opts \\ []) do
@@ -184,7 +182,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送markdown消息 -
-  [官方文档](#{@doc_link}/90236#markdown消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#markdown消息){:target="_blank"}
   """
   @spec send_markdown(Work.client(), Work.agent(), to, content, opts) :: WeChat.response()
   def send_markdown(client, agent, to, content, opts \\ []) do
@@ -193,7 +191,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送小程序通知消息 -
-  [官方文档](#{@doc_link}/90236#小程序通知消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#小程序通知消息){:target="_blank"}
   """
   @spec send_miniprogram_notice(Work.client(), Work.agent(), to, msg, opts) :: WeChat.response()
   def send_miniprogram_notice(client, agent, to, msg, opts \\ []) do
@@ -202,7 +200,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   发送模板卡片消息 -
-  [官方文档](#{@doc_link}/90236#模板卡片消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90236#模板卡片消息){:target="_blank"}
   """
   @spec send_template_card(Work.client(), Work.agent(), to, msg, opts) :: WeChat.response()
   def send_template_card(client, agent, to, msg, opts \\ []) do
@@ -211,7 +209,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   更新模版卡片消息 -
-  [官方文档](#{@doc_link}/94888){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94888){:target="_blank"}
 
   应用可以发送模板卡片消息，发送之后可再通过接口更新可回调的用户任务卡片消息的替换文案信息
   （仅原卡片为 按钮交互型、投票选择型、多项选择型的卡片可以调用本接口更新）。
@@ -229,7 +227,7 @@ defmodule WeChat.Work.Message do
 
   @doc """
   撤回应用消息 -
-  [官方文档](#{@doc_link}/94867){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94867){:target="_blank"}
   """
   @spec recall(Work.client(), Work.agent(), msg_id) :: WeChat.response()
   def recall(client, agent, msg_id) do

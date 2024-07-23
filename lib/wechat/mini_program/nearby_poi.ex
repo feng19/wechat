@@ -4,7 +4,6 @@ defmodule WeChat.MiniProgram.NearbyPOI do
   """
 
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
   @typedoc """
   门店图片
@@ -122,11 +121,9 @@ defmodule WeChat.MiniProgram.NearbyPOI do
   """
   @type status :: 0 | 1
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/nearby-poi/"
-
   @doc """
   添加地点 -
-  [官方文档](#{@doc_link}/nearbyPoi.add.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/nearby-poi/addNearbyPoi.html){:target="_blank"}
   """
   @spec add(WeChat.client(), add_options) :: WeChat.response()
   def add(client, options) do
@@ -139,7 +136,7 @@ defmodule WeChat.MiniProgram.NearbyPOI do
 
   @doc """
   删除地点 -
-  [官方文档](#{@doc_link}/nearbyPoi.delete.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/nearby-poi/deleteNearbyPoi.html){:target="_blank"}
   """
   @spec delete(WeChat.client(), poi_id) :: WeChat.response()
   def delete(client, poi_id) do
@@ -152,7 +149,7 @@ defmodule WeChat.MiniProgram.NearbyPOI do
 
   @doc """
   查看地点列表 -
-  [官方文档](#{@doc_link}/nearbyPoi.getList.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/nearby-poi/getNearbyPoiList.html){:target="_blank"}
   """
   @spec get_list(WeChat.client(), start :: non_neg_integer, limit :: 1..1000) :: WeChat.response()
   def get_list(client, start \\ 1, limit \\ 10) do
@@ -164,7 +161,7 @@ defmodule WeChat.MiniProgram.NearbyPOI do
 
   @doc """
   展示/取消展示附近小程序 -
-  [官方文档](#{@doc_link}/nearbyPoi.setShowStatus.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/nearby-poi/setShowStatus.html){:target="_blank"}
   """
   @spec set_show_status(WeChat.client(), poi_id, status) :: WeChat.response()
   def set_show_status(client, poi_id, status) do

@@ -6,7 +6,6 @@ defmodule WeChat.WebPage do
     * [网页授权](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html){:target="_blank"}
     * [JS-SDK](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html){:target="_blank"}
   """
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Requester, Utils, Card, User, Storage.Cache}
 
   @typedoc """
@@ -45,8 +44,8 @@ defmodule WeChat.WebPage do
   """
   @type js_api_ticket_type :: String.t()
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/OA_Web_Apps"
-  @component_doc_link "#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps"
+  @component_doc_link "https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html"
 
   @doc """
   网页授权 - 请求`code`

@@ -5,14 +5,12 @@ defmodule WeChat.Work.OA.Pstncc do
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "发起自动语音来电ID"
   @type call_id :: String.t()
 
   @doc """
   发起语音电话
-  - [官方文档](#{@doc_link}/91627){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/91627){:target="_blank"}
   """
   @spec call(Work.client(), Work.agent(), User.userid_list()) :: WeChat.response()
   def call(client, agent, userid_list) do
@@ -23,7 +21,7 @@ defmodule WeChat.Work.OA.Pstncc do
 
   @doc """
   获取接听状态
-  - [官方文档](#{@doc_link}/91628){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/91628){:target="_blank"}
   """
   @spec get_states(Work.client(), Work.agent(), User.userid(), call_id) :: WeChat.response()
   def get_states(client, agent, userid, call_id) do

@@ -5,10 +5,9 @@ defmodule WeChat.CustomService do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html#0){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias Tesla.Multipart
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Service_Center_messages.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html"
 
   @typedoc """
   完整客服账号，格式为：账号前缀@公众号微信号

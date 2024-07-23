@@ -58,7 +58,6 @@ defmodule WeChat do
 
   详情请看 `WeChat.Pay`
   """
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Refresher, HubClient, HubServer}
   alias WeChat.Work.Agent, as: WorkAgent
 
@@ -67,7 +66,7 @@ defmodule WeChat do
 
   加密后的微信号，每个用户对每个公众号的 `OpenID` 是唯一的。对于不同公众号，同一用户的 `OpenID` 不同
 
-  [Docs Link](#{doc_link_prefix()}/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html){:target="_blank"}
+  [Docs Link](https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html){:target="_blank"}
   """
   @type openid :: String.t()
   @type openid_list :: [openid]
@@ -77,7 +76,7 @@ defmodule WeChat do
 
   同一用户，对同一个微信开放平台下的不同应用，`UnionID` 是相同的
 
-  [Docs Link](#{doc_link_prefix()}/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html){:target="_blank"}
+  [Docs Link](https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html){:target="_blank"}
   """
   @type unionid :: String.t()
 

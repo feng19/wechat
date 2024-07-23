@@ -5,11 +5,9 @@ defmodule WeChat.Work.Agent do
   alias WeChat.ServerMessage.Encryptor
   alias WeChat.Storage.Cache
 
-  @term_introduction_doc_link "#{WeChat.Utils.work_doc_link_prefix()}/90665"
-
   @typedoc """
   每个应用都有唯一的 agentid -
-  [官方文档](#{@term_introduction_doc_link}#agentid)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#agentid)
 
   在管理后台->“应用与小程序”->“应用”，点进某个应用，即可看到 agentid
   """
@@ -18,7 +16,7 @@ defmodule WeChat.Work.Agent do
   @type agent_flag :: agent_id | agent_name
   @typedoc """
   secret 是企业应用里面用于保障数据安全的“钥匙” -
-  [官方文档](#{@term_introduction_doc_link}#secret)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#secret)
 
   每一个应用都有一个独立的访问密钥，为了保证数据的安全，secret务必不能泄漏。
   目前 `secret` 有：

@@ -102,7 +102,6 @@ defmodule WeChat.Plug.HubSpringboardTest do
     Cache.put_cache(appid, to_string(agent_id), {client, agent})
     redirect_url = "#{env_url}/a/b/c?code=test"
 
-    
     # get "/:env/:app/:agent/cb/*callback_path"
     conn =
       conn(:get, "/#{env}/#{appid}/#{agent_id}/cb/a/b/c", %{code: "test"})

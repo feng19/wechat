@@ -6,10 +6,9 @@ defmodule WeChat.CustomMessage do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Card, Material, Publish}
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Service_Center_messages.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Service_Center_messages.html"
 
   @type template_id :: String.t()
   @type title :: String.t()

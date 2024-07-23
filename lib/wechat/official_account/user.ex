@@ -1,7 +1,6 @@
 defmodule WeChat.User do
   @moduledoc "用户管理"
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
   @typedoc "微信号"
   @type username :: String.t()
@@ -21,7 +20,7 @@ defmodule WeChat.User do
   """
   @type remark :: String.t()
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/User_Management"
 
   @doc """
   设置用户备注名 -

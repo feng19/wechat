@@ -5,7 +5,6 @@ defmodule WeChat.Component do
   [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Third_party_platform_appid.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.Storage.Cache
 
   @typedoc """
@@ -20,7 +19,7 @@ defmodule WeChat.Component do
   @type auth_type :: 1 | 2 | 3
   @type biz_appid :: WeChat.appid()
 
-  @doc_link "#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api"
+  @doc_link "https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/api"
 
   @typedoc """
   选项名称及可选值说明 -
@@ -40,7 +39,7 @@ defmodule WeChat.Component do
 
   @doc """
   生成授权链接 -
-  [官方文档](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Authorization_Process_Technical_Description.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Authorization_Process_Technical_Description.html){:target="_blank"}
   """
   @spec bind_component_url(WeChat.client(), redirect_uri :: String.t(), auth_type() | biz_appid()) ::
           url :: String.t() | WeChat.response()
@@ -74,9 +73,9 @@ defmodule WeChat.Component do
 
   @doc """
   查询接口调用次数 -
-  [官方文档](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_api_quota.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_api_quota.html){:target="_blank"}
 
-  [接口调用频次限制说明](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
+  [接口调用频次限制说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
   @spec get_quota(WeChat.client(), cgi_path :: String.t()) :: WeChat.response()
   def get_quota(client, cgi_path) do
@@ -89,9 +88,9 @@ defmodule WeChat.Component do
 
   @doc """
   接口调用次数清零 -
-  [官方文档](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/2.0/api/openApi/clear_quota.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/clear_quota.html){:target="_blank"}
 
-  [接口调用频次限制说明](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
+  [接口调用频次限制说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do
@@ -123,7 +122,7 @@ defmodule WeChat.Component do
   [官方文档](#{@doc_link}/component_access_token.html){:target="_blank"}
 
   ## ticket 来源
-    [验证票据](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
+    [验证票据](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
   """
   @spec get_component_token(WeChat.client(), ticket :: String.t()) :: WeChat.response()
   def get_component_token(client, ticket) do

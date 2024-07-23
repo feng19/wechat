@@ -5,11 +5,9 @@ defmodule WeChat.Work.KF.Customer do
   alias WeChat.Work
   alias WeChat.Work.Customer, as: C
 
-  @doc_link WeChat.Utils.work_kf_doc_link_prefix()
-
   @doc """
   获取客户基本信息 -
-  [官方文档](#{@doc_link}/94769){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95159){:target="_blank"}
   """
   @spec get_customer_info(Work.client(), Work.agent(), C.external_userid_list()) ::
           WeChat.response()

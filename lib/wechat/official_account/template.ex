@@ -5,9 +5,8 @@ defmodule WeChat.Template do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Template_Message_Interface.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html"
 
   @type template_id :: String.t()
   @type title :: String.t()

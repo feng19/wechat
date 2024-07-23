@@ -2,31 +2,27 @@ defmodule WeChat.MiniProgram.Auth do
   @moduledoc """
   小程序 - 权限接口
   """
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.Storage.Cache
   alias WeChat.MiniProgram.UserInfo
-
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api"
-  @open_ability_doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/open-ability"
 
   @typedoc "会话密钥"
   @type session_key :: String.t()
 
   @doc """
   服务端获取开放数据 -
-  [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/signature.html){:target="_blank"}
 
-  [登录流程](#{@open_ability_doc_link}/login.html)
+  [登录流程](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html)
   """
   @deprecated "Use WeChat.MiniProgram.UserInfo.decode_user_info/3 instead"
   defdelegate decode_user_info(session_key, raw_data, signature), to: UserInfo
 
   @doc """
   服务端获取开放数据 - 包含敏感数据 -
-  [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/signature.html){:target="_blank"}
 
-  * [小程序登录](#{@open_ability_doc_link}/login.html)
-  * [加密数据解密算法](#{@open_ability_doc_link}/signature.html#加密数据解密算法)
+  * [小程序登录](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html)
+  * [加密数据解密算法](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/signature.html#加密数据解密算法)
   """
   @deprecated "Use WeChat.MiniProgram.UserInfo.decode_get_user_sensitive_info/3 instead"
   defdelegate decode_get_user_sensitive_info(session_key, encrypted_data, iv), to: UserInfo
@@ -34,11 +30,11 @@ defmodule WeChat.MiniProgram.Auth do
   @doc """
   小程序登录
 
-  [登录流程](#{@open_ability_doc_link}/login.html)
+  [登录流程](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html)
 
   官方文档:
-    * [Mini Program](#{@doc_link}/login/auth.code2Session.html){:target="_blank"}
-    * [Component](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Mini_Programs/WeChat_login.html){:target="_blank"}
+    * [小程序](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/code2Session.html){:target="_blank"}
+    * [第三方平台](https://developers.weixin.qq.com/doc/oplatform/openApi/OpenApiDoc/miniprogram-management/login/thirdpartyCode2Session.html){:target="_blank"}
   """
   @spec code2session(WeChat.client(), code :: String.t()) :: WeChat.response()
   def code2session(client, code) do
@@ -68,7 +64,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   检验登录态 -
-  [官方文档](#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-login/checkSessionKey.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/checkSessionKey.html){:target="_blank"}
 
   校验服务器所保存的登录态 session_key 是否合法。为了保持 session_key 私密性，接口不明文传输 session_key，而是通过校验登录态签名完成。
   """
@@ -88,7 +84,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   重置登录态 -
-  [官方文档](#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-login/ResetUserSessionKey.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/ResetUserSessionKey.html){:target="_blank"}
 
   重置指定的登录态 session_key。为了保持 session_key 私密性，接口不明文传入 session_key，而是通过校验登录态签名完成。
   """
@@ -117,7 +113,7 @@ defmodule WeChat.MiniProgram.Auth do
 
   @doc """
   获取AccessToken -
-  [官方文档](#{@doc_link}/access-token/auth.getAccessToken.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-access-token/getAccessToken.html){:target="_blank"}
   """
   @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do

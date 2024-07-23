@@ -5,9 +5,8 @@ defmodule WeChat.POI do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/WeChat_Stores/WeChat_Store_Interface.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/WeChat_Stores/WeChat_Store_Interface.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/WeChat_Stores/WeChat_Store_Interface.html"
 
   @type poi_id :: String.t()
   @typep body :: map

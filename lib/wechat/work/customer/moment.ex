@@ -4,8 +4,6 @@ defmodule WeChat.Work.Customer.Moment do
   import Jason.Helpers
   alias WeChat.{Work, Work.User}
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "朋友圈ID"
   @type moment_id :: String.t()
   @typedoc "规则组ID"
@@ -20,7 +18,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取企业全部的发表列表 -
-  [官方文档](#{@doc_link}/93333#获取企业全部的发表列表){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93333#获取企业全部的发表列表){:target="_blank"}
 
   企业和第三方应用可通过该接口获取企业全部的发表内容。
   """
@@ -36,7 +34,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取客户朋友圈企业发表的列表 -
-  [官方文档](#{@doc_link}/93333#获取客户朋友圈企业发表的列表){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈企业发表的列表){:target="_blank"}
 
   企业和第三方应用可通过该接口获取企业发表的朋友圈成员执行情况。
   """
@@ -51,7 +49,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取客户朋友圈发表时选择的可见范围 -
-  [官方文档](#{@doc_link}/93333#获取客户朋友圈发表时选择的可见范围){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈发表时选择的可见范围){:target="_blank"}
 
   企业和第三方应用可通过该接口获取客户朋友圈创建时，选择的客户可见范围。
   """
@@ -67,7 +65,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取客户朋友圈发表后的可见客户列表 -
-  [官方文档](#{@doc_link}/93333#获取客户朋友圈发表后的可见客户列表){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈发表后的可见客户列表){:target="_blank"}
 
   企业和第三方应用可通过该接口获取客户朋友圈发表后，可在微信朋友圈中查看的客户列表。
   """
@@ -83,7 +81,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取客户朋友圈的互动数据 -
-  [官方文档](#{@doc_link}/93333#获取客户朋友圈的互动数据){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93333#获取客户朋友圈的互动数据){:target="_blank"}
 
   企业和第三方应用可通过此接口获取客户朋友圈的互动数据。
   """
@@ -103,7 +101,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取规则组列表 -
-  [官方文档](#{@doc_link}/94890#获取规则组列表){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94890#获取规则组列表){:target="_blank"}
 
   企业可通过此接口获取企业配置的所有客户朋友圈规则组id列表。
   """
@@ -118,7 +116,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取规则组详情 -
-  [官方文档](#{@doc_link}/94890#获取规则组详情){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94890#获取规则组详情){:target="_blank"}
 
   企业可以通过此接口获取某个客户朋友圈规则组的详细信息。
   """
@@ -133,7 +131,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   获取规则组管理范围 -
-  [官方文档](#{@doc_link}/94890#获取规则组管理范围){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94890#获取规则组管理范围){:target="_blank"}
 
   企业可通过此接口获取某个朋友圈规则组管理的成员和部门列表。
   """
@@ -149,7 +147,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   创建新的规则组 -
-  [官方文档](#{@doc_link}/94890#创建新的规则组){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94890#创建新的规则组){:target="_blank"}
 
   企业可通过此接口创建一个新的客户朋友圈规则组。该接口仅支持串行调用，请勿并发创建规则组。
   """
@@ -162,7 +160,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   编辑规则组及其管理范围 -
-  [官方文档](#{@doc_link}/94890#编辑规则组及其管理范围){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94890#编辑规则组及其管理范围){:target="_blank"}
 
   企业可通过此接口编辑规则组的基本信息和修改客户朋友圈规则组管理范围。该接口仅支持串行调用，请勿并发修改规则组。
   """
@@ -175,7 +173,7 @@ defmodule WeChat.Work.Customer.Moment do
 
   @doc """
   删除规则组 -
-  [官方文档](#{@doc_link}/94890#删除规则组){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94890#删除规则组){:target="_blank"}
 
   企业可通过此接口删除某个客户朋友圈规则组。
   """

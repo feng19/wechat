@@ -3,7 +3,6 @@ defmodule WeChat.MiniProgram.Security do
   小程序 - 内容安全接口
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias Tesla.Multipart
 
   @typedoc "媒体类型 1 => 音频; 2 => 图片"
@@ -13,13 +12,11 @@ defmodule WeChat.MiniProgram.Security do
   @typep url :: String.t()
   @typep file_path :: Path.t()
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/sec-check/security"
-
   @doc """
   图片检测
-  - [官方文档](#{@doc_link}.imgSecCheck.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/security.imgSecCheck.html){:target="_blank"}
 
-  校验一张图片是否含有违法违规内容。详见: [内容安全解决方案](#{doc_link_prefix()}/miniprogram/dev/framework/operation.html)
+  校验一张图片是否含有违法违规内容。详见: [内容安全解决方案](https://developers.weixin.qq.com/miniprogram/dev/framework/operation.html)
 
   应用场景举例
 
@@ -39,7 +36,7 @@ defmodule WeChat.MiniProgram.Security do
 
   @doc """
   图片/音频异步检测
-  - [官方文档](#{@doc_link}.mediaCheckAsync.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/mediaCheckAsync.html){:target="_blank"}
 
   异步校验图片/音频是否含有违法违规内容。
 
@@ -62,7 +59,7 @@ defmodule WeChat.MiniProgram.Security do
 
   @doc """
   文本检测
-  - [官方文档](#{@doc_link}.msgSecCheck.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/sec-center/sec-check/msgSecCheck.html){:target="_blank"}
 
   检查一段文本是否含有违法违规内容。
 

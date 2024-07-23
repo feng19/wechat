@@ -4,13 +4,13 @@ defmodule WeChat.ServerMessage.ReplyMessage do
 
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html){:target="_blank"}
   """
-  import WeChat.Utils, only: [doc_link_prefix: 0, work_doc_link_prefix: 0, def_eex: 2]
+  import WeChat.Utils, only: [def_eex: 2]
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Passive_user_reply_message.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Passive_user_reply_message.html"
 
   @doc """
   回包加密 -
-  [官方文档](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html)
+  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Message_Encryption/Message_encryption_and_decryption.html)
 
   ```xml
   <xml>
@@ -245,7 +245,7 @@ defmodule WeChat.ServerMessage.ReplyMessage do
 
   @doc """
   消息转发客服消息 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
 
   ```xml
   <xml>
@@ -269,7 +269,7 @@ defmodule WeChat.ServerMessage.ReplyMessage do
 
   @doc """
   消息转发到指定客服 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Customer_Service/Forwarding_of_messages_to_service_center.html){:target="_blank"}
 
   ```xml
   <xml>
@@ -299,7 +299,7 @@ defmodule WeChat.ServerMessage.ReplyMessage do
 
   @doc """
   模板卡片更新消息(更新点击用户的按钮文案) -
-  [官方文档](#{work_doc_link_prefix()}/90241#更新点击用户的按钮文案){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90241#更新点击用户的按钮文案){:target="_blank"}
 
   ```xml
   <xml>
@@ -329,7 +329,7 @@ defmodule WeChat.ServerMessage.ReplyMessage do
 
   @doc """
   模板卡片更新消息(更新点击用户的整张卡片) -
-  [官方文档](#{work_doc_link_prefix()}/90241#更新点击用户的整张卡片){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90241#更新点击用户的整张卡片){:target="_blank"}
 
   ```xml
   <xml>

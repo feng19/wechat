@@ -5,9 +5,8 @@ defmodule WeChat.UserBlacklist do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/User_Management/Manage_blacklist.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management/Manage_blacklist.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/User_Management/Manage_blacklist.html"
 
   @doc """
   获取公众号的黑名单列表 -

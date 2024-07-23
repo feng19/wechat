@@ -5,12 +5,11 @@ defmodule WeChat.UserTag do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
   @type tag_id :: integer
   @type tag_name :: String.t()
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/User_Management/User_Tag_Management.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/User_Management/User_Tag_Management.html"
 
   @doc """
   创建标签 -

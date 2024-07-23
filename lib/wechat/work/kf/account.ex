@@ -4,8 +4,6 @@ defmodule WeChat.Work.KF.Account do
   import Jason.Helpers
   alias WeChat.{Work, Work.Material}
 
-  @doc_link WeChat.Utils.work_kf_doc_link_prefix()
-
   @typedoc "客服帐号ID"
   @type open_kfid :: String.t()
   @typedoc "客服帐号名称"
@@ -19,7 +17,7 @@ defmodule WeChat.Work.KF.Account do
 
   @doc """
   添加客服帐号 -
-  [官方文档](#{@doc_link}/94747){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94662){:target="_blank"}
 
   添加客服帐号，并可设置客服名称和头像。
   """
@@ -32,7 +30,7 @@ defmodule WeChat.Work.KF.Account do
 
   @doc """
   删除客服帐号 -
-  [官方文档](#{@doc_link}/94749){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94663){:target="_blank"}
 
   删除已有的客服帐号。
   """
@@ -45,7 +43,7 @@ defmodule WeChat.Work.KF.Account do
 
   @doc """
   修改客服帐号 -
-  [官方文档](#{@doc_link}/94750){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94664){:target="_blank"}
 
   修改已有的客服帐号，可修改客服名称和头像。
   """
@@ -61,7 +59,7 @@ defmodule WeChat.Work.KF.Account do
 
   @doc """
   获取客服帐号列表 -
-  [官方文档](#{@doc_link}/94746){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94661){:target="_blank"}
 
   获取客服帐号列表，包括所有的客服帐号的客服ID、名称和头像。
   """
@@ -74,7 +72,7 @@ defmodule WeChat.Work.KF.Account do
 
   @doc """
   获取客服帐号链接 -
-  [官方文档](#{@doc_link}/94751){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94665){:target="_blank"}
 
   企业可通过此接口获取带有不同参数的客服链接，不同客服帐号对应不同的客服链接。获取后，企业可将链接嵌入到网页等场景中，微信用户点击链接即可向对应的客服帐号发起咨询。企业可依据参数来识别用户的咨询来源等。
   """

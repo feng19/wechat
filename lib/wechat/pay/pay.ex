@@ -58,7 +58,6 @@ defmodule WeChat.Pay do
   详情请看 `WeChat.Pay.EventHandler`
   """
   require Logger
-  import WeChat.Utils, only: [pay_doc_link_prefix: 0]
   alias WeChat.Utils
   alias WeChat.Pay.Certificates
 
@@ -66,29 +65,29 @@ defmodule WeChat.Pay do
   @type mch_id :: binary
   @typedoc """
   平台 证书序列号 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/certificate-faqs.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/certificate-faqs.html){:target="_blank"}
   """
   @type platform_serial_no :: serial_no
   @typedoc """
   商户API 证书序列号 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/certificate-faqs.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/certificate-faqs.html){:target="_blank"}
   """
   @type client_serial_no :: serial_no
   @typedoc "证书的序列号"
   @type serial_no :: binary
   @typedoc """
   平台证书列表 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/wechatpay-certificates.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/wechatpay-certificates.html){:target="_blank"}
   """
   @type cacerts :: list(binary)
   @typedoc """
   商户 API 私钥 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/privatekey-and-certificate.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/privatekey-and-certificate.html){:target="_blank"}
   """
   @type client_key :: pem_file
   @typedoc """
   API 密钥 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/development/interface-rules/apiv3key.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/apiv3key.html){:target="_blank"}
   """
   @type api_secret_key :: binary | WeChat.env_option()
   @type client :: module

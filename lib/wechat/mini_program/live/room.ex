@@ -3,10 +3,9 @@ defmodule WeChat.MiniProgram.Live.Room do
   小程序 - 直播间管理
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{User, MiniProgram.Live.Goods}
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/liveplayer/studio-api.html"
+  @doc_link "https://developers.weixin.qq.com/miniprogram/dev/framework/liveplayer/studio-api.html"
 
   @type start :: integer
   @type limit :: 1..100

@@ -14,8 +14,6 @@ defmodule WeChat.Work.App.Workbench do
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc """
   模版类型
 
@@ -30,7 +28,7 @@ defmodule WeChat.Work.App.Workbench do
 
   @doc """
   设置应用在工作台展示的模版 -
-  [官方文档](#{@doc_link}/92535#设置应用在工作台展示的模版){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92535#设置应用在工作台展示的模版){:target="_blank"}
 
   该接口指定应用自定义模版类型。同时也支持设置企业默认模版数据。若type指定为 “normal” 则为取消自定义模式，改为普通展示模式
   """
@@ -56,7 +54,7 @@ defmodule WeChat.Work.App.Workbench do
 
   @doc """
   获取应用在工作台展示的模版 -
-  [官方文档](#{@doc_link}/92535#获取应用在工作台展示的模版){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92535#获取应用在工作台展示的模版){:target="_blank"}
 
   该接口指定应用自定义模版类型。同时也支持设置企业默认模版数据。若type指定为 “normal” 则为取消自定义模式，改为普通展示模式
   """
@@ -71,7 +69,7 @@ defmodule WeChat.Work.App.Workbench do
 
   @doc """
   设置应用在用户工作台展示的数据 -
-  [官方文档](#{@doc_link}/92535#设置应用在用户工作台展示的数据){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92535#设置应用在用户工作台展示的数据){:target="_blank"}
 
   **每个用户每个应用接口限制10次/分钟**
   """

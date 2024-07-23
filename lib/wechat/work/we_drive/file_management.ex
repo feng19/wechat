@@ -6,7 +6,6 @@ defmodule WeChat.Work.WeDrive.FileManagement do
   alias Work.Contacts.User
   alias Work.WeDrive.SpaceManagement
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
   @type file_id :: String.t()
   @type file_id_list :: [file_id]
   @typedoc """
@@ -36,7 +35,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   获取文件列表
-  - [官方文档](#{@doc_link}/93657){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/93657){:target="_blank"}
   """
   @spec list(
           Work.client(),
@@ -65,7 +64,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   上传文件
-  - [官方文档](#{@doc_link}/97880){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97880){:target="_blank"}
 
   **注意：只需要填入文件内容的Base64，不需要添加任何如：”data:application/x-javascript;base64” 的数据类型描述信息**
   """
@@ -94,7 +93,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   下载文件
-  - [官方文档](#{@doc_link}/97881){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97881){:target="_blank"}
   """
   @spec download(Work.client(), Work.agent(), User.userid(), file_id) :: WeChat.response()
   def download(client, agent, userid, file_id) do
@@ -105,7 +104,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   新建文件夹/文档
-  - [官方文档](#{@doc_link}/97882){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97882){:target="_blank"}
   """
   @spec create(
           Work.client(),
@@ -132,7 +131,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   重命名文件
-  - [官方文档](#{@doc_link}/97883){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97883){:target="_blank"}
   """
   @spec rename(Work.client(), Work.agent(), User.userid(), file_id, file_name) ::
           WeChat.response()
@@ -146,7 +145,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   移动文件
-  - [官方文档](#{@doc_link}/97884){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97884){:target="_blank"}
 
   ## 参数说明
 
@@ -173,7 +172,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   删除文件
-  - [官方文档](#{@doc_link}/97885){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97885){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), User.userid(), file_id_list) :: WeChat.response()
   def delete(client, agent, userid, file_id_list) do
@@ -186,7 +185,7 @@ defmodule WeChat.Work.WeDrive.FileManagement do
 
   @doc """
   文件信息
-  - [官方文档](#{@doc_link}/97886){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97886){:target="_blank"}
   """
   @spec info(Work.client(), Work.agent(), User.userid(), file_id) :: WeChat.response()
   def info(client, agent, userid, file_id) do

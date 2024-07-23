@@ -5,8 +5,6 @@ defmodule WeChat.Work.OA.Checkin do
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc """
   打卡类型
 
@@ -30,8 +28,8 @@ defmodule WeChat.Work.OA.Checkin do
   @type filter_type :: 1 | 2
 
   @doc """
-  获取企业所有打卡规则
-  - [官方文档](#{@doc_link}/93384){:target="_blank"}
+  获取企业所有打卡规则 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93384){:target="_blank"}
   """
   @spec list_options(Work.client(), Work.agent()) :: WeChat.response()
   def list_options(client, agent) do
@@ -41,8 +39,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  获取员工打卡规则
-  - [官方文档](#{@doc_link}/90263){:target="_blank"}
+  获取员工打卡规则 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90263){:target="_blank"}
   """
   @spec get_user_option(Work.client(), Work.agent(), timestamp, User.userid_list()) ::
           WeChat.response()
@@ -55,8 +53,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  获取打卡记录数据
-  - [官方文档](#{@doc_link}/90262){:target="_blank"}
+  获取打卡记录数据 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90262){:target="_blank"}
   """
   @spec list_data(Work.client(), Work.agent(), type, start_time, end_time, User.userid_list()) ::
           WeChat.response()
@@ -74,8 +72,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  获取打卡日报数据
-  - [官方文档](#{@doc_link}/93374){:target="_blank"}
+  获取打卡日报数据 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93374){:target="_blank"}
   """
   @spec list_day_data(Work.client(), Work.agent(), start_time, end_time, User.userid_list()) ::
           WeChat.response()
@@ -92,8 +90,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  获取打卡月报数据
-  - [官方文档](#{@doc_link}/93387){:target="_blank"}
+  获取打卡月报数据 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93387){:target="_blank"}
   """
   @spec list_month_data(Work.client(), Work.agent(), start_time, end_time, User.userid_list()) ::
           WeChat.response()
@@ -110,8 +108,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  获取打卡人员排班信息
-  - [官方文档](#{@doc_link}/93380){:target="_blank"}
+  获取打卡人员排班信息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93380){:target="_blank"}
   """
   @spec list_scheduling(Work.client(), Work.agent(), start_time, end_time, User.userid_list()) ::
           WeChat.response()
@@ -128,8 +126,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  为打卡人员排班
-  - [官方文档](#{@doc_link}/93385){:target="_blank"}
+  为打卡人员排班 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93385){:target="_blank"}
   """
   @spec set_scheduling(
           Work.client(),
@@ -160,8 +158,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  为打卡人员补卡
-  - [官方文档](#{@doc_link}/95803){:target="_blank"}
+  为打卡人员补卡 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95803){:target="_blank"}
   """
   @spec re_checkin(
           Work.client(),
@@ -205,8 +203,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  录入打卡人员人脸信息
-  - [官方文档](#{@doc_link}/93378){:target="_blank"}
+  录入打卡人员人脸信息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/93378){:target="_blank"}
   """
   @spec set_user_face(Work.client(), Work.agent(), User.userid(), user_face :: String.t()) ::
           WeChat.response()
@@ -219,8 +217,8 @@ defmodule WeChat.Work.OA.Checkin do
   end
 
   @doc """
-  获取设备打卡数据
-  - [官方文档](#{@doc_link}/94126){:target="_blank"}
+  获取设备打卡数据 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94126){:target="_blank"}
   """
   @spec get_hardware_checkin_data(
           Work.client(),

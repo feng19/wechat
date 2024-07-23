@@ -24,15 +24,13 @@ defmodule WeChat.Work do
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.{Utils, Work.Agent}
 
-  @doc_link Utils.work_doc_link_prefix()
-
   @type client :: module()
   @type js_api_ticket :: String.t()
   @type url :: String.t()
 
   @typedoc """
   每个企业都拥有唯一的 corpid -
-  [官方文档](#{@doc_link}/90665#corpid)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#corpid)
 
   获取此信息可在管理后台“我的企业”－“企业信息”下查看“企业ID”（需要有管理员权限）
 
@@ -41,7 +39,7 @@ defmodule WeChat.Work do
 
   @typedoc """
   每个应用都有唯一的 agentid -
-  [官方文档](#{@doc_link}/90665#agentid)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#agentid)
 
   在管理后台->“应用与小程序”->“应用”，点进某个应用，即可看到 agentid
   """
@@ -52,7 +50,7 @@ defmodule WeChat.Work do
 
   @typedoc """
   secret 是企业应用里面用于保障数据安全的“钥匙” -
-  [官方文档](#{@doc_link}/90665#secret)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#secret)
 
   每一个应用都有一个独立的访问密钥，为了保证数据的安全，secret务必不能泄漏。
   目前 `secret` 有：
@@ -96,7 +94,7 @@ defmodule WeChat.Work do
 
   @typedoc """
   access_token 是企业后台去企业微信的后台获取信息时的重要票据 -
-  [官方文档](#{@doc_link}/90665#access_token)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#access_token)
 
   由 `corpid` 和 `secret` 产生。所有接口在通信时都需要携带此信息用于验证接口的访问权限
   """
@@ -158,7 +156,7 @@ defmodule WeChat.Work do
   end
 
   @doc """
-  获取 access_token - [官方文档](#{@doc_link}/91039){:target="_blank"}
+  获取 access_token - [官方文档](https://developer.work.weixin.qq.com/document/path/91039){:target="_blank"}
   """
   @spec get_access_token(client, agent) :: WeChat.response()
   def get_access_token(client, agent) do
@@ -172,8 +170,8 @@ defmodule WeChat.Work do
   @doc """
   获取 jsapi_ticket
 
-  - [企业](#{@doc_link}/90506#获取企业的jsapi_ticket){:target="_blank"}
-  - [应用](#{@doc_link}/90506#获取应用的jsapi_ticket){:target="_blank"}
+  - [企业](https://developer.work.weixin.qq.com/document/path/90506#获取企业的jsapi_ticket){:target="_blank"}
+  - [应用](https://developer.work.weixin.qq.com/document/path/90506#获取应用的jsapi_ticket){:target="_blank"}
   """
   @spec get_jsapi_ticket(client, agent, is_agent :: boolean) :: WeChat.response()
   def get_jsapi_ticket(client, agent, is_agent \\ false) do
@@ -196,7 +194,7 @@ defmodule WeChat.Work do
 
   @doc """
   生成JS-SDK配置 -
-  [官方文档](#{@doc_link}/90514){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90514){:target="_blank"}
   """
   @spec js_sdk_config(client, agent, url) :: map
   def js_sdk_config(client, agent, url) do
@@ -206,7 +204,7 @@ defmodule WeChat.Work do
 
   @doc """
   生成agentConfig配置 -
-  [官方文档](#{@doc_link}/94313){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94313){:target="_blank"}
   """
   @spec js_sdk_agent_config(client, agent, url) :: map
   def js_sdk_agent_config(client, agent, url) do
@@ -221,7 +219,7 @@ defmodule WeChat.Work do
   @doc """
   生成JS-SDK配置(by ticket)
 
-  - [签名算法](#{@doc_link}/90506#签名算法){:target="_blank"}
+  - [签名算法](https://developer.work.weixin.qq.com/document/path/90506#签名算法){:target="_blank"}
   """
   @spec sign_js_sdk(js_api_ticket, url, corp_id) :: map
   def sign_js_sdk(jsapi_ticket, url, corp_id) do

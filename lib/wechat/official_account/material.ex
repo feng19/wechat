@@ -1,10 +1,9 @@
 defmodule WeChat.Material do
   @moduledoc "素材管理"
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias Tesla.Multipart
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Asset_Management"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Asset_Management"
 
   @typedoc """
   素材的类型
@@ -140,7 +139,7 @@ defmodule WeChat.Material do
 
   @doc """
   上传图文消息素材 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html#1){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html#1){:target="_blank"}
   """
   @spec upload_news(WeChat.client(), articles) :: WeChat.response()
   def upload_news(client, articles) do
@@ -151,7 +150,7 @@ defmodule WeChat.Material do
 
   @doc """
   获取批量推送类型为 `mpvideo` 时要求的 `media_id` -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html#2){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html#2){:target="_blank"}
 
   原 `media_id` 需通过 [素材管理] -> [新增素材] 来得到
   """

@@ -6,15 +6,13 @@ defmodule WeChat.Work.OA.Schedule do
   alias Work.OA.Calendar
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "日程ID"
   @type schedule_id :: String.t()
   @type schedule_id_list :: [schedule_id]
 
   @doc """
   创建日程
-  - [官方文档](#{@doc_link}/93648){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/93648){:target="_blank"}
   """
   @spec add(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def add(client, agent, body) do
@@ -25,7 +23,7 @@ defmodule WeChat.Work.OA.Schedule do
 
   @doc """
   更新日程
-  - [官方文档](#{@doc_link}/97720){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97720){:target="_blank"}
   """
   @spec update(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def update(client, agent, body) do
@@ -36,7 +34,7 @@ defmodule WeChat.Work.OA.Schedule do
 
   @doc """
   新增日程参与者
-  - [官方文档](#{@doc_link}/97721){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97721){:target="_blank"}
 
   该接口用于在日历中更新指定的日程参与者列表
   """
@@ -54,7 +52,7 @@ defmodule WeChat.Work.OA.Schedule do
 
   @doc """
   删除日程参与者
-  - [官方文档](#{@doc_link}/97722){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97722){:target="_blank"}
 
   该接口用于在日历中更新指定的日程参与者列表
   """
@@ -72,7 +70,7 @@ defmodule WeChat.Work.OA.Schedule do
 
   @doc """
   获取日程详情
-  - [官方文档](#{@doc_link}/97724){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97724){:target="_blank"}
   """
   @spec get(Work.client(), Work.agent(), schedule_id_list) :: WeChat.response()
   def get(client, agent, schedule_id_list) do
@@ -83,7 +81,7 @@ defmodule WeChat.Work.OA.Schedule do
 
   @doc """
   取消日程
-  - [官方文档](#{@doc_link}/97725){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97725){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), schedule_id) :: WeChat.response()
   def delete(client, agent, schedule_id) do
@@ -94,7 +92,7 @@ defmodule WeChat.Work.OA.Schedule do
 
   @doc """
   获取日历下的日程列表
-  - [官方文档](#{@doc_link}/97723){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97723){:target="_blank"}
   """
   @spec get_by_calendar(
           Work.client(),

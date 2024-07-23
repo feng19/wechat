@@ -1,10 +1,9 @@
 defmodule WeChat.Publish do
   @moduledoc "发布能力"
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.DraftBox
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Publish"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Publish"
 
   @typedoc "发布任务的id"
   @type publish_id :: String.t()

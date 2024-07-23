@@ -3,10 +3,9 @@ defmodule WeChat.MiniProgram.Live.Subscribe do
   小程序 - 直播长期订阅相关接口
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.MiniProgram.Live.Room
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/liveplayer/subscribe-api.html"
+  @doc_link "https://developers.weixin.qq.com/miniprogram/dev/framework/liveplayer/subscribe-api.html"
 
   @type limit :: 1..2000
   @typedoc "翻页标记，获取第一页时不带，第二页开始需带上上一页返回结果中的page_break"

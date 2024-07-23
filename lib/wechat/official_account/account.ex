@@ -1,7 +1,6 @@
 defmodule WeChat.Account do
   @moduledoc "账号管理"
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
   @typedoc """
   二维码类型
@@ -14,7 +13,7 @@ defmodule WeChat.Account do
 
   @doc """
   获取AccessToken -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Basic_Information/Get_access_token.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html){:target="_blank"}
   """
   @spec get_access_token(WeChat.client()) :: WeChat.response()
   def get_access_token(client) do
@@ -29,7 +28,7 @@ defmodule WeChat.Account do
 
   @doc """
   生成二维码 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
   """
   @spec create_qrcode(
           WeChat.client(),
@@ -61,7 +60,7 @@ defmodule WeChat.Account do
 
   @doc """
   生成并获取二维码链接 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
   """
   @spec get_qrcode_url(
           WeChat.client(),
@@ -78,7 +77,7 @@ defmodule WeChat.Account do
 
   @doc """
   生成并下载二维码 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html){:target="_blank"}
   """
   @spec download_qrcode(
           WeChat.client(),
@@ -103,7 +102,7 @@ defmodule WeChat.Account do
 
   @doc """
   长链接转成短链接 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Account_Management/URL_Shortener.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Account_Management/URL_Shortener.html){:target="_blank"}
   """
   @spec short_url(WeChat.client(), long_url :: String.t()) :: WeChat.response()
   def short_url(client, long_url) do
@@ -116,9 +115,9 @@ defmodule WeChat.Account do
 
   @doc """
   查询接口调用次数 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/openApi/get_api_quota.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/openApi/get_api_quota.html){:target="_blank"}
 
-  [接口调用频次限制说明](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
+  [接口调用频次限制说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
   @spec get_quota(WeChat.client(), cgi_path :: String.t()) :: WeChat.response()
   def get_quota(client, cgi_path) do
@@ -129,9 +128,9 @@ defmodule WeChat.Account do
 
   @doc """
   接口调用次数清零 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/openApi/clear_quota.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/openApi/clear_quota.html){:target="_blank"}
 
-  [接口调用频次限制说明](#{doc_link_prefix()}/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
+  [接口调用频次限制说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
   @spec clear_quota(WeChat.client()) :: WeChat.response()
   def clear_quota(client) do
@@ -142,7 +141,7 @@ defmodule WeChat.Account do
 
   @doc """
   获取公众号的自动回复规则 -
-  [官方文档](#{doc_link_prefix()}/doc/offiaccount/Message_Management/Getting_Rules_for_Auto_Replies.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Getting_Rules_for_Auto_Replies.html){:target="_blank"}
 
   获取公众号当前使用的自动回复规则，包括关注后自动回复、消息自动回复（60分钟内触发一次）、关键词自动回复。
 

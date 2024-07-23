@@ -6,12 +6,11 @@ defmodule WeChat.Work.WeDrive.SpaceACL do
   alias Work.Contacts.User
   alias Work.WeDrive.SpaceManagement
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
   @type auth_info :: [map]
 
   @doc """
   添加成员/部门
-  - [官方文档](#{@doc_link}/93656){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/93656){:target="_blank"}
   """
   @spec add(Work.client(), Work.agent(), User.userid(), SpaceManagement.space_id(), auth_info) ::
           WeChat.response()
@@ -25,7 +24,7 @@ defmodule WeChat.Work.WeDrive.SpaceACL do
 
   @doc """
   移除成员/部门
-  - [官方文档](#{@doc_link}/97875){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97875){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), User.userid(), SpaceManagement.space_id(), auth_info) ::
           WeChat.response()
@@ -39,7 +38,7 @@ defmodule WeChat.Work.WeDrive.SpaceACL do
 
   @doc """
   安全设置
-  - [官方文档](#{@doc_link}/97876){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97876){:target="_blank"}
   """
   @spec setting(
           Work.client(),
@@ -58,7 +57,7 @@ defmodule WeChat.Work.WeDrive.SpaceACL do
 
   @doc """
   获取邀请链接
-  - [官方文档](#{@doc_link}/97877){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97877){:target="_blank"}
   """
   @spec share(Work.client(), Work.agent(), User.userid(), SpaceManagement.space_id()) ::
           WeChat.response()
@@ -70,7 +69,7 @@ defmodule WeChat.Work.WeDrive.SpaceACL do
 
   @doc """
   获取空间信息
-  - [官方文档](#{@doc_link}/97878){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/97878){:target="_blank"}
   """
   @spec info(Work.client(), Work.agent(), SpaceManagement.space_id()) :: WeChat.response()
   def info(client, agent, space_id) do

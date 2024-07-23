@@ -62,10 +62,9 @@ defmodule WeChat.BatchSends do
   群发操作的相关返回码，可以参考全局返回码说明文档。
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Material, Material.Article}
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Batch_Sends_and_Originality_Checks.html"
 
   @typedoc """
   图文消息的接收者，

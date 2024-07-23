@@ -5,8 +5,6 @@ defmodule WeChat.Work.Material do
   alias WeChat.Work
   alias Tesla.Multipart
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc """
   素材的类型
 
@@ -28,7 +26,7 @@ defmodule WeChat.Work.Material do
   @typep file_data :: binary
 
   upload_doc = """
-  [官方文档](#{@doc_link}/90253){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90253){:target="_blank"}
 
   素材上传得到media_id，该media_id仅三天内有效，
   media_id在同一企业内应用之间可以共享。
@@ -66,7 +64,7 @@ defmodule WeChat.Work.Material do
   end
 
   upload_image_doc = """
-  [官方文档](#{@doc_link}/90256){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90256){:target="_blank"}
 
   上传图片得到图片URL，该URL永久有效
 
@@ -108,8 +106,8 @@ defmodule WeChat.Work.Material do
   end
 
   @doc """
-  获取临时素材
-  - [官方文档](#{@doc_link}/90254){:target="_blank"}
+  获取临时素材 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90254){:target="_blank"}
   """
   @spec get(Work.client(), Work.agent(), media_id) :: WeChat.response()
   def get(client, agent, media_id) do
@@ -119,8 +117,8 @@ defmodule WeChat.Work.Material do
   end
 
   @doc """
-  获取高清语音素材
-  - [官方文档](#{@doc_link}/90255){:target="_blank"}
+  获取高清语音素材 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90255){:target="_blank"}
 
   可以使用本接口获取从JSSDK的uploadVoice接口上传的临时语音素材，格式为speex，16K采样率。
   该音频比上文的临时素材获取接口（格式为amr，8K采样率）更加清晰，适合用作语音识别等对音质要求较高的业务。
@@ -133,8 +131,8 @@ defmodule WeChat.Work.Material do
   end
 
   @doc """
-  生成异步上传任务
-  - [官方文档](#{@doc_link}/96219){:target="_blank"}
+  生成异步上传任务 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/96219){:target="_blank"}
 
   为了满足临时素材的大文件诉求（最高支持200M），支持指定文件的CDN链接（必须支持Range分块下载），
   由企微微信后台异步下载和处理，处理完成后回调通知任务完成，再通过接口主动查询任务结果。

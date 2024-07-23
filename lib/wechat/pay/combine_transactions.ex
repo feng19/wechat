@@ -1,7 +1,6 @@
 defmodule WeChat.Pay.CombineTransactions do
   @moduledoc "微信支付-合单支付"
   import Jason.Helpers
-  import WeChat.Utils, only: [pay_doc_link_prefix: 0]
   alias WeChat.Pay.Transactions
 
   @typedoc """
@@ -39,7 +38,7 @@ defmodule WeChat.Pay.CombineTransactions do
 
   @doc """
   JSAPI下单 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/combine-payment/orders/jsapi-prepay.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/combine-payment/orders/jsapi-prepay.html){:target="_blank"}
 
   使用合单支付接口，用户只输入一次密码，即可完成多个订单的支付。目前最多一次可支持50笔订单进行合单支付。
   """

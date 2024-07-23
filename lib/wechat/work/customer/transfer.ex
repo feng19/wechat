@@ -5,11 +5,9 @@ defmodule WeChat.Work.Customer.Transfer do
   alias WeChat.Work
   alias Work.{User, Customer}
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @doc """
   分配在职成员的客户 -
-  [官方文档](#{@doc_link}/92125){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92125){:target="_blank"}
 
   企业可通过此接口，转接在职成员的客户给其他成员。
   """
@@ -52,7 +50,7 @@ defmodule WeChat.Work.Customer.Transfer do
 
   @doc """
   查询客户接替状态 -
-  [官方文档](#{@doc_link}/94088){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94088){:target="_blank"}
 
   企业和第三方可通过此接口查询在职成员的客户转接情况。
   """
@@ -82,7 +80,7 @@ defmodule WeChat.Work.Customer.Transfer do
 
   @doc """
   分配在职成员的客户群 -
-  [官方文档](#{@doc_link}/95703){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95703){:target="_blank"}
 
   企业可通过此接口，将在职成员为群主的群，分配给另一个客服成员。
   """
@@ -102,7 +100,7 @@ defmodule WeChat.Work.Customer.Transfer do
 
   @doc """
   获取待分配的离职成员列表 -
-  [官方文档](#{@doc_link}/92124){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92124){:target="_blank"}
 
   企业和第三方可通过此接口，获取所有离职成员的客户列表，并可进一步调用分配离职成员的客户接口将这些客户重新分配给其他企业成员。
   """
@@ -115,7 +113,7 @@ defmodule WeChat.Work.Customer.Transfer do
 
   @doc """
   分配离职成员的客户(离职继承) -
-  [官方文档](#{@doc_link}/94081){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94081){:target="_blank"}
 
   企业可通过此接口，分配离职成员的客户给其他成员。
   """
@@ -146,7 +144,7 @@ defmodule WeChat.Work.Customer.Transfer do
 
   @doc """
   查询客户接替状态(离职继承) -
-  [官方文档](#{@doc_link}/94082){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94082){:target="_blank"}
 
   企业和第三方可通过此接口查询离职成员的客户分配情况。
   """
@@ -176,7 +174,7 @@ defmodule WeChat.Work.Customer.Transfer do
 
   @doc """
   分配离职成员的客户群 -
-  [官方文档](#{@doc_link}/92127){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92127){:target="_blank"}
 
   企业可通过此接口，将已离职成员为群主的群，分配给另一个客服成员。
   """

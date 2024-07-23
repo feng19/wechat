@@ -5,11 +5,10 @@ defmodule WeChat.MemberCard do
   [官方文档](https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Membership_Cards/introduction.html){:target="_blank"}
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.Card
 
-  @create_doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Membership_Cards/Create_a_membership_card.html"
-  @mange_doc_link "#{doc_link_prefix()}/doc/offiaccount/Cards_and_Offer/Membership_Cards/Manage_Member_Card.html"
+  @create_doc_link "https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Membership_Cards/Create_a_membership_card.html"
+  @mange_doc_link "https://developers.weixin.qq.com/doc/offiaccount/Cards_and_Offer/Membership_Cards/Manage_Member_Card.html"
 
   @doc """
   创建会员卡接口 -

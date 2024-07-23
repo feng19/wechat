@@ -20,7 +20,6 @@ if Code.ensure_loaded?(Plug) do
         end
 
     """
-    import WeChat.Utils, only: [doc_link_prefix: 0]
     require Logger
     alias WeChat.{Work, Utils, Component, Storage.Cache}
     alias WeChat.ServerMessage.{Encryptor, XmlParser, ReplyMessage}
@@ -120,8 +119,8 @@ if Code.ensure_loaded?(Plug) do
     @doc """
     处理第三方平台推送通知
 
-    * [验证票据](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
-    * [授权相关推送通知](#{doc_link_prefix()}/doc/oplatform/Third-party_Platforms/api/authorize_event.html)
+    * [验证票据](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
+    * [授权相关推送通知](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/api/authorize_event.html)
     """
     def handle_component_event(_conn, client, %{"AppId" => component_appid} = message) do
       case info_type = message["InfoType"] do

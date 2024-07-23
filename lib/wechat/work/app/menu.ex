@@ -4,10 +4,8 @@ defmodule WeChat.Work.App.Menu do
   import WeChat.Work.Agent, only: [agent2id: 2]
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @doc """
-  创建菜单 - [官方文档](#{@doc_link}/90231){:target="_blank"}
+  创建菜单 - [官方文档](https://developer.work.weixin.qq.com/document/path/90231){:target="_blank"}
   """
   @spec create(Work.client(), Work.agent(), opts :: Enumerable.t()) :: WeChat.response()
   def create(client, agent, opts \\ []) do
@@ -20,7 +18,8 @@ defmodule WeChat.Work.App.Menu do
   end
 
   @doc """
-  获取菜单 - [官方文档](#{@doc_link}/90232){:target="_blank"}
+  获取菜单 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90232){:target="_blank"}
   """
   @spec get(Work.client(), Work.agent()) :: WeChat.response()
   def get(client, agent) do
@@ -34,7 +33,8 @@ defmodule WeChat.Work.App.Menu do
   end
 
   @doc """
-  删除菜单 - [官方文档](#{@doc_link}/90233){:target="_blank"}
+  删除菜单 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90233){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent()) :: WeChat.response()
   def delete(client, agent) do

@@ -6,7 +6,6 @@ defmodule WeChat.Work.KF.Message do
   alias WeChat.Work.Message, as: Msg
   alias Work.KF.Account
 
-  @doc_link WeChat.Utils.work_kf_doc_link_prefix()
   @typedoc """
   消息类型
 
@@ -48,7 +47,7 @@ defmodule WeChat.Work.KF.Message do
 
   @doc """
   获取消息 -
-  [官方文档](#{@doc_link}/94745){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94670#读取消息){:target="_blank"}
 
   客户主动发给微信客服的消息、发送消息接口发送失败事件（如被用户拒收）、客户点击菜单消息的回复消息，可以通过该接口获取具体的消息内容和事件。不支持获取通过接口发送的消息。
 
@@ -62,7 +61,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  发送消息 - [官方文档](#{@doc_link}/94744#接口定义){:target="_blank"}
+  发送消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677){:target="_blank"}
 
   当用户在主动发送消息给微信客服时，企业可在48小时内调用该接口发送消息给用户，最多可发送5条消息给客户；若用户继续发送消息，企业可再次下发消息。
   支持发送消息类型：文本、图片、语音、视频、文件、图文、小程序、菜单消息、地理位置。
@@ -102,7 +102,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  发送文本消息 - [官方文档](#{@doc_link}/94744#文本消息){:target="_blank"}
+  发送文本消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#文本消息){:target="_blank"}
   """
   @spec send_text(
           Work.client(),
@@ -117,7 +118,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  发送图片消息 - [官方文档](#{@doc_link}/94744#图片消息){:target="_blank"}
+  发送图片消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#图片消息){:target="_blank"}
   """
   @spec send_image(
           Work.client(),
@@ -132,7 +134,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  发送语音消息 - [官方文档](#{@doc_link}/94744#语音消息){:target="_blank"}
+  发送语音消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#语音消息){:target="_blank"}
   """
   @spec send_voice(
           Work.client(),
@@ -147,7 +150,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  发送视频消息 - [官方文档](#{@doc_link}/94744#视频消息){:target="_blank"}
+  发送视频消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#视频消息){:target="_blank"}
   """
   @spec send_video(
           Work.client(),
@@ -170,7 +174,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  发送文件消息 - [官方文档](#{@doc_link}/94744#文件消息){:target="_blank"}
+  发送文件消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#文件消息){:target="_blank"}
   """
   @spec send_file(
           Work.client(),
@@ -185,7 +190,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  图文链接消息 - [官方文档](#{@doc_link}/94744#图文链接消息){:target="_blank"}
+  图文链接消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#图文链接消息){:target="_blank"}
   """
   @spec send_link(Work.client(), Work.agent(), WeChat.openid(), Account.open_kfid(), msg, opts) ::
           WeChat.response()
@@ -194,7 +200,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  小程序消息 - [官方文档](#{@doc_link}/94744#小程序消息){:target="_blank"}
+  小程序消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#小程序消息){:target="_blank"}
   """
   @spec send_mini_program(
           Work.client(),
@@ -209,7 +216,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  菜单消息 - [官方文档](#{@doc_link}/94744#菜单消息){:target="_blank"}
+  菜单消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#菜单消息){:target="_blank"}
   """
   @spec send_menu(Work.client(), Work.agent(), WeChat.openid(), Account.open_kfid(), msg, opts) ::
           WeChat.response()
@@ -218,7 +226,8 @@ defmodule WeChat.Work.KF.Message do
   end
 
   @doc """
-  地理位置消息 - [官方文档](#{@doc_link}/94744#地理位置消息){:target="_blank"}
+  地理位置消息 -
+  [官方文档](https://developer.work.weixin.qq.com/document/path/94677#地理位置消息){:target="_blank"}
   """
   @spec send_location(
           Work.client(),
@@ -234,7 +243,7 @@ defmodule WeChat.Work.KF.Message do
 
   @doc """
   发送事件响应消息 -
-  [官方文档](#{@doc_link}/95123){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95122){:target="_blank"}
 
   当特定的事件回调消息包含code字段，可以此code为凭证，调用该接口给用户发送相应事件场景下的消息，如客服欢迎语。
 
@@ -257,7 +266,7 @@ defmodule WeChat.Work.KF.Message do
 
   @doc """
   发送事件响应消息[文本消息] -
-  [官方文档](#{@doc_link}/95123#文本消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95122#文本消息){:target="_blank"}
   """
   @spec send_text_on_event(Work.client(), Work.agent(), code, content, msg_id) ::
           WeChat.response()
@@ -267,7 +276,7 @@ defmodule WeChat.Work.KF.Message do
 
   @doc """
   发送事件响应消息[菜单消息] -
-  [官方文档](#{@doc_link}/95123#菜单消息){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95122#菜单消息){:target="_blank"}
   """
   @spec send_menu_on_event(Work.client(), Work.agent(), code, msg, msg_id) :: WeChat.response()
   def send_menu_on_event(client, agent, code, msg, msg_id \\ nil) do

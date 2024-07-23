@@ -3,9 +3,8 @@ defmodule WeChat.MiniProgram.Live.Goods do
   小程序 - 直播商品管理
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/liveplayer/commodity-api.html"
+  @doc_link "https://developers.weixin.qq.com/miniprogram/dev/framework/liveplayer/commodity-api.html"
 
   @typedoc "审核单ID"
   @type audit_id :: integer

@@ -1,7 +1,6 @@
 defmodule WeChat.Pay.Refund do
   @moduledoc "微信支付-退款"
   import Jason.Helpers
-  import WeChat.Utils, only: [pay_doc_link_prefix: 0]
   alias WeChat.Pay.Transactions
   @currency "CNY"
 
@@ -93,7 +92,7 @@ defmodule WeChat.Pay.Refund do
 
   @doc """
   退款申请 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/refund/refunds/create.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/refund/refunds/create.html){:target="_blank"}
 
   当交易发生之后一段时间内，由于买家或者卖家的原因需要退款时，卖家可以通过退款接口将支付款退还给买家，
   微信支付将在收到退款请求并且验证成功之后，按照退款规则将支付款按原路退到买家帐号上。
@@ -105,7 +104,7 @@ defmodule WeChat.Pay.Refund do
 
   @doc """
   查询单笔退款(通过商户退款单号) -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/refund/refunds/query-by-out-refund-no.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/refund/refunds/query-by-out-refund-no.html){:target="_blank"}
 
   提交退款申请后，通过调用该接口查询退款状态。
   退款有一定延时，建议查询退款状态在提交退款申请后1分钟发起，一般来说零钱支付的退款5分钟内到账，银行卡支付的退款1-3个工作日到账。
@@ -117,7 +116,7 @@ defmodule WeChat.Pay.Refund do
 
   @doc """
   发起异常退款 -
-  [官方文档](#{pay_doc_link_prefix()}/merchant/apis/refund/refunds/create-abnormal-refund.html){:target="_blank"}
+  [官方文档](https://pay.weixin.qq.com/docs/merchant/apis/refund/refunds/create-abnormal-refund.html){:target="_blank"}
 
   提交退款申请后，查询退款确认状态为退款异常，可调用此接口发起异常退款处理。支持退款至用户、退款至交易商户银行账户两种处理方式。
 

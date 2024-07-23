@@ -5,11 +5,9 @@ defmodule WeChat.Work.Contacts.User do
   alias WeChat.Work
   alias Work.Contacts.{Department, Tag}
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc """
   每个成员都有唯一的 userid -
-  [官方文档](#{@doc_link}/90665#userid)
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#userid)
 
   即所谓“帐号”。在管理后台->“通讯录”->点进某个成员的详情页，可以看到。
   """
@@ -27,7 +25,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   创建成员 -
-  [官方文档](#{@doc_link}/92195){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90195){:target="_blank"}
   """
   @spec create(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def create(client, agent, body) do
@@ -38,7 +36,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   读取成员 -
-  [官方文档](#{@doc_link}/92196){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90196){:target="_blank"}
 
   在通讯录同步助手中此接口可以读取企业通讯录的所有成员信息，而自建应用可以读取该应用设置的可见范围内的成员信息。
   """
@@ -51,7 +49,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   更新成员 -
-  [官方文档](#{@doc_link}/92197){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90197){:target="_blank"}
   """
   @spec update(Work.client(), Work.agent(), body :: map) :: WeChat.response()
   def update(client, agent, body) do
@@ -62,7 +60,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   删除成员 -
-  [官方文档](#{@doc_link}/92198){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90198){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), userid) :: WeChat.response()
   def delete(client, agent, userid) do
@@ -73,7 +71,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   批量删除成员 -
-  [官方文档](#{@doc_link}/92199){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90199){:target="_blank"}
 
   对应管理端的帐号。最多支持200个。若存在无效UserID，直接返回错误
   """
@@ -86,7 +84,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   获取部门成员(简要) -
-  [官方文档](#{@doc_link}/90200){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90200){:target="_blank"}
   """
   @spec list_department_users(Work.client(), Work.agent(), Department.id()) :: WeChat.response()
   def list_department_users(client, agent, department_id) do
@@ -100,7 +98,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   获取部门成员(详情) -
-  [官方文档](#{@doc_link}/90201){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90201){:target="_blank"}
   """
   @spec list_department_users_detail(Work.client(), Work.agent(), Department.id()) ::
           WeChat.response()
@@ -115,7 +113,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   userid转openid -
-  [官方文档](#{@doc_link}/90202){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90202){:target="_blank"}
 
   该接口使用场景为企业支付，在使用企业红包和向员工付款时，需要自行将企业微信的 `userid` 转成 `openid`。
 
@@ -131,7 +129,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   openid转userid -
-  [官方文档](#{@doc_link}/90202){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90202){:target="_blank"}
 
   该接口主要应用于使用企业支付之后的结果查询。
   开发者需要知道某个结果事件的 `openid` 对应企业微信内成员的信息时，可以通过调用该接口进行转换查询。
@@ -145,7 +143,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   二次验证 -
-  [官方文档](#{@doc_link}/90203){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90203){:target="_blank"}
 
   此接口可以满足安全性要求高的企业进行成员验证。开启二次验证后，当且仅当成员登录时，需跳转至企业自定义的页面进行验证。验证频率可在设置页面选择。
 
@@ -166,7 +164,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   邀请成员 -
-  [官方文档](#{@doc_link}/90975){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90975){:target="_blank"}
 
   企业可通过接口批量邀请成员使用企业微信，邀请后将通过短信或邮件下发通知。
   """
@@ -190,7 +188,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   获取加入企业二维码 -
-  [官方文档](#{@doc_link}/91714){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/91714){:target="_blank"}
 
   支持企业用户获取实时成员加入二维码。
   """
@@ -203,7 +201,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   手机号获取 userid -
-  [官方文档](#{@doc_link}/95402){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95402){:target="_blank"}
 
   通过手机号获取其所对应的userid。
   """
@@ -216,7 +214,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   邮箱获取 userid -
-  [官方文档](#{@doc_link}/95895){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/95895){:target="_blank"}
 
   通过邮箱获取其所对应的userid。
   """
@@ -232,7 +230,7 @@ defmodule WeChat.Work.Contacts.User do
 
   @doc """
   获取成员ID列表 -
-  [官方文档](#{@doc_link}/96067){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/96067){:target="_blank"}
 
   获取企业成员的userid与对应的部门ID列表，预计于2022年8月8号发布。若需要获取其他字段，参见「适配建议」。
   """

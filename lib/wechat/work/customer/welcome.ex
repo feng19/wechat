@@ -3,14 +3,12 @@ defmodule WeChat.Work.Customer.Welcome do
 
   alias WeChat.Work
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "群欢迎语的素材id"
   @type template_id :: String.t()
 
   @doc """
   发送新客户欢迎语 -
-  [官方文档](#{@doc_link}/92137){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92137){:target="_blank"}
 
   - 企业微信在向企业推送添加外部联系人事件时，会额外返回一个welcome_code，企业以此为凭据调用接口，即可通过成员向新添加的客户发送个性化的欢迎语。
   - 为了保证用户体验以及避免滥用，企业仅可在收到相关事件后20秒内调用，且只可调用一次。
@@ -27,7 +25,7 @@ defmodule WeChat.Work.Customer.Welcome do
 
   @doc """
   添加入群欢迎语素材 -
-  [官方文档](#{@doc_link}/92366#添加入群欢迎语素材){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92366#添加入群欢迎语素材){:target="_blank"}
 
   企业可通过此API向企业的入群欢迎语素材库中添加素材。每个企业的入群欢迎语素材库中，最多容纳100个素材。
   """
@@ -40,7 +38,7 @@ defmodule WeChat.Work.Customer.Welcome do
 
   @doc """
   编辑入群欢迎语素材 -
-  [官方文档](#{@doc_link}/92366#编辑入群欢迎语素材){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92366#编辑入群欢迎语素材){:target="_blank"}
 
   企业可通过此API编辑入群欢迎语素材库中的素材，且仅能够编辑调用方自己创建的入群欢迎语素材。
   """
@@ -53,7 +51,7 @@ defmodule WeChat.Work.Customer.Welcome do
 
   @doc """
   获取入群欢迎语素材 -
-  [官方文档](#{@doc_link}/92366#获取入群欢迎语素材){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92366#获取入群欢迎语素材){:target="_blank"}
 
   企业可通过此API获取入群欢迎语素材。
   """
@@ -66,7 +64,7 @@ defmodule WeChat.Work.Customer.Welcome do
 
   @doc """
   删除入群欢迎语素材 -
-  [官方文档](#{@doc_link}/92366#删除入群欢迎语素材){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/92366#删除入群欢迎语素材){:target="_blank"}
 
   企业可通过此API删除入群欢迎语素材，且仅能删除调用方自己创建的入群欢迎语素材。
   """

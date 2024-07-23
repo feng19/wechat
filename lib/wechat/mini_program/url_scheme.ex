@@ -4,7 +4,6 @@ defmodule WeChat.MiniProgram.UrlScheme do
   """
 
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
   @typedoc """
   通过 `scheme` 码进入的小程序页面路径
@@ -31,11 +30,11 @@ defmodule WeChat.MiniProgram.UrlScheme do
 
   @doc """
   生成的小程序码 -
-  [官方文档](#{doc_link_prefix()}/miniprogram/dev/api-backend/open-api/url-scheme/urlscheme.generate.html){:target="_blank"}
+  [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/url-scheme/generateScheme.html){:target="_blank"}
 
   获取小程序scheme码，适用于短信、邮件、外部网页等拉起小程序的业务场景。
   通过该接口，可以选择生成到期失效和永久有效的小程序码，目前仅针对国内非个人主体的小程序开放，
-  详见[获取URL scheme码](#{doc_link_prefix()}/miniprogram/dev/framework/open-ability/url-scheme.html){:target="_blank"}。
+  详见[获取URL scheme码](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/url-scheme.html){:target="_blank"}。
   """
   @spec create_scheme(WeChat.client(), jump_wxa, expire_time) :: WeChat.response()
   def create_scheme(client, jump_wxa, expire_time \\ nil) when is_map(jump_wxa) do

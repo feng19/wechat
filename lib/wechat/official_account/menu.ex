@@ -1,14 +1,13 @@
 defmodule WeChat.Menu do
   @moduledoc "自定义菜单"
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
 
   @typedoc "菜单id，可以通过自定义菜单查询接口获取"
   @type menu_id :: String.t()
   @typedoc "粉丝的OpenID / 粉丝的微信号"
   @type user_id :: String.t()
 
-  @doc_link "#{doc_link_prefix()}/doc/offiaccount/Custom_Menus"
+  @doc_link "https://developers.weixin.qq.com/doc/offiaccount/Custom_Menus"
 
   @doc """
   创建接口 -

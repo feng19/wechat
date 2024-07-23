@@ -1,13 +1,11 @@
 defmodule WeChat.Pay.Middleware.VerifySignature do
-  import WeChat.Utils, only: [pay_doc_link_prefix: 0]
-
   @moduledoc """
   微信支付 V3 验证签名
 
   Tesla Middleware
 
-  - [如何验证签名](#{pay_doc_link_prefix()}/merchant/development/interface-rules/signature-verification.html){:target="_blank"}
-  - [签名相关问题](#{pay_doc_link_prefix()}/merchant/development/interface-rules/signature-faqs.html){:target="_blank"}
+  - [如何验证签名](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/signature-verification.html){:target="_blank"}
+  - [签名相关问题](https://pay.weixin.qq.com/docs/merchant/development/interface-rules/signature-faqs.html){:target="_blank"}
   """
   @behaviour Tesla.Middleware
   alias WeChat.Pay.{Crypto, Certificates}

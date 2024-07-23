@@ -5,8 +5,6 @@ defmodule WeChat.Work.OA.Vacation do
   alias WeChat.Work
   alias Work.Contacts.User
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc "假期ID"
   @type vacation_id :: integer
   @typedoc """
@@ -37,7 +35,7 @@ defmodule WeChat.Work.OA.Vacation do
 
   @doc """
   获取企业假期管理配置
-  - [官方文档](#{@doc_link}/93375){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/93375){:target="_blank"}
   """
   @spec list_configs(Work.client(), Work.agent()) :: WeChat.response()
   def list_configs(client, agent) do
@@ -48,7 +46,7 @@ defmodule WeChat.Work.OA.Vacation do
 
   @doc """
   获取成员假期余额
-  - [官方文档](#{@doc_link}/93376){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/93376){:target="_blank"}
   """
   @spec get_user_quota(Work.client(), Work.agent(), User.userid()) :: WeChat.response()
   def get_user_quota(client, agent, userid) do
@@ -59,7 +57,7 @@ defmodule WeChat.Work.OA.Vacation do
 
   @doc """
   修改成员假期余额
-  - [官方文档](#{@doc_link}/93377){:target="_blank"}
+  - [官方文档](https://developer.work.weixin.qq.com/document/path/93377){:target="_blank"}
   """
   @spec set_user_quota(
           Work.client(),

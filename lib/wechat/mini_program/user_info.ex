@@ -3,15 +3,11 @@ defmodule WeChat.MiniProgram.UserInfo do
   小程序 - 用户信息
   """
   import Jason.Helpers
-  import WeChat.Utils, only: [doc_link_prefix: 0]
   alias WeChat.{Utils, ServerMessage.Encryptor}
-
-  @doc_link "#{doc_link_prefix()}/miniprogram/dev/OpenApiDoc/user-info"
-  @open_ability_doc_link "#{doc_link_prefix()}/miniprogram/dev/framework/open-ability"
 
   @doc """
   获取插件用户openpid
-  - [官方文档](#{@doc_link}/basic-info/getPluginOpenPId.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/basic-info/getPluginOpenPId.html){:target="_blank"}
   """
   @spec get_plugin_openpid(WeChat.client(), code :: String.t()) :: WeChat.response()
   def get_plugin_openpid(client, code) do
@@ -25,7 +21,7 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   检查加密信息
-  - [官方文档](#{@doc_link}/basic-info/checkEncryptedData.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/basic-info/checkEncryptedData.html){:target="_blank"}
   """
   @spec check_encrypted_data(WeChat.client(), encrypted_msg_hash :: String.t()) ::
           WeChat.response()
@@ -39,7 +35,7 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   支付后获取用户的`UnionId`
-  - [官方文档](#{@doc_link}/basic-info/getPaidUnionid.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/basic-info/getPaidUnionid.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -59,7 +55,7 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   支付后获取用户的`UnionId` - 微信支付订单号(`transaction_id`)
-  - [官方文档](#{@doc_link}/basic-info/getPaidUnionid.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/basic-info/getPaidUnionid.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -81,7 +77,7 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   支付后获取用户的`UnionId` - 微信支付商户订单号和微信支付商户号(`out_trade_no`及`mch_id`)
-  - [官方文档](#{@doc_link}/basic-info/getPaidUnionid.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/basic-info/getPaidUnionid.html){:target="_blank"}
 
   用户支付完成后，获取该用户的`UnionId`，无需用户授权.
 
@@ -108,7 +104,7 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   获取用户 EncryptKey
-  - [官方文档](#{@doc_link}/internet/getUserEncryptKey.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/internet/getUserEncryptKey.html){:target="_blank"}
   """
   @spec get_user_encrypt_key(WeChat.client(), WeChat.openid(), session_key :: String.t()) ::
           WeChat.response()
@@ -127,7 +123,7 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   手机号快速验证
-  - [官方文档](#{@doc_link}/phone-number/getPhoneNumber.html){:target="_blank"}
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-info/phone-number/getPhoneNumber.html){:target="_blank"}
   """
   @spec get_phone_number(WeChat.client(), WeChat.openid(), code :: String.t()) ::
           WeChat.response()
@@ -141,8 +137,8 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   服务端获取开放数据
-  - [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
-  - [登录流程](#{@open_ability_doc_link}/login.html)
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/signature.html){:target="_blank"}
+  - [登录流程](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html)
   """
   @spec decode_user_info(
           session_key :: String.t(),
@@ -161,9 +157,9 @@ defmodule WeChat.MiniProgram.UserInfo do
 
   @doc """
   服务端获取开放数据 - 包含敏感数据
-  - [官方文档](#{@open_ability_doc_link}/signature.html){:target="_blank"}
-  - [小程序登录](#{@open_ability_doc_link}/login.html)
-  - [加密数据解密算法](#{@open_ability_doc_link}/signature.html#加密数据解密算法)
+  - [官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/signature.html){:target="_blank"}
+  - [小程序登录](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html)
+  - [加密数据解密算法](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/signature.html#加密数据解密算法)
   """
   @spec decode_get_user_sensitive_info(
           session_key :: String.t(),

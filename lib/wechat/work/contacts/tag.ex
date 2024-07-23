@@ -5,11 +5,9 @@ defmodule WeChat.Work.Contacts.Tag do
   alias WeChat.Work
   alias Work.Contacts.{Department, User}
 
-  @doc_link WeChat.Utils.work_doc_link_prefix()
-
   @typedoc """
   每个标签都有唯一的标签id -
-  [官方文档](#{@doc_link}/90665#tagid){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90665#tagid){:target="_blank"}
 
   在管理后台->“通讯录”->“标签”，选中某个标签，在右上角会有“标签详情”按钮，点击即可看到
   """
@@ -20,7 +18,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @doc """
   创建标签 -
-  [官方文档](#{@doc_link}/90210){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90210){:target="_blank"}
   """
   @spec create(Work.client(), Work.agent(), tag_name, tag_id) :: WeChat.response()
   def create(client, agent, tag_name, tag_id \\ nil) do
@@ -38,7 +36,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @doc """
   更新标签名字 -
-  [官方文档](#{@doc_link}/90211){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90211){:target="_blank"}
   """
   @spec update(Work.client(), Work.agent(), tag_id, tag_name) :: WeChat.response()
   def update(client, agent, tag_id, tag_name) do
@@ -49,7 +47,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @doc """
   删除标签 -
-  [官方文档](#{@doc_link}/90212){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90212){:target="_blank"}
   """
   @spec delete(Work.client(), Work.agent(), tag_id) :: WeChat.response()
   def delete(client, agent, tag_id) do
@@ -60,7 +58,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @doc """
   获取标签成员 -
-  [官方文档](#{@doc_link}/90213){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90213){:target="_blank"}
   """
   @spec list_user(Work.client(), Work.agent(), tag_id) :: WeChat.response()
   def list_user(client, agent, tag_id) do
@@ -71,7 +69,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @doc """
   增加标签成员 -
-  [官方文档](#{@doc_link}/90214){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90214){:target="_blank"}
   """
   @spec add_user(
           Work.client(),
@@ -93,7 +91,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @doc """
   删除标签成员 -
-  [官方文档](#{@doc_link}/90215){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90215){:target="_blank"}
   """
   @spec delete_user(
           Work.client(),
@@ -115,7 +113,7 @@ defmodule WeChat.Work.Contacts.Tag do
 
   @doc """
   获取标签列表 -
-  [官方文档](#{@doc_link}/90216){:target="_blank"}
+  [官方文档](https://developer.work.weixin.qq.com/document/path/90216){:target="_blank"}
   """
   @spec list(Work.client(), Work.agent()) :: WeChat.response()
   def list(client, agent) do

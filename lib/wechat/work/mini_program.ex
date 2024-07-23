@@ -2,12 +2,11 @@ defmodule WeChat.Work.MiniProgram do
   @moduledoc "小程序"
 
   alias WeChat.Work
-  @doc_link WeChat.Utils.work_doc_link_prefix()
 
   @doc """
-  登录 - [官方文档](#{@doc_link}/91507){:target="_blank"}
+  登录 - [官方文档](https://developer.work.weixin.qq.com/document/path/91507){:target="_blank"}
 
-  [登录流程](#{@doc_link}/92426){:target="_blank"}
+  [登录流程](https://developer.work.weixin.qq.com/document/path/92426){:target="_blank"}
 
   临时登录凭证校验接口是一个服务端 HTTPS 接口，开发者服务器使用临时登录凭证code获取 session_key、用户userid以及用户所在企业的corpid等信息。
   """
