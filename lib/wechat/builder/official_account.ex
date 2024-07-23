@@ -35,6 +35,8 @@ defmodule WeChat.Builder.OfficialAccount do
     WeChat.Card,
     WeChat.CardManaging,
     WeChat.CardDistributing,
+    WeChat.EInvoice,
+    WeChat.InvoicingPlatform,
     WeChat.MemberCard,
     WeChat.CustomService,
     WeChat.BatchSends,

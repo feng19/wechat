@@ -90,6 +90,7 @@ defmodule WeChat.MixProject do
        ]},
       {"微信卡券 APIs",
        [WeChat.Card, WeChat.CardManaging, WeChat.CardDistributing, WeChat.MemberCard]},
+      {"电子发票 APIs", [WeChat.EInvoice, WeChat.InvoicingPlatform]},
       {"事件推送",
        [
          WeChat.Plug.EventHandler,
