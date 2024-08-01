@@ -62,7 +62,9 @@ defmodule WeChat.Builder.OfficialAccount do
     MiniProgram.Live.Room,
     MiniProgram.Live.Goods,
     MiniProgram.Live.Role,
-    MiniProgram.Live.Subscribe
+    MiniProgram.Live.Subscribe,
+    MiniProgram.UserInfo,
+    MiniProgram.SubscribeMessage
   ]
 
   defmacro __using__(options \\ []) do

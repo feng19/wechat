@@ -129,7 +129,8 @@ defmodule WeChat.MixProject do
          MiniProgram.Live.Goods,
          MiniProgram.Live.Role,
          MiniProgram.Live.Subscribe,
-         MiniProgram.UserInfo
+         MiniProgram.UserInfo,
+         MiniProgram.SubscribeMessage
        ]},
       {"企业微信 APIs",
        [
