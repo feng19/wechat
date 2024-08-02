@@ -1,5 +1,6 @@
 defmodule WeChat.Builder.Utils do
   @moduledoc false
+  require Logger
 
   def gen_code_name(client) do
     client |> to_string() |> String.split(".") |> List.last() |> String.downcase()
@@ -165,4 +166,18 @@ defmodule WeChat.Builder.Utils do
   end
 
   def handle_env_option(_, _, _), do: :not_handle
+
+  def warn_unknown_option(options, known_keys, client) when is_list(options) do
+    do_warn_unknown_option(Keyword.keys(options) -- known_keys, client)
+  end
+
+  def warn_unknown_option(options, known_keys, client) when is_map(options) do
+    do_warn_unknown_option(Map.keys(options) -- known_keys, client)
+  end
+
+  defp do_warn_unknown_option(unknown_keys, client) do
+    Enum.each(unknown_keys, fn key ->
+      Logger.warning("Found unknown option: #{key} for #{client}")
+    end)
+  end
 end

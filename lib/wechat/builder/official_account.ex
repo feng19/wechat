@@ -13,6 +13,12 @@ defmodule WeChat.Builder.OfficialAccount do
     :encoding_aes_key,
     :token
   ]
+  @known_option_keys [
+    :gen_sub_module?,
+    :component_appid,
+    :component_appsecret,
+    :appsecret | @base_option_fields
+  ]
 
   @default_opts [
     app_type: :official_account,
@@ -70,6 +76,7 @@ defmodule WeChat.Builder.OfficialAccount do
   defmacro __using__(options \\ []) do
     client = __CALLER__.module
     opts = Macro.prewalk(options, &Macro.expand(&1, __CALLER__))
+    Utils.warn_unknown_option(opts, @known_option_keys, client)
     default_opts = Keyword.merge(@default_opts, opts)
 
     unless Keyword.get(default_opts, :appid) |> is_binary() do

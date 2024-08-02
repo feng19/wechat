@@ -8,10 +8,12 @@ defmodule WeChat.Builder.Work do
     storage: WeChat.Storage.File,
     requester: WeChat.Requester.Work
   ]
+  @known_option_keys [:corp_id, :agents, :server_role, :storage, :requester]
 
   defmacro __using__(options \\ []) do
     client = __CALLER__.module
     opts = Macro.prewalk(options, &Macro.expand(&1, __CALLER__))
+    Utils.warn_unknown_option(opts, @known_option_keys, client)
     default_opts = Keyword.merge(@default_opts, opts)
 
     unless Keyword.get(default_opts, :corp_id) |> is_binary() do

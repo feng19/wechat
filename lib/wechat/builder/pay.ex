@@ -2,6 +2,15 @@ defmodule WeChat.Builder.Pay do
   @moduledoc false
   alias WeChat.Builder.Utils
   @compile {:no_warn_undefined, X509.PublicKey}
+  @known_option_keys [
+    :mch_id,
+    :api_secret_v2_key,
+    :api_secret_key,
+    :client_serial_no,
+    :client_key,
+    :requester,
+    :storage
+  ]
 
   defmacro __using__(options \\ []) do
     unless Code.ensure_loaded?(X509) do
@@ -70,6 +79,7 @@ defmodule WeChat.Builder.Pay do
 
   defp check_options!(options, client, caller) do
     options = options |> Macro.prewalk(&Macro.expand(&1, caller)) |> Map.new()
+    Utils.warn_unknown_option(options, @known_option_keys, client)
 
     unless Map.get(options, :mch_id) |> is_binary() do
       raise ArgumentError, "Please set mch_id option for #{inspect(client)}"
