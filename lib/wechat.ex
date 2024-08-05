@@ -200,11 +200,19 @@ defmodule WeChat do
   @doc "动态启动 client"
   @spec start_client(client, start_options) :: :ok
   def start_client(client, options \\ %{}) do
-    {setup_options, options} = Map.split(options, [:hub_springboard_url, :oauth2_callbacks])
-
     if match?(:work, client.app_type()) do
-      WeChat.Setup.setup_work_client(client, setup_options)
+      cond do
+        Map.has_key?(options, :all) ->
+          WeChat.Setup.setup_work_client(client, Map.take(options, [:all]))
+
+        Map.has_key?(options, :agents) ->
+          WeChat.Setup.setup_work_client(client, Map.get(options, :agents))
+
+        true ->
+          :ignore
+      end
     else
+      setup_options = Map.take(options, [:hub_springboard_url, :oauth2_callbacks])
       WeChat.Setup.setup_client(client, setup_options)
     end
 
