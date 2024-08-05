@@ -88,19 +88,21 @@ if Code.ensure_loaded?(Plug) do
 
     # special client & single agent
     def init_plug_clients(opts = %{client: client, agent: agent}, _plug)
-        when is_atom(client) and is_atom(agent) do
+        when is_atom(client) and (is_atom(agent) or is_binary(agent)) do
       opts
     end
 
     # runtime client and special agents
     def init_plug_clients(opts = %{client: {:runtime, _persistent_id}, agent: agent}, _plug)
-        when is_atom(agent),
-        do: opts
+        when is_atom(agent) or is_binary(agent) do
+      opts
+    end
 
     # special client and runtime agents
     def init_plug_clients(opts = %{client: client, agents: {:runtime, _persistent_id}}, _plug)
-        when is_atom(client),
-        do: opts
+        when is_atom(client) do
+      opts
+    end
 
     def init_plug_clients(%{client: client, agents: :runtime} = opts, plug)
         when is_atom(client) do
