@@ -79,7 +79,7 @@ defmodule WeChat.Builder.OfficialAccount do
     Utils.warn_unknown_option(opts, @known_option_keys, client)
     default_opts = Keyword.merge(@default_opts, opts)
 
-    unless Keyword.get(default_opts, :appid) |> is_binary() do
+    if !(Keyword.get(default_opts, :appid) |> is_binary()) do
       raise ArgumentError, "please set appid option for #{inspect(client)}"
     end
 
@@ -101,7 +101,7 @@ defmodule WeChat.Builder.OfficialAccount do
 
     {sub_modules, default_opts} =
       if Keyword.get(default_opts, :by_component?, false) do
-        unless Keyword.has_key?(default_opts, :component_appid) do
+        if !Keyword.has_key?(default_opts, :component_appid) do
           raise ArgumentError, "please set :component_appid when setting by_component?: true"
         end
 

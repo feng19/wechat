@@ -13,7 +13,7 @@ defmodule WeChat.Builder.Pay do
   ]
 
   defmacro __using__(options \\ []) do
-    unless Code.ensure_loaded?(X509) do
+    if !Code.ensure_loaded?(X509) do
       raise ArgumentError, "Please add :x509 to deps before use WeChatPay!!!"
     end
 
@@ -81,11 +81,11 @@ defmodule WeChat.Builder.Pay do
     options = options |> Macro.prewalk(&Macro.expand(&1, caller)) |> Map.new()
     Utils.warn_unknown_option(options, @known_option_keys, client)
 
-    unless Map.get(options, :mch_id) |> is_binary() do
+    if !(Map.get(options, :mch_id) |> is_binary()) do
       raise ArgumentError, "Please set mch_id option for #{inspect(client)}"
     end
 
-    unless Map.get(options, :client_serial_no) |> is_binary() do
+    if !(Map.get(options, :client_serial_no) |> is_binary()) do
       raise ArgumentError, "Please set client_serial_no option for #{inspect(client)}"
     end
 

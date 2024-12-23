@@ -139,7 +139,8 @@ defmodule WeChat.Work.Agent do
          true <- Enum.any?(agents, &match?(%{cache_id: nil}, &1)) do
       agents
       |> Enum.all?(&is_struct(&1, __MODULE__))
-      |> unless do
+      |> Kernel.!()
+      |> if do
         raise ArgumentError, "please set WeChat.Work.Agent struct for :agents option"
       end
 
@@ -159,7 +160,7 @@ defmodule WeChat.Work.Agent do
          {:ok, configs} <- Application.fetch_env(:wechat, client),
          {:ok, agents} <- Keyword.fetch(configs, :agents) do
       agent =
-        unless agent.cache_id do
+        if !agent.cache_id do
           corp_id = client.appid()
           Map.put(agent, :cache_id, "#{corp_id}_#{agent.id}")
         else

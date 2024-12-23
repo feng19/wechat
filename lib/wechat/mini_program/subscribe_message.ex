@@ -14,7 +14,10 @@ defmodule WeChat.MiniProgram.SubscribeMessage do
   defdelegate delete_template(client, pri_tmpl_id), to: WeChat.SubscribeMessage
   defdelegate get_category(client), to: WeChat.SubscribeMessage
   defdelegate get_pub_template_key_words_by_id(client, tid), to: WeChat.SubscribeMessage
-  defdelegate get_pub_template_titles(client, ids, start \\ 0, limit \\ 30), to: WeChat.SubscribeMessage
+
+  defdelegate get_pub_template_titles(client, ids, start \\ 0, limit \\ 30),
+    to: WeChat.SubscribeMessage
+
   defdelegate get_templates(client), to: WeChat.SubscribeMessage
   defdelegate send(client, openid, template_id, data, options \\ %{}), to: WeChat.SubscribeMessage
 

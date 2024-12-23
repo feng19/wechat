@@ -51,7 +51,7 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   defp check_secret(client, fun) do
     if client.server_role() != :hub_client do
-      unless function_exported?(client, fun, 0) do
+      if !function_exported?(client, fun, 0) do
         raise RuntimeError, "Please set :appsecret when defining #{inspect(client)}."
       end
     end

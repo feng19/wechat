@@ -16,7 +16,7 @@ defmodule WeChat.Builder.Work do
     Utils.warn_unknown_option(opts, @known_option_keys, client)
     default_opts = Keyword.merge(@default_opts, opts)
 
-    unless Keyword.get(default_opts, :corp_id) |> is_binary() do
+    if !(Keyword.get(default_opts, :corp_id) |> is_binary()) do
       raise ArgumentError, "please set corp_id option for #{inspect(client)}"
     end
 
@@ -33,7 +33,8 @@ defmodule WeChat.Builder.Work do
 
           agents
           |> Enum.all?(&is_struct(&1, WeChat.Work.Agent))
-          |> unless do
+          |> Kernel.!()
+          |> if do
             raise ArgumentError, "please set WeChat.Work.Agent struct for :agents option"
           end
 
