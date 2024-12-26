@@ -184,17 +184,23 @@ defmodule WeChat do
   @doc "动态构建 client"
   @spec build_client(client, options) :: {:ok, client}
   def build_client(client, options) do
-    with {:module, module, _binary, _term} <-
-           Module.create(
-             client,
-             quote do
-               @moduledoc false
-               use WeChat.Builder.OfficialAccount, unquote(Macro.escape(options))
-             end,
-             Macro.Env.location(__ENV__)
-           ) do
-      {:ok, module}
-    end
+    Code.compiler_options(ignore_module_conflict: true)
+
+    result =
+      with {:module, module, _binary, _term} <-
+             Module.create(
+               client,
+               quote do
+                 @moduledoc false
+                 use WeChat.Builder.OfficialAccount, unquote(Macro.escape(options))
+               end,
+               Macro.Env.location(__ENV__)
+             ) do
+        {:ok, module}
+      end
+
+    Code.compiler_options(ignore_module_conflict: false)
+    result
   end
 
   @doc "动态启动 client"
