@@ -44,15 +44,17 @@ defmodule WeChat.MixProject do
 
   defp docs do
     [
-      extras: [
-        "LICENSE.md": [title: "License"],
-        "README.md": [title: "Overview"]
-      ],
       main: "readme",
       source_url: @source_url,
       source_ref: "master",
       formatters: ["html"],
       formatter_opts: [gfm: true],
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
+      extras: [
+        "LICENSE.md": [title: "License"],
+        "README.md": [title: "Overview"],
+        "CHANGELOG.md": [title: "Changelog"]
+      ],
       groups_for_modules: groups_for_modules(),
       groups_for_docs: [Action: &(&1[:doc_group] == :action)],
       nest_modules_by_prefix: [
