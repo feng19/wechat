@@ -73,17 +73,11 @@ WeChat.add_to_refresher(YourApp.WeChatAppCodeName)
 
 ### 调用接口
 
-定义的 `client`，支持以下两种调用形式:
-
-- 调用 `client` 方法:
-
-  `YourApp.WeChatAppCodeName.Material.batch_get_material(:image, 2)`
-
-- 原生调用方法
-
   `WeChat.Material.batch_get_material(YourApp.WeChatAppCodeName, :image, 2)`
 
 更多详情请见：[WeChat模块](https://hexdocs.pm/wechat_sdk/WeChat.html)
+
+**从 `0.17` 开始不再推荐 `Client.Material.batch_get_material/2` 子模块的调用方式**
 
 ## 网页授权
 

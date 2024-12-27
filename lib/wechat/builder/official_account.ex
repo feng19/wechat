@@ -119,7 +119,7 @@ defmodule WeChat.Builder.OfficialAccount do
         }
       end
 
-    if Keyword.get(opts, :gen_sub_module?, true) do
+    if Keyword.get(opts, :gen_sub_module?, false) do
       gen_get_functions(default_opts, client) ++ Utils.gen_sub_modules(sub_modules, client)
     else
       gen_get_functions(default_opts, client)

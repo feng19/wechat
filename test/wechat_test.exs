@@ -55,7 +55,8 @@ defmodule WeChatTest do
       appid: "wx2c2769f8efd9abc2",
       appsecret: "appsecret",
       encoding_aes_key: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG",
-      token: "spamtest"
+      token: "spamtest",
+      gen_sub_module?: true
     ]
 
     assert {:ok, WxApp3} = WeChat.build_client(WxApp3, opts)
@@ -71,7 +72,8 @@ defmodule WeChatTest do
       component_appid: "wx3c2769f8efd9abc3",
       appsecret: "appsecret",
       encoding_aes_key: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG",
-      token: "spamtest"
+      token: "spamtest",
+      gen_sub_module?: true
     ]
 
     assert {:ok, WxApp4} = WeChat.build_client(WxApp4, opts)
@@ -87,7 +89,8 @@ defmodule WeChatTest do
       appid: "wx2c2769f8efd9abc2",
       appsecret: "appsecret",
       encoding_aes_key: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG",
-      token: "spamtest"
+      token: "spamtest",
+      gen_sub_module?: true
     ]
 
     assert {:ok, WxApp5} = WeChat.build_client(WxApp5, opts)

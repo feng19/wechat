@@ -4,8 +4,7 @@ defmodule WeChat.Test.OfficialAccount do
     appid: "wx2c2769f8efd9abc2",
     appsecret: "appsecret",
     encoding_aes_key: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG",
-    token: "spamtest",
-    gen_sub_module?: false
+    token: "spamtest"
 end
 
 defmodule WeChat.Test.DynamicSecretA do
@@ -14,8 +13,7 @@ defmodule WeChat.Test.DynamicSecretA do
     appid: "wx2c2769f8efd9abc2",
     appsecret: :runtime_env,
     encoding_aes_key: :compile_env,
-    token: {:compile_env, :wechat},
-    gen_sub_module?: false
+    token: {:compile_env, :wechat}
 end
 
 defmodule WeChat.Test.Component do
@@ -24,7 +22,8 @@ defmodule WeChat.Test.Component do
     appid: "wx2c2769f8efd9abc2",
     by_component?: true,
     component_appid: "wx3c2769f8efd9abc3",
-    component_appsecret: "component_appsecret"
+    component_appsecret: "component_appsecret",
+    gen_sub_module?: true
 end
 
 defmodule WeChat.Test.DynamicSecretB do
@@ -33,14 +32,16 @@ defmodule WeChat.Test.DynamicSecretB do
     appid: "wx2c2769f8efd9abc2",
     by_component?: true,
     component_appid: "wx3c2769f8efd9abc3",
-    component_appsecret: :runtime_env
+    component_appsecret: :runtime_env,
+    gen_sub_module?: true
 end
 
 defmodule WeChat.Test.Mini do
   @moduledoc "小程序"
   use WeChat,
     appid: "wx2c2769f8efd9abc2",
-    app_type: :mini_program
+    app_type: :mini_program,
+    gen_sub_module?: true
 end
 
 defmodule WeChat.Test.MiniComponent do
@@ -50,7 +51,8 @@ defmodule WeChat.Test.MiniComponent do
     app_type: :mini_program,
     by_component?: true,
     component_appid: "wx3c2769f8efd9abc3",
-    component_appsecret: "component_appsecret"
+    component_appsecret: "component_appsecret",
+    gen_sub_module?: true
 end
 
 defmodule WeChat.Test.Work do

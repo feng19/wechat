@@ -135,7 +135,7 @@ defmodule WeChat do
   - `encoding_aes_key`: 在编译时会自动将 `encoding_aes_key` 转换为 `aes_key`
   - `token`: Token
   - `requester`: 请求客户端, 默认值: `WeChat.Requester`
-  - `gen_sub_module?`: 是否生成子模块，默认值: true
+  - `gen_sub_module?`: 是否生成子模块，默认值: false
   - `sub_modules`: 指定生成子模块的列表
   """
   @type options :: [
