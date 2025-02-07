@@ -41,7 +41,7 @@ defmodule WeChat.ServerMessage.ReplyMessage do
     <ToUserName><![CDATA[toUser]]></ToUserName>
     <FromUserName><![CDATA[fromUser]]></FromUserName>
     <CreateTime>12345678</CreateTime>
-    <MsgType>text></MsgType>
+    <MsgType><![CDATA[text]]></MsgType>
     <Content><![CDATA[你好]]></Content>
   </xml>
   ```
@@ -52,7 +52,7 @@ defmodule WeChat.ServerMessage.ReplyMessage do
       <ToUserName><![CDATA[<%= to_openid %>]]></ToUserName>
       <FromUserName><![CDATA[<%= from_wx_no %>]]></FromUserName>
       <CreateTime><%= timestamp %></CreateTime>
-      <MsgType>text</MsgType>
+      <MsgType><![CDATA[text]]></MsgType>
       <Content><![CDATA[<%= content %>]]></Content>
     </xml>
     """
