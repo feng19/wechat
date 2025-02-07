@@ -357,6 +357,27 @@ defmodule WeChat.Refresher.Default do
     end
   end
 
+  def ensure_authorizer_refresh_token(client) do
+    appid = client.appid()
+    store_id = appid
+    store_key = :authorizer_refresh_token
+    case restore_and_cache(store_id, store_key, client) do
+      false ->
+        Logger.error(
+          "Attention: #{inspect(appid)}'s authorizer_refresh_token is expired because it has not been refreshed for too long, you can use api_get_authorizer_list API to refresh it"
+        )
+
+        {:error, "authorizer_refresh_token expired"}
+
+      {true, _expires_in} ->
+        Logger.info(
+          "Restore #{inspect(appid)}'s authorizer_refresh_token succeed."
+        )
+
+        :ok
+    end
+  end
+
   defp init_client_options(client, options) do
     Logger.info(
       "Initialize WeChat Client: #{inspect(client)} by AppType: #{client.app_type()}, Storage: #{inspect(client.storage())}."

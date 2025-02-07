@@ -5,6 +5,7 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   require Logger
   alias WeChat.{Account, WebPage, Component, MiniProgram, Work, Utils, Storage.Cache}
+  alias WeChat.Refresher.Default
 
   @type key_name :: atom
   @type token :: String.t()
@@ -236,6 +237,7 @@ defmodule WeChat.Refresher.DefaultSettings do
   @spec refresh_authorizer_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_authorizer_access_token(client) do
     with :ignore <- get_token_for_hub_client(client, :access_token),
+         :ok <- Default.ensure_authorizer_refresh_token(client),
          {:ok, %{status: 200, body: data}} <- Component.authorizer_token(client),
          %{
            "authorizer_access_token" => authorizer_access_token,
