@@ -281,7 +281,7 @@ defmodule WeChat.Refresher.Default do
   @impl true
   def handle_cast({:refresh_key, client, store_id, store_key, value, expires}, state) do
     cache_and_store(store_id, store_key, value, expires, client)
-    {:ok, state}
+    {:noreply, state}
   end
 
   @impl true
