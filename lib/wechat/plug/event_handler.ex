@@ -97,7 +97,7 @@ if Code.ensure_loaded?(Plug) do
 
       event_parser =
         case Map.fetch(opts, :event_parser) do
-          {:ok, parser} when is_function(parser, 4) ->
+          {:ok, parser} when is_function(parser, 3) ->
             parser
 
           {:ok, :auto} ->
