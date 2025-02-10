@@ -5,7 +5,6 @@ defmodule WeChat.Refresher.DefaultSettings do
 
   require Logger
   alias WeChat.{Account, WebPage, Component, MiniProgram, Work, Utils, Storage.Cache}
-  alias WeChat.Refresher.Default
 
   @type key_name :: atom
   @type token :: String.t()
@@ -237,8 +236,10 @@ defmodule WeChat.Refresher.DefaultSettings do
   @spec refresh_authorizer_access_token(WeChat.client()) :: refresh_fun_result
   def refresh_authorizer_access_token(client) do
     with :ignore <- get_token_for_hub_client(client, :access_token),
-         :ok <- Default.ensure_authorizer_refresh_token(client),
-         {:ok, %{status: 200, body: data}} <- Component.authorizer_token(client),
+         authorizer_refresh_token when authorizer_refresh_token != nil <-
+           ensure_authorizer_refresh_token(client),
+         {:ok, %{status: 200, body: data}} <-
+           Component.authorizer_token(client, authorizer_refresh_token),
          %{
            "authorizer_access_token" => authorizer_access_token,
            "authorizer_refresh_token" => authorizer_refresh_token,
@@ -251,6 +252,31 @@ defmodule WeChat.Refresher.DefaultSettings do
       ]
 
       {:ok, list, expires_in}
+    end
+  end
+
+  defp ensure_authorizer_refresh_token(client) do
+    appid = client.appid()
+
+    case Cache.get_cache(appid, :authorizer_refresh_token) do
+      nil ->
+        with storage when storage != nil <- client.storage(),
+             {:ok, %{"value" => authorizer_refresh_token, "expired_time" => expires}} <-
+               storage.restore(appid, :authorizer_refresh_token),
+             diff <- expires - Utils.now_unix(),
+             true <- diff > 0 do
+          authorizer_refresh_token
+        else
+          _ ->
+            Logger.error(
+              "authorizer_refresh_token is expired or missing, call WeChat.Component.get_authorizer_list to get it."
+            )
+
+            nil
+        end
+
+      authorizer_refresh_token ->
+        authorizer_refresh_token
     end
   end
 

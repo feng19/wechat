@@ -19,7 +19,7 @@ defmodule WeChat.Component do
   @type auth_type :: 1 | 2 | 3
   @type biz_appid :: WeChat.appid()
 
-  @doc_link "https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/api"
+  @doc_link "https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api"
 
   @typedoc """
   选项名称及可选值说明 -
@@ -39,7 +39,7 @@ defmodule WeChat.Component do
 
   @doc """
   生成授权链接 -
-  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Authorization_Process_Technical_Description.html){:target="_blank"}
+  [官方文档](#{@doc_link}/Before_Develop/Authorization_Process_Technical_Description.html){:target="_blank"}
   """
   @spec bind_component_url(WeChat.client(), redirect_uri :: String.t(), auth_type() | biz_appid()) ::
           url :: String.t() | WeChat.response()
@@ -73,7 +73,7 @@ defmodule WeChat.Component do
 
   @doc """
   查询接口调用次数 -
-  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/get_api_quota.html){:target="_blank"}
+  [官方文档](#{@doc_link}/openApi/get_api_quota.html){:target="_blank"}
 
   [接口调用频次限制说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
@@ -88,7 +88,7 @@ defmodule WeChat.Component do
 
   @doc """
   接口调用次数清零 -
-  [官方文档](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/api/openApi/clear_quota.html){:target="_blank"}
+  [官方文档](#{@doc_link}/openApi/clear_quota.html){:target="_blank"}
 
   [接口调用频次限制说明](https://developers.weixin.qq.com/doc/offiaccount/Message_Management/API_Call_Limits.html){:target="_blank"}
   """
@@ -105,13 +105,13 @@ defmodule WeChat.Component do
 
   @doc """
   获取令牌 -
-  [官方文档](#{@doc_link}/component_access_token.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/token/component_access_token.html){:target="_blank"}
   """
   @spec get_component_token(WeChat.client()) :: WeChat.response()
   def get_component_token(client) do
-    client.component_appid()
-    |> Cache.get_cache(:component_verify_ticket)
-    |> case do
+    component_appid = client.component_appid()
+
+    case Cache.get_cache(component_appid, :component_verify_ticket) do
       nil -> {:error, :missing_component_verify_ticket}
       ticket -> get_component_token(client, ticket)
     end
@@ -119,10 +119,10 @@ defmodule WeChat.Component do
 
   @doc """
   获取令牌 -
-  [官方文档](#{@doc_link}/component_access_token.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/token/component_access_token.html){:target="_blank"}
 
   ## ticket 来源
-    [验证票据](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/api/component_verify_ticket.html)
+    [验证票据](#{@doc_link}/ThirdParty/token/component_verify_ticket.html){:target="_blank"}
   """
   @spec get_component_token(WeChat.client(), ticket :: String.t()) :: WeChat.response()
   def get_component_token(client, ticket) do
@@ -138,7 +138,7 @@ defmodule WeChat.Component do
 
   @doc """
   获取预授权码 -
-  [官方文档](#{@doc_link}/pre_auth_code.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/token/pre_auth_code.html){:target="_blank"}
   """
   @spec create_pre_auth_code(WeChat.client()) :: WeChat.response()
   def create_pre_auth_code(client) do
@@ -153,7 +153,7 @@ defmodule WeChat.Component do
 
   @doc """
   使用授权码获取授权信息 -
-  [官方文档](#{@doc_link}/authorization_info.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/token/authorization_info.html){:target="_blank"}
   """
   @spec query_auth(WeChat.client(), authorization_code :: String.t()) :: WeChat.response()
   def query_auth(client, authorization_code) do
@@ -171,31 +171,42 @@ defmodule WeChat.Component do
 
   @doc """
   获取/刷新接口调用令牌 -
-  [官方文档](#{@doc_link}/api_authorizer_token.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/token/api_authorizer_token.html){:target="_blank"}
   """
-  @spec authorizer_token(WeChat.client()) :: nil | WeChat.response()
+  @spec authorizer_token(WeChat.client()) :: WeChat.response()
   def authorizer_token(client) do
     appid = client.appid()
 
-    with authorizer_refresh_token when authorizer_refresh_token != nil <-
-           Cache.get_cache(appid, :authorizer_refresh_token) do
-      component_appid = client.component_appid()
-
-      client.post(
-        "/cgi-bin/component/api_authorizer_token",
-        json_map(
-          component_appid: component_appid,
-          authorizer_appid: appid,
-          authorizer_refresh_token: authorizer_refresh_token
-        ),
-        query: [component_access_token: get_access_token(component_appid)]
-      )
+    case Cache.get_cache(appid, :authorizer_refresh_token) do
+      nil -> {:error, :missing_authorizer_refresh_token}
+      authorizer_refresh_token -> authorizer_token(client, authorizer_refresh_token)
     end
   end
 
   @doc """
+  获取/刷新接口调用令牌 -
+  [官方文档](#{@doc_link}/ThirdParty/token/api_authorizer_token.html){:target="_blank"}
+  """
+  @spec authorizer_token(WeChat.client(), authorizer_refresh_token :: String.t()) ::
+          WeChat.response()
+  def authorizer_token(client, authorizer_refresh_token) do
+    appid = client.appid()
+    component_appid = client.component_appid()
+
+    client.post(
+      "/cgi-bin/component/api_authorizer_token",
+      json_map(
+        component_appid: component_appid,
+        authorizer_appid: appid,
+        authorizer_refresh_token: authorizer_refresh_token
+      ),
+      query: [component_access_token: get_access_token(component_appid)]
+    )
+  end
+
+  @doc """
   获取授权方的帐号基本信息 -
-  [官方文档](#{@doc_link}/api_get_authorizer_info.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/token/api_get_authorizer_info.html){:target="_blank"}
   """
   @spec get_authorizer_info(WeChat.client()) :: WeChat.response()
   def get_authorizer_info(client) do
@@ -210,7 +221,7 @@ defmodule WeChat.Component do
 
   @doc """
   获取授权方选项信息 -
-  [官方文档](#{@doc_link}/api_get_authorizer_option.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/Account_Authorization/api_get_authorizer_option.html){:target="_blank"}
   """
   @spec get_authorizer_option(WeChat.client(), option_name) :: WeChat.response()
   def get_authorizer_option(client, option_name) do
@@ -229,7 +240,7 @@ defmodule WeChat.Component do
 
   @doc """
   拉取所有已授权的帐号信息 -
-  [官方文档](#{@doc_link}/api_get_authorizer_list.html){:target="_blank"}
+  [官方文档](#{@doc_link}/ThirdParty/Account_Authorization/api_get_authorizer_list.html){:target="_blank"}
   """
   @spec get_authorizer_list(WeChat.client(), offset :: integer, count :: integer) ::
           WeChat.response()
