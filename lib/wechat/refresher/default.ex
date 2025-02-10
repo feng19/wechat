@@ -281,7 +281,7 @@ defmodule WeChat.Refresher.Default do
   @impl true
   def handle_cast({:refresh_key, client, store_id, store_key, value, expires}, state) do
     cache_and_store(store_id, store_key, value, expires, client)
-    {:ok, state}
+    {:noreply, state}
   end
 
   @impl true
@@ -354,6 +354,27 @@ defmodule WeChat.Refresher.Default do
         )
 
         false
+    end
+  end
+
+  def ensure_authorizer_refresh_token(client) do
+    appid = client.appid()
+    store_id = appid
+    store_key = :authorizer_refresh_token
+    case restore_and_cache(store_id, store_key, client) do
+      false ->
+        Logger.error(
+          "Attention: #{inspect(appid)}'s authorizer_refresh_token is expired because it has not been refreshed for too long, you can use api_get_authorizer_list API to refresh it"
+        )
+
+        {:error, "authorizer_refresh_token expired"}
+
+      {true, _expires_in} ->
+        Logger.info(
+          "Restore #{inspect(appid)}'s authorizer_refresh_token succeed."
+        )
+
+        :ok
     end
   end
 

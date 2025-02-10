@@ -243,7 +243,11 @@ if Code.ensure_loaded?(Plug) do
     @spec decrypt_xml_msg(encrypt_content, params, WeChat.client()) ::
             {:ok, :encrypted, xml_string} | {:error, String.t()}
     def decrypt_xml_msg(encrypt_content, params, client) do
-      decrypt_xml_msg(encrypt_content, params, client.appid(), client.token(), client.aes_key())
+      if client.by_component? do
+        decrypt_xml_msg(encrypt_content, params, client.component_appid(), client.token(), client.aes_key())
+      else
+        decrypt_xml_msg(encrypt_content, params, client.appid(), client.token(), client.aes_key())
+      end
     end
 
     @spec decrypt_xml_msg(
@@ -288,12 +292,20 @@ if Code.ensure_loaded?(Plug) do
 
     @spec encrypt_xml_msg(xml_string, timestamp, WeChat.client()) :: String.t()
     def encrypt_xml_msg(xml_string, timestamp, client) do
-      encrypt_xml_msg(xml_string, timestamp, client.appid(), client.token(), client.aes_key())
+      if client.by_component? do
+        encrypt_xml_msg(xml_string, timestamp, client.component_appid(), client.token(), client.aes_key())
+      else
+        encrypt_xml_msg(xml_string, timestamp, client.appid(), client.token(), client.aes_key())
+      end
     end
 
     @spec encrypt_xml_msg(xml_string, timestamp, WeChat.client(), Work.Agent.t()) :: String.t()
     def encrypt_xml_msg(xml_string, timestamp, client, agent) do
-      encrypt_xml_msg(xml_string, timestamp, client.appid(), agent.token, agent.aes_key)
+      if client.by_component? do
+        encrypt_xml_msg(xml_string, timestamp, client.component_appid(), agent.token, agent.aes_key)
+      else
+        encrypt_xml_msg(xml_string, timestamp, client.appid(), agent.token, agent.aes_key)
+      end
     end
 
     @spec encrypt_xml_msg(
