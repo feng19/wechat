@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.18.0]
+- 解决在第三方平台下的 bugs
+- 更新 `WeChat.Component` 模块文档
+
 ## [0.17.0]
 - 不再推荐使用子模块的调用方式
 - `gen_sub_module?` 默认值设置为 `false`
