@@ -208,7 +208,10 @@ defmodule WeChat.MixProject do
       files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
       maintainers: ["feng19"],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => @source_url}
+      links: %{
+        "GitHub" => @source_url,
+        "Changelog" => "https://hexdocs.pm/wechat_sdk/changelog.html"
+      }
     ]
   end
 end
