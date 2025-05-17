@@ -1,6 +1,6 @@
 defmodule WeChat.Plug.HubExposerTest do
   use ExUnit.Case, async: true
-  use Plug.Test
+  import Plug.Test
   alias WeChat.Plug.HubExposer
   alias WeChat.HubExposerRouter
   alias WeChat.Work.Agent, as: WorkAgent

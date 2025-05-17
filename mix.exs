@@ -2,7 +2,7 @@ defmodule WeChat.MixProject do
   use Mix.Project
   alias WeChat.{Requester, Refresher, ServerMessage, Storage, MiniProgram, Work, Pay}
 
-  @version "0.18.0"
+  @version "0.18.1"
   @source_url "https://github.com/feng19/wechat"
 
   def project do
@@ -46,7 +46,7 @@ defmodule WeChat.MixProject do
     [
       main: "readme",
       source_url: @source_url,
-      source_ref: "master",
+      source_ref: "v#{@version}",
       formatters: ["html"],
       formatter_opts: [gfm: true],
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
@@ -205,7 +205,7 @@ defmodule WeChat.MixProject do
     [
       name: "wechat_sdk",
       description: "WeChat SDK for Elixir, 支持: 公众号/小程序/第三方应用/企业微信/微信支付",
-      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
+      files: ~w"lib mix.exs README.md LICENSE.md",
       maintainers: ["feng19"],
       licenses: ["Apache-2.0"],
       links: %{

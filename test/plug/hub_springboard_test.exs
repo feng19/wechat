@@ -1,6 +1,7 @@
 defmodule WeChat.Plug.HubSpringboardTest do
   use ExUnit.Case, async: true
-  use Plug.Test
+  import Plug.Conn
+  import Plug.Test
   alias WeChat.HubServer
   alias WeChat.Storage.Cache
   alias WeChat.Plug.HubSpringboard

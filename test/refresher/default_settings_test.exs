@@ -3,6 +3,8 @@ defmodule WeChat.Refresher.DefaultSettingsTest do
   alias WeChat.Refresher.DefaultSettings
   alias WeChat.Test.{OfficialAccount, Component}
 
+  @moduletag :capture_log
+
   setup_all do
     WeChat.Test.Mock.mock()
   end

@@ -19,7 +19,10 @@ defmodule WeChat.MiniProgram.SubscribeMessage do
     to: WeChat.SubscribeMessage
 
   defdelegate get_templates(client), to: WeChat.SubscribeMessage
-  defdelegate send(client, openid, template_id, data, options \\ %{}), to: WeChat.SubscribeMessage
+
+  defdelegate send(client, openid, template_id, data, options \\ %{}),
+    to: WeChat.SubscribeMessage,
+    as: :send_mini
 
   @doc """
   激活与更新服务卡片 -

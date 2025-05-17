@@ -4,6 +4,8 @@ defmodule WeChat.Refresher.DefaultTest do
   alias WeChat.Storage.Cache
   alias WeChat.Test.{OfficialAccount, Component, MiniComponent}
 
+  @moduletag :capture_log
+
   setup_all do
     WeChat.Test.Mock.mock()
   end

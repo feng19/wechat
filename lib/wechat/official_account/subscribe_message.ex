@@ -166,16 +166,44 @@ defmodule WeChat.SubscribeMessage do
   - [公众号](https://developers.weixin.qq.com/doc/offiaccount/Subscription_Messages/api.html#send发送订阅通知){:target="_blank"}
   - [小程序](https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/mp-message-management/subscribe-message/sendMessage.html){:target="_blank"}
   """
-  @spec send(WeChat.client(), WeChat.openid(), template_id, send_data, send_options) ::
+  case Module.split(__MODULE__) do
+    [_, _] ->
+      @spec send(WeChat.client(), WeChat.openid(), template_id, send_data, send_options) ::
+              WeChat.response()
+      def send(client, openid, template_id, data, options \\ %{}) do
+        case client.app_type() do
+          :official_account -> send_oa(client, openid, template_id, data, options)
+          :mini_program -> send_mini(client, openid, template_id, data, options)
+        end
+      end
+
+    # as official_account sub_module
+    _ ->
+      @spec send(WeChat.openid(), template_id, send_data, send_options) :: WeChat.response()
+      def send(openid, template_id, data, options \\ %{}) do
+        send_oa(openid, template_id, data, options)
+      end
+  end
+
+  @spec send_oa(WeChat.client(), WeChat.openid(), template_id, send_data, send_options) ::
           WeChat.response()
-  def send(client, openid, template_id, data, options \\ %{}) do
+  def send_oa(client, openid, template_id, data, options \\ %{}) do
     data = Enum.into(data, %{}, fn {k, v} -> {k, %{value: v}} end)
 
-    case client.app_type() do
-      :official_account -> "/cgi-bin/message/subscribe/bizsend"
-      :mini_program -> "/cgi-bin/message/subscribe/send"
-    end
-    |> client.post(
+    client.post(
+      "/cgi-bin/message/subscribe/bizsend",
+      Map.merge(options, %{touser: openid, template_id: template_id, data: data}),
+      query: [access_token: client.get_access_token()]
+    )
+  end
+
+  @spec send_mini(WeChat.client(), WeChat.openid(), template_id, send_data, send_options) ::
+          WeChat.response()
+  def send_mini(client, openid, template_id, data, options \\ %{}) do
+    data = Enum.into(data, %{}, fn {k, v} -> {k, %{value: v}} end)
+
+    client.post(
+      "/cgi-bin/message/subscribe/send",
       Map.merge(options, %{touser: openid, template_id: template_id, data: data}),
       query: [access_token: client.get_access_token()]
     )

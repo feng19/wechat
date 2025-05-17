@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.18.1 (2025-05-17)
+- fix SubscribeMessage module warning: clause will never match
+- update deps
+
 ## v0.18.0 (2025-03-14)
 - 解决在第三方平台下的 bugs
 - 更新 `WeChat.Component` 模块文档
